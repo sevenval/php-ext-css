@@ -1,0 +1,15 @@
+language: php
+
+php:
+    - 7.0
+    - 7.1
+    - nightly
+
+script:
+    - phpize
+    - ./configure
+    - make
+    - export NO_INTERACTION=1
+    - export REPORT_EXIT_STATUS=1
+    - export TEST_PHP_EXECUTABLE=`which php`
+    - php -n run-tests.php -n -d extension_dir=./modules/ -d extension=extcss3.so --show-diff
