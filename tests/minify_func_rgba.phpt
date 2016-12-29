@@ -1,5 +1,7 @@
 --TEST--
 Test CSS3Processor::minify() method for CSS rgb[a]() function
+--SKIPIF--
+<?php if(true) echo 'skip'; ?>
 --FILE--
 <?php
 

@@ -699,9 +699,16 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 				return NULL;
 			}
 		} else if (value->type == EXTCSS3_TYPE_FUNCTION) {
+			// RGB and RGBA version:
+			//if (
+			//	((value->data.len == 3) || (value->data.len == 4)) &&
+			//	(strncasecmp(value->data.str, "rgba", value->data.len) == 0)
+			//)
+
+			// RGB only version:
 			if (
-				((value->data.len == 3) || (value->data.len == 4)) &&
-				(strncasecmp(value->data.str, "rgba", value->data.len) == 0)
+				(value->data.len == 3) &&
+				(strncasecmp(value->data.str, "rgb", 3) == 0)
 			) {
 				if (EXTCSS3_SUCCESS != extcss3_minify_function_rgb_a(&value, decl, error)) {
 					return NULL;

@@ -26,8 +26,8 @@ without testing it previously locally.
 * Removing of unnecessary whitespaces, comments and semicolons
 * Removing of invalid or empty declarations and qualified rules
 * Color name transformations (e.g. `MediumSpringGreen` to `#00FA9A`)
-* Hexadecimal color transformations (e.g. `#FF0000FF` to `red`)
-* Function transformations (e.g. `rgba(255, 255, 255, 1)` to `#FFF`)
+* Hexadecimal color transformations (e.g. `#FF0000` to `red`)
+* Function transformations (e.g. `rgb(255, 255, 255)` to `#FFF`)
 * Minifying of numeric values (e.g. `005` to `5` or `0.1em` to `.1em`)
 * Optionally: Removing of verdor-prefixed declarations
 
