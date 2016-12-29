@@ -884,17 +884,23 @@ static inline bool _extcss3_check_at_rule_is_valid_charset(extcss3_intern *inter
 
 static inline bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule)
 {
+	extcss3_rule *prev = rule->prev;
+
+	while ((prev != NULL) && _EXTCSS3_TYPE_EMPTY(prev->base_selector->type)) {
+		prev = prev->prev;
+	}
+
 	if (rule->level != 0) {
 		return false;
-	} else if (rule->prev) {
+	} else if (prev != NULL) {
 		if (
-			(rule->prev->base_selector->data.len == 7 /* strlen("@import") */) &&
-			(memcmp(rule->prev->base_selector->data.str, "@import", 7) == 0)
+			(prev->base_selector->data.len == 7 /* strlen("@import") */) &&
+			(memcmp(prev->base_selector->data.str, "@import", 7) == 0)
 		) {
 			// Do nothing. The previous "@import" is already checked.
 		} else if (
-			(rule->prev->base_selector->data.len == 8 /* strlen("@charset") */) &&
-			(memcmp(rule->prev->base_selector->data.str, "@charset", 8) == 0)
+			(prev->base_selector->data.len == 8 /* strlen("@charset") */) &&
+			(memcmp(prev->base_selector->data.str, "@charset", 8) == 0)
 		) {
 			// Do nothing. The previous "@charset" is already checked.
 		} else {
@@ -916,22 +922,28 @@ static inline bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule)
 
 static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
 {
+	extcss3_rule *prev = rule->prev;
+
+	while ((prev != NULL) && _EXTCSS3_TYPE_EMPTY(prev->base_selector->type)) {
+		prev = prev->prev;
+	}
+
 	if (rule->level != 0) {
 		return false;
-	} else if (rule->prev) {
+	} else if (prev != NULL) {
 		if (
-			(rule->prev->base_selector->data.len == 10 /* strlen("@namespace") */) &&
-			(memcmp(rule->prev->base_selector->data.str, "@namespace", 10) == 0)
+			(prev->base_selector->data.len == 10 /* strlen("@namespace") */) &&
+			(memcmp(prev->base_selector->data.str, "@namespace", 10) == 0)
 		) {
 			// Do nothing. The previous "@namespace" is already checked.
 		} else if (
-			(rule->prev->base_selector->data.len == 7 /* strlen("@import") */) &&
-			(memcmp(rule->prev->base_selector->data.str, "@import", 7) == 0)
+			(prev->base_selector->data.len == 7 /* strlen("@import") */) &&
+			(memcmp(prev->base_selector->data.str, "@import", 7) == 0)
 		) {
 			// Do nothing. The previous "@import" is already checked.
 		} else if (
-			(rule->prev->base_selector->data.len == 8 /* strlen("@charset") */) &&
-			(memcmp(rule->prev->base_selector->data.str, "@charset", 8) == 0)
+			(prev->base_selector->data.len == 8 /* strlen("@charset") */) &&
+			(memcmp(prev->base_selector->data.str, "@charset", 8) == 0)
 		) {
 			// Do nothing. The previous "@charset" is already checked.
 		} else {
