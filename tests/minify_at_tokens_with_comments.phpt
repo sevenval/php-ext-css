@@ -54,5 +54,5 @@ var_dump($oProcessor->minify($sCSS));
 ?>
 ===DONE===
 --EXPECT--
-string(289) "@import"string.css";/* IMPORT comment inside the URL function */@import url("url.css");/* NAMESPACE comment inside the URL function */@namespace prefix url(www.example.com);@font-face{font-family:"Font-Name";/* DO NOT TOUCH the comment inside the FONT-FACE */ src:url("/path/to/FONT.ttf")}"
+string(288) "@import"string.css";/* IMPORT comment inside the URL function */@import url("url.css");/* NAMESPACE comment inside the URL function */@namespace prefix url(www.example.com);@font-face{font-family:"Font-Name";/* DO NOT TOUCH the comment inside the FONT-FACE */src:url("/path/to/FONT.ttf")}"
 ===DONE===
