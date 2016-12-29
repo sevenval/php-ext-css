@@ -1,3 +1,4 @@
+[![Software license][ico-license]](LICENSE)
 
 # `extcss3`
 
@@ -131,3 +132,5 @@ $min = $proc->minify($css, ['-ms', '-moz', '-o']);
 ```
 
 More examples coming soon...
+
+[ico-license]: https://img.shields.io/github/license/mashape/apistatus.svg
