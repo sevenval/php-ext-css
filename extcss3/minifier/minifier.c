@@ -521,6 +521,8 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 	name = _extcss3_get_decl_name(decl);
 
 	if (name != NULL) {
+		_extcss3_trim_around(name, &decl->last);
+
 		sep = _extcss3_get_decl_sep(name, decl);
 
 		if (sep != NULL) {
