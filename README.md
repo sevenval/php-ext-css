@@ -1,4 +1,5 @@
 [![Software license][ico-license]](LICENSE)
+[![Build status][ico-travis]][link-travis]
 
 # `extcss3`
 
@@ -147,3 +148,5 @@ $min = $proc->minify($css, ['-ms', '-moz', '-o']);
 More examples coming soon...
 
 [ico-license]: https://img.shields.io/github/license/mashape/apistatus.svg
+[ico-travis]: https://travis-ci.org/sevenval/php-ext-css.svg?branch=master
+[link-travis]: https://travis-ci.org/sevenval/php-ext-css
