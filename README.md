@@ -87,6 +87,9 @@ public CSS3Processor::minify(string $css [, array $vendors ]) : string
 
 ### PHP Class Constants
 
+
+#### Type Constants
+
 * `TYPE_IDENT`			1
 * `TYPE_FUNCTION`		2
 * `TYPE_AT_KEYWORD`		3
@@ -120,6 +123,16 @@ public CSS3Processor::minify(string $css [, array $vendors ]) : string
 * `TYPE_BR_CC`			31
 * `TYPE_COMMENT`		32 (modifiable)
 * `TYPE_EOF`			33
+
+
+#### Flag Constants
+
+* `FLAG_ID`				1
+* `FLAG_UNRESTRICTED`	2
+* `FLAG_INTEGER`		3
+* `FLAG_NUMBER`			4
+* `FLAG_STRING`			5
+* `FLAG_AT_URL_STRING`	6
 
 
 ### Examples
