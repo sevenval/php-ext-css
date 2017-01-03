@@ -270,7 +270,6 @@ PHP_METHOD(CSS3Processor, setModifier)
 	}
 
 	RETURN_TRUE;
-
 }
 
 PHP_METHOD(CSS3Processor, dump)
@@ -314,6 +313,7 @@ PHP_METHOD(CSS3Processor, minify)
 		return;
 	} else if (intern == NULL) {
 		zend_throw_exception(zend_ce_exception, "Missing the 'intern' struct object", 0);
+		return;
 	} else if (!len) {
 		RETURN_EMPTY_STRING();
 	} else if (EXTCSS3_SUCCESS != extcss3_set_css_string(intern, css, len)) {
@@ -321,7 +321,7 @@ PHP_METHOD(CSS3Processor, minify)
 		return;
 	}
 
-	if (intern->base_vendor != NULL) {
+	if ((intern->base_vendor != NULL) || (intern->last_vendor != NULL)) {
 		extcss3_release_vendor(intern->base_vendor, true);
 		intern->base_vendor = intern->last_vendor = NULL;
 	}
@@ -416,6 +416,10 @@ PHP_MINIT_FUNCTION(extcss3)
 	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_CC",			EXTCSS3_TYPE_BR_CC);
 	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_COMMENT",		EXTCSS3_TYPE_COMMENT);
 	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_EOF",			EXTCSS3_TYPE_EOF);
+
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+	// TODO: Register all flags (EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_...", EXTCSS3_FLAG_...))
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
