@@ -345,7 +345,7 @@ static inline int _extcss3_token_add(extcss3_intern *intern, extcss3_token *toke
 	if (token->type == EXTCSS3_TYPE_STRING) {
 		prev = token->prev;
 
-		while (prev) {
+		while (prev != NULL) {
 			if ((prev->type == EXTCSS3_TYPE_WS) || (prev->type == EXTCSS3_TYPE_COMMENT)) {
 				prev = prev->prev;
 				continue;
