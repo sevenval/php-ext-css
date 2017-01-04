@@ -19,7 +19,7 @@ without testing it previously locally.
 * written in pure C99
 * doesn't require any external libraries
 * implements an intervention API
-* PHP 7 ready
+* PHP 7 and PHP 7.1 ready
 
 
 ## Minifying Features
