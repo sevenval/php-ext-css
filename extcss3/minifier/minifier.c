@@ -561,21 +561,6 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	if (
-		(name->data.len >= 5)				&&
-		(value->user.str == NULL)			&&
-		(value->type == EXTCSS3_TYPE_IDENT)	&&
-		(value->data.len > 4)
-	) {
-		if (strncasecmp(name->data.str + name->data.len - 5, "color", 5) == 0) {
-			if (EXTCSS3_SUCCESS != extcss3_minify_color(value, error)) {
-				return NULL;
-			}
-		}
-	}
-
-	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
 	// Remove the leading whitespaces and comments
 	while (decl->last != decl->base) {
 		if (_EXTCSS3_TYPE_EMPTY_EX(decl->last)) {
@@ -688,6 +673,16 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 			break;
 		} else if (value->type == EXTCSS3_TYPE_HASH) {
 			if (EXTCSS3_SUCCESS != extcss3_minify_hash(value->data.str + 1, value->data.len - 1, value, error)) {
+				return NULL;
+			}
+		} else if (
+			(name->data.len >= 5)				&&
+			(value->user.str == NULL)			&&
+			(value->type == EXTCSS3_TYPE_IDENT)	&&
+			(value->data.len > 4)				&&
+			(strncasecmp(name->data.str + name->data.len - 5, "color", 5) == 0)
+		) {
+			if (EXTCSS3_SUCCESS != extcss3_minify_color(value, error)) {
 				return NULL;
 			}
 		} else if (
