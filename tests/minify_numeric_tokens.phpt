@@ -316,6 +316,68 @@ e {
 	c14: +10.0;
 }
 
+f {
+	a01: 0E3xyz;
+	b01: -0E3xyz;
+	c01: +0E3xyz;
+
+	a02: 1.1E3xyz;
+	b02: -1.1E3xyz;
+	c02: +1.1E3xyz;
+
+	a03: .0xyz;
+	b03: -.0xyz;
+	c03: +.0xyz;
+
+	a04: 0xyz;
+	b04: -0xyz;
+	c04: +0xyz;
+
+	a05: 0.0xyz;
+	b05: -0.0xyz;
+	c05: +0.0xyz;
+
+	a06: 005xyz;
+	b06: -005xyz;
+	c06: +005xyz;
+
+	a07: 5.000xyz;
+	b07: -5.000xyz;
+	c07: +5.000xyz;
+
+	a07: 5.001xyz;
+	b07: -5.001xyz;
+	c07: +5.001xyz;
+
+	a08: 12345xyz;
+	b08: -12345xyz;
+	c08: +12345xyz;
+
+	a09: 123.45xyz;
+	b09: -123.45xyz;
+	c09: +123.45xyz;
+
+	a10: 000xyz;
+	b10: -000xyz;
+	c10: +000xyz;
+
+	a11: 0.1xyz;
+	b11: -0.1xyz;
+	c11: +0.1xyz;
+
+	a12: 500xyz;
+	b12: -500xyz;
+	c12: +500xyz;
+
+	a13: 0.10xyz;
+	b13: -0.10xyz;
+	c13: +0.10xyz;
+
+	a14: 10.0xyz;
+	b14: -10.0xyz;
+	c14: +10.0xyz;
+}
+
 x {
 	x:nth-of-type(n+1){a:b}
 	x:nth-of-type(-n-2){a:b}
@@ -333,7 +395,7 @@ var_dump(preg_split('/\}?\w\{/', $oProcessor->minify($sCSS)));
 ?>
 ===DONE===
 --EXPECT--
-array(7) {
+array(8) {
   [0]=>
   string(0) ""
   [1]=>
@@ -347,6 +409,8 @@ array(7) {
   [5]=>
   string(345) "a01:0;b01:0;c01:0;a02:1.1E3;b02:-1.1E3;c02:1.1E3;a03:0;b03:0;c03:0;a04:0;b04:0;c04:0;a05:0;b05:0;c05:0;a06:5;b06:-5;c06:5;a07:5;b07:-5;c07:5;a07:5.001;b07:-5.001;c07:5.001;a08:12345;b08:-12345;c08:12345;a09:123.45;b09:-123.45;c09:123.45;a10:0;b10:0;c10:0;a11:.1;b11:-.1;c11:.1;a12:500;b12:-500;c12:500;a13:.1;b13:-.1;c13:.1;a14:10;b14:-10;c14:10"
   [6]=>
+  string(480) "a01:0xyz;b01:0xyz;c01:0xyz;a02:1.1E3xyz;b02:-1.1E3xyz;c02:1.1E3xyz;a03:0xyz;b03:0xyz;c03:0xyz;a04:0xyz;b04:0xyz;c04:0xyz;a05:0xyz;b05:0xyz;c05:0xyz;a06:5xyz;b06:-5xyz;c06:5xyz;a07:5xyz;b07:-5xyz;c07:5xyz;a07:5.001xyz;b07:-5.001xyz;c07:5.001xyz;a08:12345xyz;b08:-12345xyz;c08:12345xyz;a09:123.45xyz;b09:-123.45xyz;c09:123.45xyz;a10:0xyz;b10:0xyz;c10:0xyz;a11:.1xyz;b11:-.1xyz;c11:.1xyz;a12:500xyz;b12:-500xyz;c12:500xyz;a13:.1xyz;b13:-.1xyz;c13:.1xyz;a14:10xyz;b14:-10xyz;c14:10xyz"
+  [7]=>
   string(139) "x:nth-of-type(n+1){a:b}x:nth-of-type(-n-2){a:b}x:nth-of-type(+n+3){a:b}y:nth-child(3n+0){a:b}y:nth-child(3n-0){a:b}y:nth-child(-3n+0){a:b}}"
 }
 ===DONE===

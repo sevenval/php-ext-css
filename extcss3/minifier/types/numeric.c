@@ -2,6 +2,59 @@
 #include "../../utils.h"
 
 #include <string.h>
+#include <strings.h>
+
+/* ==================================================================================================== */
+
+const char *extcss3_numeric_dimensions[19] = {
+    "em",
+	"ex",
+	"ch",
+	"rem",
+
+	"vw",
+	"vh",
+	"vmin",
+	"vmax",
+
+	"cm",
+	"mm",
+	"q",
+	"in",
+	"pc",
+	"pt",
+	"px",
+
+	"deg",
+	"grad",
+	"rad",
+	"turn"
+};
+
+bool _extcss3_minify_numeric_prevent_dimension(extcss3_token *token)
+{
+	unsigned short int i, elements;
+	bool prevent = true;
+
+	if (token->type != EXTCSS3_TYPE_DIMENSION) {
+		return false;
+	}
+
+	elements = sizeof(extcss3_numeric_dimensions) / sizeof(extcss3_numeric_dimensions[0]);
+
+	for (i = 0; i < elements; i++) {
+		if (
+			(strlen(extcss3_numeric_dimensions[i]) == token->info.len) &&
+			(strncasecmp(token->info.str, extcss3_numeric_dimensions[i], token->info.len) == 0)
+		) {
+			prevent = false;
+
+			break;
+		}
+	}
+
+	return prevent;
+}
 
 /* ==================================================================================================== */
 
@@ -103,15 +156,7 @@ bool extcss3_minify_numeric(extcss3_token *token, bool prevent_sign, int *error)
 
 	if (
 		(num != 0) ||
-		(
-			(token->info.len == 1) &&
-			EXTCSS3_CHARS_EQ(*token->info.str, 's')
-		) ||
-		(
-			(token->info.len == 2) &&
-			EXTCSS3_CHARS_EQ(*token->info.str, 'm') &&
-			EXTCSS3_CHARS_EQ(token->info.str[1], 's')
-		)
+		_extcss3_minify_numeric_prevent_dimension(token)
 	) {
 		memcpy(token->user.str + token->user.len - token->info.len, token->info.str, token->info.len);
 	} else if (token->user.str != NULL) {
