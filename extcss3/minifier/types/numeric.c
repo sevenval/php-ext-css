@@ -154,10 +154,7 @@ bool extcss3_minify_numeric(extcss3_token *token, bool prevent_sign, int *error)
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	if (
-		(num != 0) ||
-		_extcss3_minify_numeric_prevent_dimension(token)
-	) {
+	if ((num != 0) || _extcss3_minify_numeric_prevent_dimension(token) ) {
 		memcpy(token->user.str + token->user.len - token->info.len, token->info.str, token->info.len);
 	} else if (token->user.str != NULL) {
 		token->user.len -= token->info.len;
