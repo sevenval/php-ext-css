@@ -880,10 +880,10 @@ static inline bool _extcss3_check_at_rule_is_valid_charset(extcss3_intern *inter
 		(rule->base_selector->data.str == intern->copy.str)						&&
 		(memcmp(rule->base_selector->data.str, "@charset", 8) == 0)
 	) {
-		return true;
+		return EXTCSS3_SUCCESS;
 	}
 
-	return false;
+	return EXTCSS3_FAILURE;
 }
 
 static inline bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule)
@@ -895,7 +895,7 @@ static inline bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule)
 	}
 
 	if (rule->level != 0) {
-		return false;
+		return EXTCSS3_FAILURE;
 	} else if (prev != NULL) {
 		if (
 			(prev->base_selector->data.len == 7 /* strlen("@import") */) &&
@@ -908,7 +908,7 @@ static inline bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule)
 		) {
 			// Do nothing. The previous "@charset" is already checked.
 		} else {
-			return false;
+			return EXTCSS3_FAILURE;
 		}
 	}
 
@@ -918,10 +918,10 @@ static inline bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule)
 		(rule->base_selector->data.len == 7) &&
 		(memcmp(rule->base_selector->data.str, "@import", 7) == 0)
 	) {
-		return true;
+		return EXTCSS3_SUCCESS;
 	}
 
-	return false;
+	return EXTCSS3_FAILURE;
 }
 
 static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
@@ -933,7 +933,7 @@ static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
 	}
 
 	if (rule->level != 0) {
-		return false;
+		return EXTCSS3_FAILURE;
 	} else if (prev != NULL) {
 		if (
 			(prev->base_selector->data.len == 10 /* strlen("@namespace") */) &&
@@ -951,7 +951,7 @@ static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
 		) {
 			// Do nothing. The previous "@charset" is already checked.
 		} else {
-			return false;
+			return EXTCSS3_FAILURE;
 		}
 	}
 
@@ -961,8 +961,8 @@ static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
 		(rule->base_selector->data.len == 10) &&
 		(memcmp(rule->base_selector->data.str, "@namespace", 10) == 0)
 	) {
-		return true;
+		return EXTCSS3_SUCCESS;
 	}
 
-	return false;
+	return EXTCSS3_FAILURE;
 }

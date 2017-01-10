@@ -1055,10 +1055,10 @@ static inline int _extcss3_consume_name(extcss3_intern *intern)
 static inline bool _extcss3_check_start_valid_escape(char *str)
 {
 	if ((*str != '\\') || (str[1] == '\n')) {
-		return false;
+		return EXTCSS3_FAILURE;
 	}
 
-	return true;
+	return EXTCSS3_SUCCESS;
 }
 
 /**
@@ -1067,10 +1067,10 @@ static inline bool _extcss3_check_start_valid_escape(char *str)
 static inline bool _extcss3_check_start_name(char *str)
 {
 	if ((*str == '_') || EXTCSS3_IS_LETTER(*str) || (extcss3_char_len(*str) > 1)) {
-		return true;
+		return EXTCSS3_SUCCESS;
 	}
 
-	return false;
+	return EXTCSS3_FAILURE;
 }
 
 /**
@@ -1083,18 +1083,18 @@ static inline bool _extcss3_check_start_ident(char *str)
 			(EXTCSS3_SUCCESS == _extcss3_check_start_name(str + 1)) ||
 			(EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(str + 1))
 		) {
-			return true;
+			return EXTCSS3_SUCCESS;
 		}
 
-		return false;
+		return EXTCSS3_FAILURE;
 	} else if (
 		(EXTCSS3_SUCCESS == _extcss3_check_start_name(str)) ||
 		(EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(str))
 	) {
-		return true;
+		return EXTCSS3_SUCCESS;
 	}
 
-	return false;
+	return EXTCSS3_FAILURE;
 }
 
 /**
@@ -1104,19 +1104,19 @@ static inline bool _extcss3_check_start_number(char *str)
 {
 	if ((*str == '+') || (*str == '-')) {
 		if (EXTCSS3_IS_DIGIT(str[1])) {
-			return true;
+			return EXTCSS3_SUCCESS;
 		} else if ((str[1] == '.') && EXTCSS3_IS_DIGIT(str[2])) {
-			return true;
+			return EXTCSS3_SUCCESS;
 		}
 
-		return false;
+		return EXTCSS3_FAILURE;
 	} else if ((*str == '.') && EXTCSS3_IS_DIGIT(str[1])) {
-		return true;
+		return EXTCSS3_SUCCESS;
 	} else if (EXTCSS3_IS_DIGIT(*str)) {
-		return true;
+		return EXTCSS3_SUCCESS;
 	}
 
-	return false;
+	return EXTCSS3_FAILURE;
 }
 
 /**
@@ -1125,8 +1125,8 @@ static inline bool _extcss3_check_start_number(char *str)
 static inline bool _extcss3_check_is_name(char *str)
 {
 	if ((EXTCSS3_SUCCESS == _extcss3_check_start_name(str)) || EXTCSS3_IS_DIGIT(*str) || (*str == '-')) {
-		return true;
+		return EXTCSS3_SUCCESS;
 	}
 
-	return false;
+	return EXTCSS3_FAILURE;
 }

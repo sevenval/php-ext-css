@@ -22,21 +22,21 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 	while ((curr->next != NULL) && (curr->type != EXTCSS3_TYPE_BR_RC)) {
 		if ((curr->type == EXTCSS3_TYPE_NUMBER) || (curr->type == EXTCSS3_TYPE_PERCENTAGE)) {
 			if (!validity || (((*token)->data.len == 3) && (idx > 4)) || (((*token)->data.len == 4) && (idx > 6))) {
-				return false; // Too much values
+				return EXTCSS3_FAILURE; // Too much values
 			}
 
 			value = atof(curr->data.str);
 
 			if (value < 0) {
-				return false; // Invalid value: 0 - 255
+				return EXTCSS3_FAILURE; // Invalid value: 0 - 255
 			} else if ((curr->type == EXTCSS3_TYPE_NUMBER) && (value > 255)) {
-				return false; // Invalid value: 0 - 255
+				return EXTCSS3_FAILURE; // Invalid value: 0 - 255
 			} else if ((curr->type == EXTCSS3_TYPE_PERCENTAGE) && (value > 100)) {
-				return false; // Invalid value: 0% - 100%
+				return EXTCSS3_FAILURE; // Invalid value: 0% - 100%
 			} else if ((idx > 4) && (curr->type == EXTCSS3_TYPE_NUMBER) && ((int)value > 1)) {
-				return false; // Invalid value: 0 - 1
+				return EXTCSS3_FAILURE; // Invalid value: 0 - 1
 			} else if ((idx < 6) && ((int)value != value)) {
-				return false; // Invalid value: 0 - 1
+				return EXTCSS3_FAILURE; // Invalid value: 0 - 1
 			}
 
 			if (curr->type == EXTCSS3_TYPE_PERCENTAGE) {
@@ -52,7 +52,7 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 			}
 
 			if (percentages && numbers) {
-				return false; // Invalid value: No mixed types!
+				return EXTCSS3_FAILURE; // Invalid value: No mixed types!
 			}
 
 			sprintf(&hex[idx], "%02x", (int)value);
@@ -61,7 +61,7 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 			validity = false;
 		} else if (!_EXTCSS3_TYPE_EMPTY(curr->type)) {
 			if (validity) {
-				return false;
+				return EXTCSS3_FAILURE;
 			} else if (curr->type == EXTCSS3_TYPE_COMMA) {
 				validity = true;
 			}
@@ -78,7 +78,7 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 
 	if ((((*token)->data.len == 3) && (idx == 6)) || (((*token)->data.len == 4) && (idx == 8))) {
 		if (EXTCSS3_SUCCESS != extcss3_minify_hash(hex, idx, *token, error)) {
-			return false;
+			return EXTCSS3_FAILURE;
 		}
 
 		// It was nothing to do for the extcss3_minify_hash() function
@@ -87,7 +87,7 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 
 			if (((*token)->user.str = (char *)calloc(1, sizeof(char) * (*token)->user.len)) == NULL) {
 				*error = EXTCSS3_ERR_MEMORY;
-				return false;
+				return EXTCSS3_FAILURE;
 			}
 
 			(*token)->user.str[0] = '#';
@@ -117,7 +117,7 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 				extcss3_release_token(temp, true);
 
 				*error = EXTCSS3_ERR_MEMORY;
-				return false;
+				return EXTCSS3_FAILURE;
 			}
 
 			(*token)->next->type = EXTCSS3_TYPE_WS;
@@ -128,8 +128,8 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 
 		*token = (*token)->next;
 
-		return true;
+		return EXTCSS3_SUCCESS;
 	}
 
-	return false;
+	return EXTCSS3_FAILURE;
 }

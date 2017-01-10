@@ -189,7 +189,7 @@ void extcss3_release_decl(extcss3_decl *decl, bool recursive)
 bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len)
 {
 	if ((intern == NULL) || (css == NULL)) {
-		return false;
+		return EXTCSS3_FAILURE;
 	} else if (intern->copy.str != NULL) {
 		free(intern->copy.str);
 	}
@@ -211,7 +211,7 @@ bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len)
 	intern->copy.str = (char *)calloc(1, sizeof(char) * (intern->copy.len + 1));
 
 	if (intern->copy.str == NULL) {
-		return false;
+		return EXTCSS3_FAILURE;
 	}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -227,13 +227,13 @@ bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len)
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	return true;
+	return EXTCSS3_SUCCESS;
 }
 
 bool extcss3_set_modifier(extcss3_intern *intern, short int type, void *callable)
 {
 	if ((intern == NULL) || (intern->modifier.destructor == NULL) || (intern->modifier.callback == NULL) || (callable == NULL)) {
-		return false;
+		return EXTCSS3_FAILURE;
 	}
 
 	switch (type) {
@@ -283,26 +283,26 @@ bool extcss3_set_modifier(extcss3_intern *intern, short int type, void *callable
 			break;
 		}
 		default:
-			return false;
+			return EXTCSS3_FAILURE;
 	}
 
-	return true;
+	return EXTCSS3_SUCCESS;
 }
 
 bool extcss3_set_vendor_string(extcss3_intern *intern, char *name, size_t len)
 {
 	if ((intern == NULL) || (name == NULL)) {
-		return false;
+		return EXTCSS3_FAILURE;
 	}
 
 	intern->last_vendor->name.len = len;
 	intern->last_vendor->name.str = (char *)calloc(1, sizeof(char) * (intern->last_vendor->name.len));
 
 	if (intern->last_vendor->name.str == NULL) {
-		return false;
+		return EXTCSS3_FAILURE;
 	}
 
 	memcpy(intern->last_vendor->name.str, name, intern->last_vendor->name.len);
 
-	return true;
+	return EXTCSS3_SUCCESS;
 }

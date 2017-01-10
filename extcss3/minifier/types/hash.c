@@ -173,7 +173,7 @@ bool extcss3_minify_hash(char *str, size_t len, extcss3_token *token, int *error
 
 	if ((token == NULL) || (str == NULL)) {
 		*error = EXTCSS3_ERR_NULL_PTR;
-		return false;
+		return EXTCSS3_FAILURE;
 	}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -194,7 +194,7 @@ bool extcss3_minify_hash(char *str, size_t len, extcss3_token *token, int *error
 			token->user.len = 5;
 			if ((token->user.str = (char *)calloc(1, sizeof(char) * (token->user.len))) == NULL) {
 				*error = EXTCSS3_ERR_MEMORY;
-				return false;
+				return EXTCSS3_FAILURE;
 			}
 
 			token->user.str[0] = '#';
@@ -213,7 +213,7 @@ bool extcss3_minify_hash(char *str, size_t len, extcss3_token *token, int *error
 				token->user.len = 3;
 				if ((token->user.str = (char *)calloc(1, sizeof(char) * (token->user.len))) == NULL) {
 					*error = EXTCSS3_ERR_MEMORY;
-					return false;
+					return EXTCSS3_FAILURE;
 				}
 
 				memcpy(token->user.str, "red", 3);
@@ -221,7 +221,7 @@ bool extcss3_minify_hash(char *str, size_t len, extcss3_token *token, int *error
 				token->user.len = 4;
 				if ((token->user.str = (char *)calloc(1, sizeof(char) * (token->user.len))) == NULL) {
 					*error = EXTCSS3_ERR_MEMORY;
-					return false;
+					return EXTCSS3_FAILURE;
 				}
 
 				token->user.str[0] = '#';
@@ -235,7 +235,7 @@ bool extcss3_minify_hash(char *str, size_t len, extcss3_token *token, int *error
 					token->user.len = strlen(extcss3_hash_colors[i][1]);
 					if ((token->user.str = (char *)calloc(1, sizeof(char) * (token->user.len))) == NULL) {
 						*error = EXTCSS3_ERR_MEMORY;
-						return false;
+						return EXTCSS3_FAILURE;
 					}
 
 					memcpy(token->user.str, extcss3_hash_colors[i][1], token->user.len);
@@ -247,14 +247,14 @@ bool extcss3_minify_hash(char *str, size_t len, extcss3_token *token, int *error
 			token->user.len = 3;
 			if ((token->user.str = (char *)calloc(1, sizeof(char) * (token->user.len))) == NULL) {
 				*error = EXTCSS3_ERR_MEMORY;
-				return false;
+				return EXTCSS3_FAILURE;
 			}
 
 			memcpy(token->user.str, "red", 3);
 		}
 	}
 
-	return true;
+	return EXTCSS3_SUCCESS;
 }
 
 bool extcss3_minify_color(extcss3_token *token, int *error)
@@ -264,7 +264,7 @@ bool extcss3_minify_color(extcss3_token *token, int *error)
 
 	if (token == NULL) {
 		*error = EXTCSS3_ERR_NULL_PTR;
-		return false;
+		return EXTCSS3_FAILURE;
 	}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -322,7 +322,7 @@ bool extcss3_minify_color(extcss3_token *token, int *error)
 
 			if ((token->user.str = (char *)calloc(1, sizeof(char) * (token->user.len))) == NULL) {
 				*error = EXTCSS3_ERR_MEMORY;
-				return false;
+				return EXTCSS3_FAILURE;
 			}
 
 			*token->user.str = '#';
@@ -332,5 +332,5 @@ bool extcss3_minify_color(extcss3_token *token, int *error)
 		}
 	}
 
-	return true;
+	return EXTCSS3_SUCCESS;
 }

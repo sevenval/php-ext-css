@@ -37,7 +37,7 @@ bool _extcss3_minify_numeric_prevent_dimension(extcss3_token *token)
 	bool prevent = true;
 
 	if (token->type != EXTCSS3_TYPE_DIMENSION) {
-		return false;
+		return EXTCSS3_FAILURE;
 	}
 
 	elements = sizeof(extcss3_numeric_dimensions) / sizeof(extcss3_numeric_dimensions[0]);
@@ -47,7 +47,7 @@ bool _extcss3_minify_numeric_prevent_dimension(extcss3_token *token)
 			(strlen(extcss3_numeric_dimensions[i]) == token->info.len) &&
 			(strncasecmp(token->info.str, extcss3_numeric_dimensions[i], token->info.len) == 0)
 		) {
-			prevent = false;
+			prevent = EXTCSS3_FAILURE;
 
 			break;
 		}
@@ -66,15 +66,15 @@ bool extcss3_minify_numeric(extcss3_token *token, bool prevent_sign, int *error)
 
 	if (token == NULL) {
 		*error = EXTCSS3_ERR_NULL_PTR;
-		return false;
+		return EXTCSS3_FAILURE;
 	} else if (
 		(token->type != EXTCSS3_TYPE_NUMBER)		&&
 		(token->type != EXTCSS3_TYPE_PERCENTAGE)	&&
 		(token->type != EXTCSS3_TYPE_DIMENSION)
 	) {
-		return true;
+		return EXTCSS3_SUCCESS;
 	} else if (token->data.len <= 1) {
-		return true; // No minifying potential
+		return EXTCSS3_SUCCESS; // No minifying potential
 	}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -88,7 +88,7 @@ bool extcss3_minify_numeric(extcss3_token *token, bool prevent_sign, int *error)
 
 		if ((token->user.str = (char *)calloc(1, sizeof(char) * (token->user.len + token->info.len))) == NULL) {
 			*error = EXTCSS3_ERR_MEMORY;
-			return false;
+			return EXTCSS3_FAILURE;
 		}
 
 		if (prevent_sign && ((*token->data.str == '-') || (*token->data.str == '+'))) {
@@ -134,7 +134,7 @@ bool extcss3_minify_numeric(extcss3_token *token, bool prevent_sign, int *error)
 
 		if (base == (token->data.str + val_is_signed)) {
 			if (last == (token->data.str + token->data.len - token->info.len)) {
-				return true; // Nothing to do
+				return EXTCSS3_SUCCESS; // Nothing to do
 			}
 		}
 
@@ -142,7 +142,7 @@ bool extcss3_minify_numeric(extcss3_token *token, bool prevent_sign, int *error)
 
 		if ((token->user.str = (char *)calloc(1, sizeof(char) * (token->user.len))) == NULL) {
 			*error = EXTCSS3_ERR_MEMORY;
-			return false;
+			return EXTCSS3_FAILURE;
 		}
 
 		if (val_is_signed > 0) {
@@ -160,5 +160,5 @@ bool extcss3_minify_numeric(extcss3_token *token, bool prevent_sign, int *error)
 		token->user.len -= token->info.len;
 	}
 
-	return true;
+	return EXTCSS3_SUCCESS;
 }
