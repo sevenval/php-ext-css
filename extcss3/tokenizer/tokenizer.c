@@ -11,7 +11,7 @@
 /* HELPER */
 static int _extcss3_cleanup_tokenizer(int ret, extcss3_intern *intern, bool token, bool ctxt);
 static int _extcss3_next_char(extcss3_intern *intern);
-static int _extcss3_token_add(extcss3_intern *intern, extcss3_token *token);
+static bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *token, int *error);
 
 /* TOKEN FILLER */
 static int _extcss3_fill_fixed_token(extcss3_intern *intern, extcss3_token *token, short int type, unsigned short int chars);
@@ -42,7 +42,7 @@ static bool _extcss3_check_is_name(char *str);
 int extcss3_tokenize(extcss3_intern *intern)
 {
 	extcss3_token *token;
-	int i, ret;
+	int i, ret = 0;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -63,7 +63,7 @@ int extcss3_tokenize(extcss3_intern *intern)
 	 * state machine run parallel but offset by "i" characters.
 	 */
 	for (i = 0; i < 5; i++) {
-		if ((ret = extcss3_preprocess(intern)) != 0) {
+		if (EXTCSS3_SUCCESS != extcss3_preprocess(intern, &ret)) {
 			return _extcss3_cleanup_tokenizer(ret, intern, true, true);
 		}
 	}
@@ -281,7 +281,7 @@ int extcss3_tokenize(extcss3_intern *intern)
 
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-		if ((ret = _extcss3_token_add(intern, token)) != 0) {
+		if (EXTCSS3_SUCCESS != _extcss3_token_add(intern, token, &ret)) {
 			return _extcss3_cleanup_tokenizer(ret, intern, true, true);
 		}
 
@@ -319,9 +319,9 @@ static inline int _extcss3_cleanup_tokenizer(int ret, extcss3_intern *intern, bo
 
 static inline int _extcss3_next_char(extcss3_intern *intern)
 {
-	int ret;
+	int ret = 0;
 
-	if ((ret = extcss3_preprocess(intern)) != 0) {
+	if (EXTCSS3_SUCCESS != extcss3_preprocess(intern, &ret)) {
 		return ret;
 	} else if (*intern->state.reader != '\0') {
 		intern->state.reader += extcss3_char_len(*intern->state.reader);
@@ -330,10 +330,9 @@ static inline int _extcss3_next_char(extcss3_intern *intern)
 	return 0;
 }
 
-static inline int _extcss3_token_add(extcss3_intern *intern, extcss3_token *token)
+static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *token, int *error)
 {
 	extcss3_token *prev;
-	int ret = 0;
 
 	if ((token->prev = intern->last_token) != NULL) {
 		intern->last_token->next = token;
@@ -374,13 +373,13 @@ static inline int _extcss3_token_add(extcss3_intern *intern, extcss3_token *toke
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	if (EXTCSS3_SUCCESS != extcss3_ctxt_update(intern, &ret)) {
-		return ret;
+	if (EXTCSS3_SUCCESS != extcss3_ctxt_update(intern, error)) {
+		return EXTCSS3_FAILURE;
 	}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	return 0;
+	return EXTCSS3_SUCCESS;
 }
 
 /* ==================================================================================================== */

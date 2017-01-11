@@ -8,7 +8,7 @@
 /**
  * Check the validity of the bytes in the non-ASCII (UTF-8) character
  */
-static inline int _extcss3_check_bytes_corruption(extcss3_intern *intern)
+static inline bool _extcss3_check_bytes_corruption(extcss3_intern *intern, int *error)
 {
 	unsigned short int i, j;
 
@@ -18,11 +18,15 @@ static inline int _extcss3_check_bytes_corruption(extcss3_intern *intern)
 
 		while ((i >= 0) && ((*intern->state.cursor >> i) & 1)) {
 			if (j > intern->state.rest) {
-				return EXTCSS3_ERR_BYTES_CORRUPTION;
+				*error = EXTCSS3_ERR_BYTES_CORRUPTION;
+
+				return EXTCSS3_FAILURE;
 			}
 
 			if (j && ((((intern->state.cursor[j] >> 7) & 1) != 1) || (((intern->state.cursor[j] >> 6) & 1) != 0))) {
-				return EXTCSS3_ERR_BYTES_CORRUPTION;
+				*error = EXTCSS3_ERR_BYTES_CORRUPTION;
+
+				return EXTCSS3_FAILURE;
 			}
 
 			j++;
@@ -30,17 +34,19 @@ static inline int _extcss3_check_bytes_corruption(extcss3_intern *intern)
 		}
 
 		if ((j == 1) || (j > intern->state.rest)) {
-			return EXTCSS3_ERR_BYTES_CORRUPTION;
+			*error = EXTCSS3_ERR_BYTES_CORRUPTION;
+
+			return EXTCSS3_FAILURE;
 		}
 	}
 
-	return 0;
+	return EXTCSS3_SUCCESS;
 }
 
 /**
  * Copy a part of the input string to the intern CSS string and move the intern pointers to the new positions
  */
-static inline int _extcss3_copy_and_move(extcss3_intern *intern, const char *src_str, size_t src_len, int processed)
+static inline bool _extcss3_copy_and_move(extcss3_intern *intern, const char *src_str, size_t src_len, int processed)
 {
 	memcpy(intern->state.writer, src_str, src_len);
 
@@ -51,24 +57,26 @@ static inline int _extcss3_copy_and_move(extcss3_intern *intern, const char *src
 
 	*intern->state.writer = '\0';
 
-	return 0;
+	return EXTCSS3_SUCCESS;
 }
 
 /**
  * Extended version of https://www.w3.org/TR/css-syntax-3/#input-preprocessing
  */
-int extcss3_preprocess(extcss3_intern *intern)
+bool extcss3_preprocess(extcss3_intern *intern, int *error)
 {
-	int ret, len;
+	int len;
 
-	if ((intern == NULL) || (intern->state.cursor == NULL)) {
-		return EXTCSS3_ERR_NULL_PTR;
+	if ((intern == NULL) || (intern->state.cursor == NULL) || (intern->state.writer == NULL)) {
+		*error = EXTCSS3_ERR_NULL_PTR;
+
+		return EXTCSS3_FAILURE;
 	} else if ((intern->state.rest > 0) && (intern->state.rest <= intern->orig.len)) {
-		if ((ret = _extcss3_check_bytes_corruption(intern)) != 0) {
-			return ret;
+		if (EXTCSS3_SUCCESS != _extcss3_check_bytes_corruption(intern, error)) {
+			return EXTCSS3_FAILURE;
 		}
 	} else if (intern->state.rest == 0) {
-		return 0;
+		return EXTCSS3_SUCCESS;
 	}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
