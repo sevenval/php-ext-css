@@ -186,9 +186,11 @@ void extcss3_release_decl(extcss3_decl *decl, bool recursive)
 
 /* ==================================================================================================== */
 
-bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len)
+bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len, int *error)
 {
 	if ((intern == NULL) || (css == NULL)) {
+		*error = EXTCSS3_ERR_NULL_PTR;
+
 		return EXTCSS3_FAILURE;
 	} else if (intern->copy.str != NULL) {
 		free(intern->copy.str);
@@ -211,6 +213,8 @@ bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len)
 	intern->copy.str = (char *)calloc(1, sizeof(char) * (intern->copy.len + 1));
 
 	if (intern->copy.str == NULL) {
+		*error = EXTCSS3_ERR_MEMORY;
+
 		return EXTCSS3_FAILURE;
 	}
 
@@ -230,9 +234,11 @@ bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len)
 	return EXTCSS3_SUCCESS;
 }
 
-bool extcss3_set_modifier(extcss3_intern *intern, short int type, void *callable)
+bool extcss3_set_modifier(extcss3_intern *intern, short int type, void *callable, int *error)
 {
 	if ((intern == NULL) || (intern->modifier.destructor == NULL) || (intern->modifier.callback == NULL) || (callable == NULL)) {
+		*error = EXTCSS3_ERR_NULL_PTR;
+
 		return EXTCSS3_FAILURE;
 	}
 
@@ -283,15 +289,21 @@ bool extcss3_set_modifier(extcss3_intern *intern, short int type, void *callable
 			break;
 		}
 		default:
+		{
+			*error = EXTCSS3_ERR_INV_PARAM;
+
 			return EXTCSS3_FAILURE;
+		}
 	}
 
 	return EXTCSS3_SUCCESS;
 }
 
-bool extcss3_set_vendor_string(extcss3_intern *intern, char *name, size_t len)
+bool extcss3_set_vendor_string(extcss3_intern *intern, char *name, size_t len, int *error)
 {
 	if ((intern == NULL) || (name == NULL)) {
+		*error = EXTCSS3_ERR_NULL_PTR;
+
 		return EXTCSS3_FAILURE;
 	}
 
@@ -299,6 +311,8 @@ bool extcss3_set_vendor_string(extcss3_intern *intern, char *name, size_t len)
 	intern->last_vendor->name.str = (char *)calloc(1, sizeof(char) * (intern->last_vendor->name.len));
 
 	if (intern->last_vendor->name.str == NULL) {
+		*error = EXTCSS3_ERR_MEMORY;
+
 		return EXTCSS3_FAILURE;
 	}
 

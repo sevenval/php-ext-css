@@ -21,9 +21,9 @@ void extcss3_release_rule(extcss3_rule *rule, bool recursive);
 void extcss3_release_block(extcss3_block *block);
 void extcss3_release_decl(extcss3_decl *decl, bool recursive);
 
-bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len);
-bool extcss3_set_modifier(extcss3_intern *intern, short int type, void *callable);
-bool extcss3_set_vendor_string(extcss3_intern *intern, char *name, size_t len);
+bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len, int *error);
+bool extcss3_set_modifier(extcss3_intern *intern, short int type, void *callable, int *error);
+bool extcss3_set_vendor_string(extcss3_intern *intern, char *name, size_t len, int *error);
 
 /* ==================================================================================================== */
 

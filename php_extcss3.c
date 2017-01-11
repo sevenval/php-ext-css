@@ -59,6 +59,9 @@ static inline void php_extcss3_throw_exception(int error)
 		case EXTCSS3_ERR_NULL_PTR:
 			zend_throw_exception(zend_ce_exception, "extcss3: Unexpected NULL pointer received", EXTCSS3_ERR_NULL_PTR);
 			break;
+		case EXTCSS3_ERR_INV_PARAM:
+			zend_throw_exception(zend_ce_exception, "extcss3: Invalid paramenter or parameter type given", EXTCSS3_ERR_INV_PARAM);
+			break;
 		default:
 			zend_throw_exception(zend_ce_exception, "extcss3: Undefined internal error", 0);
 	}
@@ -227,7 +230,7 @@ PHP_METHOD(CSS3Processor, __construct)
 	extcss3_intern *intern = extcss3_create_intern();
 
 	if (intern == NULL) {
-		zend_throw_exception(zend_ce_exception, "Memory allocation for the 'intern' struct object failed", 0);
+		php_extcss3_throw_exception(EXTCSS3_ERR_MEMORY);
 	} else {
 		intern->modifier.callback	= php_extcss3_modifier_callback;
 		intern->modifier.destructor	= php_extcss3_modifier_destructor;
@@ -242,11 +245,12 @@ PHP_METHOD(CSS3Processor, setModifier)
 	extcss3_intern *intern = object->intern;
 	zval *callable, *copy;
 	size_t type;
+	int error = 0;
 
 	if (SUCCESS != zend_parse_parameters(ZEND_NUM_ARGS(), "lz", &type, &callable)) {
 		return;
 	} else if (intern == NULL) {
-		zend_throw_exception(zend_ce_exception, "Missing the 'intern' struct object", 0);
+		php_extcss3_throw_exception(EXTCSS3_ERR_NULL_PTR);
 		return;
 	} else if (!EXTCSS3_TYPE_IS_MODIFIABLE(type)) {
 		zend_throw_exception(zend_ce_exception, "Setting the modifier for an unmodifiable type failed", 0);
@@ -256,16 +260,16 @@ PHP_METHOD(CSS3Processor, setModifier)
 	copy = (zval *)calloc(1, sizeof(zval));
 
 	if (copy == NULL) {
-		zend_throw_exception(zend_ce_exception, "Memory allocation for the callable failed", 0);
+		php_extcss3_throw_exception(EXTCSS3_ERR_MEMORY);
 		return;
 	}
 
 	ZVAL_COPY(copy, callable);
 
-	if (EXTCSS3_SUCCESS != extcss3_set_modifier(intern, type, copy)) {
+	if (EXTCSS3_SUCCESS != extcss3_set_modifier(intern, type, copy, &error)) {
 		intern->modifier.destructor(copy);
 
-		zend_throw_exception(zend_ce_exception, "Setting the modifier failed", 0);
+		php_extcss3_throw_exception(error);
 		return;
 	}
 
@@ -283,16 +287,12 @@ PHP_METHOD(CSS3Processor, dump)
 	if (SUCCESS != zend_parse_parameters(ZEND_NUM_ARGS(), "s", &css, &len)) {
 		return;
 	} else if (intern == NULL) {
-		zend_throw_exception(zend_ce_exception, "Missing the 'intern' struct object", 0);
-		return;
+		php_extcss3_throw_exception(EXTCSS3_ERR_NULL_PTR);
 	} else if (!len) {
 		RETURN_EMPTY_STRING();
-	} else if (EXTCSS3_SUCCESS != extcss3_set_css_string(intern, css, len)) {
-		zend_throw_exception(zend_ce_exception, "Memory allocation for the CSS string failed", 0);
-		return;
-	}
-
-	if ((result = extcss3_dump_tokens(intern, &error)) == NULL) {
+	} else if (EXTCSS3_SUCCESS != extcss3_set_css_string(intern, css, len, &error)) {
+		php_extcss3_throw_exception(error);
+	} else if ((result = extcss3_dump_tokens(intern, &error)) == NULL) {
 		php_extcss3_throw_exception(error);
 	} else {
 		RETVAL_STRING(result);
@@ -312,12 +312,12 @@ PHP_METHOD(CSS3Processor, minify)
 	if (SUCCESS != zend_parse_parameters(ZEND_NUM_ARGS(), "s|a", &css, &len, &vendors)) {
 		return;
 	} else if (intern == NULL) {
-		zend_throw_exception(zend_ce_exception, "Missing the 'intern' struct object", 0);
+		php_extcss3_throw_exception(EXTCSS3_ERR_NULL_PTR);
 		return;
 	} else if (!len) {
 		RETURN_EMPTY_STRING();
-	} else if (EXTCSS3_SUCCESS != extcss3_set_css_string(intern, css, len)) {
-		zend_throw_exception(zend_ce_exception, "Memory allocation for the CSS string failed", 0);
+	} else if (EXTCSS3_SUCCESS != extcss3_set_css_string(intern, css, len, &error)) {
+		php_extcss3_throw_exception(error);
 		return;
 	}
 
@@ -339,8 +339,8 @@ PHP_METHOD(CSS3Processor, minify)
 				intern->last_vendor = intern->last_vendor->next;
 			}
 
-			if ((intern->last_vendor == NULL) || (EXTCSS3_SUCCESS != extcss3_set_vendor_string(intern, Z_STRVAL_P(name), Z_STRLEN_P(name)))) {
-				zend_throw_exception(zend_ce_exception, "Memory allocation for the 'vendor' struct object failed", 0);
+			if ((intern->last_vendor == NULL) || (EXTCSS3_SUCCESS != extcss3_set_vendor_string(intern, Z_STRVAL_P(name), Z_STRLEN_P(name), &error))) {
+				php_extcss3_throw_exception(error);
 				return;
 			}
 		} ZEND_HASH_FOREACH_END();

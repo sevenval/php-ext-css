@@ -14,6 +14,7 @@
 #define EXTCSS3_ERR_MEMORY				((int)1)
 #define EXTCSS3_ERR_BYTES_CORRUPTION	((int)2)
 #define EXTCSS3_ERR_NULL_PTR			((int)3)
+#define EXTCSS3_ERR_INV_PARAM			((int)4)
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
