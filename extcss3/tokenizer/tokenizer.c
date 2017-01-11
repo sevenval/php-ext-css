@@ -333,7 +333,7 @@ static inline int _extcss3_next_char(extcss3_intern *intern)
 static inline int _extcss3_token_add(extcss3_intern *intern, extcss3_token *token)
 {
 	extcss3_token *prev;
-	int ret;
+	int ret = 0;
 
 	if ((token->prev = intern->last_token) != NULL) {
 		intern->last_token->next = token;
@@ -374,7 +374,7 @@ static inline int _extcss3_token_add(extcss3_intern *intern, extcss3_token *toke
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	if ((ret = extcss3_ctxt_update(intern)) != 0) {
+	if (EXTCSS3_SUCCESS != extcss3_ctxt_update(intern, &ret)) {
 		return ret;
 	}
 

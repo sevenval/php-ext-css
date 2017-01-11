@@ -15,10 +15,12 @@ void inline _extcss3_ctxt_parent(extcss3_intern *intern)
 	}
 }
 
-int inline extcss3_ctxt_update(extcss3_intern *intern)
+bool inline extcss3_ctxt_update(extcss3_intern *intern, int *error)
 {
 	if ((intern == NULL) || (intern->last_token == NULL) || (intern->last_ctxt == NULL)) {
-		return EXTCSS3_ERR_NULL_PTR;
+		*error = EXTCSS3_ERR_NULL_PTR;
+
+		return EXTCSS3_FAILURE;
 	}
 
 	switch (intern->last_token->type) {
@@ -29,7 +31,9 @@ int inline extcss3_ctxt_update(extcss3_intern *intern)
 		case EXTCSS3_TYPE_BR_CO:
 		{
 			if ((intern->last_ctxt->next = extcss3_create_ctxt()) == NULL) {
-				return EXTCSS3_ERR_MEMORY;
+				*error = EXTCSS3_ERR_MEMORY;
+
+				return EXTCSS3_FAILURE;
 			}
 
 			intern->last_ctxt->next->level = intern->last_ctxt->level + 1;
@@ -71,5 +75,5 @@ int inline extcss3_ctxt_update(extcss3_intern *intern)
 		}
 	}
 
-	return 0;
+	return EXTCSS3_SUCCESS;
 }

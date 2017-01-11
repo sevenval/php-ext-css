@@ -5,6 +5,6 @@
 
 /* ==================================================================================================== */
 
-int extcss3_ctxt_update(extcss3_intern *intern);
+bool extcss3_ctxt_update(extcss3_intern *intern, int *error);
 
 #endif /* EXTCSS3_TOKENIZER_CONTEXT_H */
