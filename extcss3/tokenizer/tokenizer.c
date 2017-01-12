@@ -304,14 +304,16 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 
 static inline bool _extcss3_cleanup_tokenizer(int error, extcss3_intern *intern, bool token, bool ctxt)
 {
-	if (token) {
-		extcss3_release_token(intern->base_token, true);
-		intern->base_token = NULL;
-	}
+	if (intern != NULL) {
+		if (token) {
+			extcss3_release_token(intern->base_token, true);
+			intern->base_token = NULL;
+		}
 
-	if (ctxt) {
-		extcss3_release_ctxt(intern->base_ctxt, true);
-		intern->base_ctxt = NULL;
+		if (ctxt) {
+			extcss3_release_ctxt(intern->base_ctxt, true);
+			intern->base_ctxt = NULL;
+		}
 	}
 
 	return error == 0 ? EXTCSS3_SUCCESS : EXTCSS3_FAILURE;
