@@ -28,7 +28,7 @@ static bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_token *to
 /* CONSUMER */
 static int _extcss3_consume_escaped(extcss3_intern *intern);
 static bool _extcss3_consume_bad_url_remnants(extcss3_intern *intern, int *error);
-static int _extcss3_consume_name(extcss3_intern *intern);
+static bool _extcss3_consume_name(extcss3_intern *intern, int *error);
 
 /* CHECKER */
 static bool _extcss3_check_start_valid_escape(char *str);
@@ -458,7 +458,7 @@ static inline bool _extcss3_fill_hash_token(extcss3_intern *intern, extcss3_toke
 		token->flag = EXTCSS3_FLAG_ID;
 	}
 
-	if ((*error = _extcss3_consume_name(intern)) != 0) {
+	if (EXTCSS3_SUCCESS != _extcss3_consume_name(intern, error)) {
 		return EXTCSS3_FAILURE;
 	}
 
@@ -475,7 +475,7 @@ static inline bool _extcss3_fill_at_token(extcss3_intern *intern, extcss3_token 
 	token->type = EXTCSS3_TYPE_AT_KEYWORD;
 	token->data.str = intern->state.reader;
 
-	if ((*error = _extcss3_consume_name(intern)) != 0) {
+	if (EXTCSS3_SUCCESS != _extcss3_consume_name(intern, error)) {
 		return EXTCSS3_FAILURE;
 	}
 
@@ -588,7 +588,7 @@ static inline bool _extcss3_fill_ident_like_token(extcss3_intern *intern, extcss
 {
 	token->data.str = intern->state.reader;
 
-	if ((*error = _extcss3_consume_name(intern)) != 0) {
+	if (EXTCSS3_SUCCESS != _extcss3_consume_name(intern, error)) {
 		return EXTCSS3_FAILURE;
 	}
 
@@ -896,7 +896,7 @@ static inline bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_to
 		token->type = EXTCSS3_TYPE_DIMENSION;
 		token->info.str = intern->state.reader;
 
-		if ((*error = _extcss3_consume_name(intern)) != 0) {
+		if (EXTCSS3_SUCCESS != _extcss3_consume_name(intern, error)) {
 			return EXTCSS3_FAILURE;
 		}
 
@@ -1015,27 +1015,25 @@ static inline bool _extcss3_consume_bad_url_remnants(extcss3_intern *intern, int
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-a-name
  */
-static inline int _extcss3_consume_name(extcss3_intern *intern)
+static inline bool _extcss3_consume_name(extcss3_intern *intern, int *error)
 {
-	int ret;
-
 	while (true) {
-		if ((ret = _extcss3_next_char(intern)) != 0) {
-			return ret;
+		if ((*error = _extcss3_next_char(intern)) != 0) {
+			return EXTCSS3_FAILURE;
 		}
 
 		if (EXTCSS3_SUCCESS == _extcss3_check_is_name(intern->state.reader)) {
 			continue;
 		} else if (EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(intern->state.reader)) {
-			if ((ret = _extcss3_consume_escaped(intern)) != 0) {
-				return ret;
+			if ((*error = _extcss3_consume_escaped(intern)) != 0) {
+				return EXTCSS3_FAILURE;
 			}
 		} else {
 			break;
 		}
 	}
 
-	return 0;
+	return EXTCSS3_SUCCESS;
 }
 
 /* ==================================================================================================== */
