@@ -91,50 +91,57 @@ public CSS3Processor::minify(string $css [, array $vendors ]) : string
 
 #### Type Constants
 
-* `TYPE_IDENT`			1
-* `TYPE_FUNCTION`		2
-* `TYPE_AT_KEYWORD`		3
-* `TYPE_HASH`			4
-* `TYPE_STRING`			5 (modifiable)
-* `TYPE_BAD_STRING`		6 (modifiable)
-* `TYPE_URL`			7 (modifiable)
-* `TYPE_BAD_URL`		8 (modifiable)
-* `TYPE_DELIM`			9
-* `TYPE_NUMBER`			10
-* `TYPE_PERCENTAGE`		11
-* `TYPE_DIMENSION`		12
-* `TYPE_UNICODE_RANGE`	13
-* `TYPE_INCLUDE_MATCH`	14
-* `TYPE_DASH_MATCH`		15
-* `TYPE_PREFIX_MATCH`	16
-* `TYPE_SUFFIX_MATCH`	17
-* `TYPE_SUBSTR_MATCH`	18
-* `TYPE_COLUMN`			19
-* `TYPE_WS`				20
-* `TYPE_CDO`			21
-* `TYPE_CDC`			22
-* `TYPE_COLON`			23
-* `TYPE_SEMICOLON`		24
-* `TYPE_COMMA`			25
-* `TYPE_BR_RO`			26
-* `TYPE_BR_RC`			27
-* `TYPE_BR_SO`			28
-* `TYPE_BR_SC`			29
-* `TYPE_BR_CO`			30
-* `TYPE_BR_CC`			31
-* `TYPE_COMMENT`		32 (modifiable)
-* `TYPE_EOF`			33
+* `TYPE_IDENT`				1
+* `TYPE_FUNCTION`			2
+* `TYPE_AT_KEYWORD`			3
+* `TYPE_HASH`				4
+* `TYPE_STRING`				5 (modifiable)
+* `TYPE_BAD_STRING`			6 (modifiable)
+* `TYPE_URL`				7 (modifiable)
+* `TYPE_BAD_URL`			8 (modifiable)
+* `TYPE_DELIM`				9
+* `TYPE_NUMBER`				10
+* `TYPE_PERCENTAGE`			11
+* `TYPE_DIMENSION`			12
+* `TYPE_UNICODE_RANGE`		13
+* `TYPE_INCLUDE_MATCH`		14
+* `TYPE_DASH_MATCH`			15
+* `TYPE_PREFIX_MATCH`		16
+* `TYPE_SUFFIX_MATCH`		17
+* `TYPE_SUBSTR_MATCH`		18
+* `TYPE_COLUMN`				19
+* `TYPE_WS`					20
+* `TYPE_CDO`				21
+* `TYPE_CDC`				22
+* `TYPE_COLON`				23
+* `TYPE_SEMICOLON`			24
+* `TYPE_COMMA`				25
+* `TYPE_BR_RO`				26
+* `TYPE_BR_RC`				27
+* `TYPE_BR_SO`				28
+* `TYPE_BR_SC`				29
+* `TYPE_BR_CO`				30
+* `TYPE_BR_CC`				31
+* `TYPE_COMMENT`			32 (modifiable)
+* `TYPE_EOF`				33
 
 
 #### Flag Constants
 
-* `FLAG_ID`				1
-* `FLAG_UNRESTRICTED`	2
-* `FLAG_INTEGER`		3
-* `FLAG_NUMBER`			4
-* `FLAG_STRING`			5
-* `FLAG_AT_URL_STRING`	6
+* `FLAG_ID`					1
+* `FLAG_UNRESTRICTED`		2
+* `FLAG_INTEGER`			3
+* `FLAG_NUMBER`				4
+* `FLAG_STRING`				5
+* `FLAG_AT_URL_STRING`		6
 
+
+#### Exception Code Constants
+
+* `ERR_MEMORY`				1
+* `ERR_BYTES_CORRUPTION`	2
+* `ERR_NULL_PTR`			3
+* `ERR_INV_PARAM`			4
 
 ### Examples
 
