@@ -47,7 +47,7 @@ char *extcss3_minify(extcss3_intern *intern, int *error)
 
 	if ((intern == NULL) || (intern->copy.str == NULL)) {
 		return _extcss3_set_error_code(error, EXTCSS3_ERR_NULL_PTR, NULL, NULL);
-	} else if ((*error = extcss3_tokenize(intern)) != 0) {
+	} else if (EXTCSS3_SUCCESS != extcss3_tokenize(intern, error)) {
 		return _extcss3_set_error_code(error, *error, NULL, NULL);
 	} else if ((token = intern->base_token) == NULL) {
 		return _extcss3_set_error_code(error, EXTCSS3_ERR_NULL_PTR, NULL, NULL);
