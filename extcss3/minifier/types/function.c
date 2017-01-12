@@ -105,7 +105,7 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 			curr->prev->next = curr->next;
 
 			temp = curr->prev;
-			extcss3_release_token(curr, false);
+			extcss3_release_token(curr);
 			curr = temp;
 		}
 
@@ -114,7 +114,7 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 
 			// Create a new whitespace token
 			if (((*token)->next = extcss3_create_token()) == NULL) {
-				extcss3_release_token(temp, true);
+				extcss3_release_tokens_list(temp);
 
 				*error = EXTCSS3_ERR_MEMORY;
 				return EXTCSS3_FAILURE;

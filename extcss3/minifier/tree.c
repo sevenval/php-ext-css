@@ -243,7 +243,7 @@ static inline void *_extcss3_set_error_code(int *error, int code, extcss3_rule *
 	*error = code;
 
 	if (tree != NULL) {
-		extcss3_release_rule(tree, true);
+		extcss3_release_rules_list(tree);
 	}
 
 	return NULL;

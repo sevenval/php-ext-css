@@ -306,12 +306,12 @@ static inline bool _extcss3_cleanup_tokenizer(int error, extcss3_intern *intern,
 {
 	if (intern != NULL) {
 		if (token) {
-			extcss3_release_token(intern->base_token, true);
+			extcss3_release_tokens_list(intern->base_token);
 			intern->base_token = NULL;
 		}
 
 		if (ctxt) {
-			extcss3_release_ctxt(intern->base_ctxt, true);
+			extcss3_release_ctxts_list(intern->base_ctxt);
 			intern->base_ctxt = NULL;
 		}
 	}

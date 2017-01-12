@@ -10,7 +10,7 @@ void inline _extcss3_ctxt_parent(extcss3_intern *intern)
 	if ((intern->last_ctxt != NULL) && (intern->last_ctxt->prev != NULL)) {
 		prev = intern->last_ctxt->prev;
 		prev->next = NULL;
-		extcss3_release_ctxt(intern->last_ctxt, false);
+		extcss3_release_ctxt(intern->last_ctxt);
 		intern->last_ctxt = prev;
 	}
 }

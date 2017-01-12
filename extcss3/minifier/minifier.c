@@ -83,11 +83,11 @@ static inline void *_extcss3_set_error_code(int *error, int code, extcss3_rule *
 	*error = code;
 
 	if (tree != NULL) {
-		extcss3_release_rule(tree, true);
+		extcss3_release_rules_list(tree);
 	}
 
 	if ((intern != NULL) && (intern->base_token != NULL)) {
-		extcss3_release_token(intern->base_token, true);
+		extcss3_release_tokens_list(intern->base_token);
 		intern->base_token = NULL;
 	}
 
@@ -119,7 +119,7 @@ static extcss3_rule *_extcss3_minify_tree(extcss3_intern *intern, extcss3_rule *
 			}
 
 			next = curr->next;
-			extcss3_release_rule(curr, false);
+			extcss3_release_rule(curr);
 
 			curr = next;
 			continue;
@@ -129,7 +129,7 @@ static extcss3_rule *_extcss3_minify_tree(extcss3_intern *intern, extcss3_rule *
 	}
 
 	if ((*tree)->base_selector == NULL) {
-		extcss3_release_rule(*tree, true);
+		extcss3_release_rules_list(*tree);
 
 		*tree = NULL;
 	}
@@ -492,7 +492,7 @@ static inline extcss3_block *_extcss3_minify_declarations(extcss3_intern *intern
 			}
 
 			temp = curr->next;
-			extcss3_release_decl(curr, false);
+			extcss3_release_decl(curr);
 			curr = temp;
 
 			continue;
@@ -810,7 +810,7 @@ static inline void _extcss3_trim_left(extcss3_token *curr)
 	while ((curr->prev != NULL) && _EXTCSS3_TYPE_EMPTY_EX(curr->prev)) {
 		if ((temp = curr->prev->prev) != NULL) {
 			temp->next = curr;
-			extcss3_release_token(curr->prev, false);
+			extcss3_release_token(curr->prev);
 			curr->prev = temp;
 		}
 	}
@@ -827,7 +827,7 @@ static inline void _extcss3_trim_right(extcss3_token *curr, extcss3_token **last
 			}
 
 			temp->prev = curr;
-			extcss3_release_token(curr->next, false);
+			extcss3_release_token(curr->next);
 			curr->next = temp;
 		}
 	}
@@ -856,7 +856,7 @@ static inline void _extcss3_remove_token(extcss3_token **base, extcss3_token **t
 		(*token)->prev->next = (*token)->next;
 	}
 
-	extcss3_release_token(*token, false);
+	extcss3_release_token(*token);
 
 	*token = repl;
 }

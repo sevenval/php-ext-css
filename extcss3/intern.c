@@ -54,15 +54,15 @@ void extcss3_release_intern(extcss3_intern *intern)
 	}
 
 	if (intern->base_vendor != NULL) {
-		extcss3_release_vendor(intern->base_vendor, true);
+		extcss3_release_vendors_list(intern->base_vendor);
 	}
 
 	if (intern->base_token != NULL) {
-		extcss3_release_token(intern->base_token, true);
+		extcss3_release_tokens_list(intern->base_token);
 	}
 
 	if (intern->base_ctxt != NULL) {
-		extcss3_release_ctxt(intern->base_ctxt, true);
+		extcss3_release_ctxts_list(intern->base_ctxt);
 	}
 
 	if (intern->modifier.destructor != NULL) {
@@ -90,20 +90,10 @@ void extcss3_release_intern(extcss3_intern *intern)
 	free(intern);
 }
 
-void extcss3_release_vendor(extcss3_vendor *vendor, bool recursive)
+void extcss3_release_vendor(extcss3_vendor *vendor)
 {
-	extcss3_vendor *next;
-
 	if (vendor == NULL) {
 		return;
-	}
-
-	if (recursive) {
-		while (vendor->next != NULL) {
-			next = vendor->next->next;
-			extcss3_release_vendor(vendor->next, false);
-			vendor->next = next;
-		}
 	}
 
 	if (vendor->name.str != NULL) {
@@ -113,20 +103,27 @@ void extcss3_release_vendor(extcss3_vendor *vendor, bool recursive)
 	free(vendor);
 }
 
-void extcss3_release_token(extcss3_token *token, bool recursive)
+void extcss3_release_vendors_list(extcss3_vendor *list)
 {
-	extcss3_token *next;
+	extcss3_vendor *next;
 
-	if (token == NULL) {
+	if (list == NULL) {
 		return;
 	}
 
-	if (recursive) {
-		while (token->next != NULL) {
-			next = token->next->next;
-			extcss3_release_token(token->next, false);
-			token->next = next;
-		}
+	while (list->next != NULL) {
+		next = list->next->next;
+		extcss3_release_vendor(list->next);
+		list->next = next;
+	}
+
+	extcss3_release_vendor(list);
+}
+
+void extcss3_release_token(extcss3_token *token)
+{
+	if (token == NULL) {
+		return;
 	}
 
 	if (token->user.str != NULL) {
@@ -136,39 +133,53 @@ void extcss3_release_token(extcss3_token *token, bool recursive)
 	free(token);
 }
 
-void extcss3_release_ctxt(extcss3_ctxt *ctxt, bool recursive)
+void extcss3_release_tokens_list(extcss3_token *list)
 {
-	extcss3_ctxt *next;
+	extcss3_token *next;
 
-	if (ctxt == NULL) {
+	if (list == NULL) {
 		return;
 	}
 
-	if (recursive) {
-		while (ctxt->next != NULL) {
-			next = ctxt->next->next;
-			extcss3_release_ctxt(ctxt->next, false);
-			ctxt->next = next;
-		}
+	while (list->next != NULL) {
+		next = list->next->next;
+		extcss3_release_token(list->next);
+		list->next = next;
+	}
+
+	extcss3_release_token(list);
+}
+
+void extcss3_release_ctxt(extcss3_ctxt *ctxt)
+{
+	if (ctxt == NULL) {
+		return;
 	}
 
 	free(ctxt);
 }
 
-void extcss3_release_rule(extcss3_rule *rule, bool recursive)
+void extcss3_release_ctxts_list(extcss3_ctxt *list)
 {
-	extcss3_rule *next;
+	extcss3_ctxt *next;
 
-	if (rule == NULL) {
+	if (list == NULL) {
 		return;
 	}
 
-	if (recursive) {
-		while (rule->next != NULL) {
-			next = rule->next->next;
-			extcss3_release_rule(rule->next, false);
-			rule->next = next;
-		}
+	while (list->next != NULL) {
+		next = list->next->next;
+		extcss3_release_ctxt(list->next);
+		list->next = next;
+	}
+
+	extcss3_release_ctxt(list);
+}
+
+void extcss3_release_rule(extcss3_rule *rule)
+{
+	if (rule == NULL) {
+		return;
 	}
 
 	if (rule->block != NULL) {
@@ -178,6 +189,23 @@ void extcss3_release_rule(extcss3_rule *rule, bool recursive)
 	free(rule);
 }
 
+void extcss3_release_rules_list(extcss3_rule *list)
+{
+	extcss3_rule *next;
+
+	if (list == NULL) {
+		return;
+	}
+
+	while (list->next != NULL) {
+		next = list->next->next;
+		extcss3_release_rule(list->next);
+		list->next = next;
+	}
+
+	extcss3_release_rule(list);
+}
+
 void extcss3_release_block(extcss3_block *block)
 {
 	if (block == NULL) {
@@ -185,33 +213,40 @@ void extcss3_release_block(extcss3_block *block)
 	}
 
 	if (block->rules != NULL) {
-		extcss3_release_rule(block->rules, true);
+		extcss3_release_rules_list(block->rules);
 	}
 
 	if (block->decls != NULL) {
-		extcss3_release_decl(block->decls, true);
+		extcss3_release_decls_list(block->decls);
 	}
 
 	free(block);
 }
 
-void extcss3_release_decl(extcss3_decl *decl, bool recursive)
+void extcss3_release_decl(extcss3_decl *decl)
 {
-	extcss3_decl *next;
-
 	if (decl == NULL) {
 		return;
 	}
 
-	if (recursive) {
-		while (decl->next != NULL) {
-			next = decl->next->next;
-			extcss3_release_decl(decl->next, false);
-			decl->next = next;
-		}
+	free(decl);
+}
+
+void extcss3_release_decls_list(extcss3_decl *list)
+{
+	extcss3_decl *next;
+
+	if (list == NULL) {
+		return;
 	}
 
-	free(decl);
+	while (list->next != NULL) {
+		next = list->next->next;
+		extcss3_release_decl(list->next);
+		list->next = next;
+	}
+
+	extcss3_release_decl(list);
 }
 
 /* ==================================================================================================== */

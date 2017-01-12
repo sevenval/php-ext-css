@@ -322,7 +322,7 @@ PHP_METHOD(CSS3Processor, minify)
 	}
 
 	if ((intern->base_vendor != NULL) || (intern->last_vendor != NULL)) {
-		extcss3_release_vendor(intern->base_vendor, true);
+		extcss3_release_vendors_list(intern->base_vendor);
 		intern->base_vendor = intern->last_vendor = NULL;
 	}
 

@@ -82,7 +82,7 @@ char *extcss3_dump_tokens(extcss3_intern *intern, int *error)
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	extcss3_release_token(intern->base_token, true);
+	extcss3_release_tokens_list(intern->base_token);
 	intern->base_token = NULL;
 
 	return result;
