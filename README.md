@@ -146,10 +146,15 @@ public CSS3Processor::minify(string $css [, array $vendors ]) : string
 ### Examples
 
 ```
-$proc = new \CSS3Processor();
+$css = file_get_contents('style.css');
 
-$css = file_get_contents('style.css')
-$min = $proc->minify($css, ['-ms', '-moz', '-o']);
+try {
+	$proc = new \CSS3Processor();
+
+	$min = $proc->minify($css, ['-ms', '-moz', '-o']);
+} catch (Exception $e) {
+	...
+}
 ```
 
 More examples coming soon...
