@@ -167,7 +167,7 @@ const char *extcss3_color_hashes_xx[11][2] = {
 
 /* ==================================================================================================== */
 
-bool extcss3_minify_hash(char *str, size_t len, extcss3_token *token, int *error)
+bool extcss3_minify_hash(char *str, unsigned short int len, extcss3_token *token, int *error)
 {
 	unsigned short int i;
 
