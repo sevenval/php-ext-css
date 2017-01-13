@@ -924,7 +924,7 @@ static inline bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_to
 static inline bool _extcss3_consume_escaped(extcss3_intern *intern, int *error)
 {
 	unsigned short int i;
-	int v;
+	unsigned int v;
 	char hex[7];
 
 	// Consume '\\'

@@ -65,7 +65,7 @@ static inline bool _extcss3_copy_and_move(extcss3_intern *intern, const char *sr
  */
 bool extcss3_preprocess(extcss3_intern *intern, int *error)
 {
-	int len;
+	unsigned short int len;
 
 	if ((intern == NULL) || (intern->state.cursor == NULL) || (intern->state.writer == NULL)) {
 		*error = EXTCSS3_ERR_NULL_PTR;

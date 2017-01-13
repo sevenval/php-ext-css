@@ -11,15 +11,15 @@
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#define EXTCSS3_ERR_MEMORY				((int)1)
-#define EXTCSS3_ERR_BYTES_CORRUPTION	((int)2)
-#define EXTCSS3_ERR_NULL_PTR			((int)3)
-#define EXTCSS3_ERR_INV_PARAM			((int)4)
+#define EXTCSS3_ERR_MEMORY				((unsigned short int)1)
+#define EXTCSS3_ERR_BYTES_CORRUPTION	((unsigned short int)2)
+#define EXTCSS3_ERR_NULL_PTR			((unsigned short int)3)
+#define EXTCSS3_ERR_INV_PARAM			((unsigned short int)4)
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #define EXTCSS3_REPLACEMENT_CHR			("\xEF\xBF\xBD")
-#define EXTCSS3_REPLACEMENT_LEN			((int)3)
+#define EXTCSS3_REPLACEMENT_LEN			((unsigned short int)3)
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -209,7 +209,7 @@ struct _extcss3_block
 
 struct _extcss3_rule
 {
-	int					level;
+	unsigned int		level;
 
 	extcss3_token		*base_selector;
 	extcss3_token		*last_selector;

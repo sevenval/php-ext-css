@@ -16,7 +16,7 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, int
 	extcss3_token *search;
 	extcss3_rule *tree, *rule;
 	extcss3_decl *decl, *last;
-	int levels, nested;
+	unsigned int levels, nested;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
