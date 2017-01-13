@@ -42,7 +42,7 @@ static bool _extcss3_check_is_name(char *str);
 bool extcss3_tokenize(extcss3_intern *intern, int *error)
 {
 	extcss3_token *token;
-	int i;
+	unsigned short int i;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -50,7 +50,10 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 		return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_NULL_PTR, NULL, false, false);
 	} else if ((intern->base_token = token = extcss3_create_token()) == NULL) {
 		return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_MEMORY, NULL, false, false);
-	} else if ((intern->base_ctxt = intern->last_ctxt = extcss3_create_ctxt()) == NULL) {
+	} else if (
+		EXTCSS3_HAS_MODIFIER(intern) &&
+		((intern->base_ctxt = intern->last_ctxt = extcss3_create_ctxt()) == NULL)
+	) {
 		return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_MEMORY, intern, true, false);
 	}
 
@@ -62,7 +65,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 	 * "i" characters. The "reader" and "writer" pointers of the
 	 * state machine run parallel but offset by "i" characters.
 	 */
-	for (i = 0; i < 5; i++) {
+	for (i = 5; i--; ) {
 		if (EXTCSS3_SUCCESS != extcss3_preprocess(intern, error)) {
 			return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 		}
@@ -305,12 +308,12 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 static inline bool _extcss3_cleanup_tokenizer(int error, extcss3_intern *intern, bool token, bool ctxt)
 {
 	if (intern != NULL) {
-		if (token) {
+		if (token && (intern->base_token != NULL)) {
 			extcss3_release_tokens_list(intern->base_token);
 			intern->base_token = NULL;
 		}
 
-		if (ctxt) {
+		if (ctxt && (intern->base_ctxt != NULL)) {
 			extcss3_release_ctxts_list(intern->base_ctxt);
 			intern->base_ctxt = NULL;
 		}
@@ -367,14 +370,14 @@ static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *tok
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	if (EXTCSS3_TYPE_IS_MODIFIABLE(token->type) && (intern->modifier.callback != NULL)) {
-		intern->modifier.callback(intern);
-	}
+	if (intern->base_ctxt != NULL) {
+		if (EXTCSS3_TYPE_IS_MODIFIABLE(token->type) && (intern->modifier.callback != NULL)) {
+			intern->modifier.callback(intern);
+		}
 
-	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-	if (EXTCSS3_SUCCESS != extcss3_ctxt_update(intern, error)) {
-		return EXTCSS3_FAILURE;
+		if (EXTCSS3_SUCCESS != extcss3_ctxt_update(intern, error)) {
+			return EXTCSS3_FAILURE;
+		}
 	}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

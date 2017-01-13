@@ -27,6 +27,14 @@
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+#define EXTCSS3_HAS_MODIFIER(intern) (			\
+	((intern->modifier.string)		!= NULL) ||	\
+	((intern->modifier.bad_string)	!= NULL) ||	\
+	((intern->modifier.bad_url)		!= NULL) ||	\
+	((intern->modifier.url)			!= NULL) ||	\
+	((intern->modifier.comment)		!= NULL)	\
+)
+
 #define EXTCSS3_TYPE_IS_MODIFIABLE(i) (	   \
 	((i) == EXTCSS3_TYPE_STRING)		|| \
 	((i) == EXTCSS3_TYPE_BAD_STRING)	|| \
