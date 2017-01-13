@@ -31,7 +31,7 @@ const char *extcss3_numeric_dimensions[19] = {
 	"turn"
 };
 
-bool _extcss3_minify_numeric_prevent_dimension(extcss3_token *token)
+static inline bool _extcss3_minify_numeric_prevent_dimension(extcss3_token *token)
 {
 	unsigned short int i, elements;
 	bool prevent = true;
