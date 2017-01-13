@@ -3,7 +3,7 @@
 
 /* ==================================================================================================== */
 
-void inline _extcss3_ctxt_parent(extcss3_intern *intern)
+static inline void _extcss3_ctxt_parent(extcss3_intern *intern)
 {
 	extcss3_ctxt *prev;
 
@@ -15,7 +15,7 @@ void inline _extcss3_ctxt_parent(extcss3_intern *intern)
 	}
 }
 
-bool inline extcss3_ctxt_update(extcss3_intern *intern, int *error)
+bool extcss3_ctxt_update(extcss3_intern *intern, int *error)
 {
 	if ((intern == NULL) || (intern->last_token == NULL) || (intern->last_ctxt == NULL)) {
 		*error = EXTCSS3_ERR_NULL_PTR;
