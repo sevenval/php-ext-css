@@ -16,12 +16,12 @@ zend_object_handlers oh_extcss3;
 #define EXTCSS3_REGISTER_LONG_CLASS_CONST(name, value) \
 	zend_declare_class_constant_long(ce_extcss3, name, strlen(name), value);
 
-inline extcss3_object *extcss3_fetch(zend_object *object)
+inline extcss3_object *extcss3_object_fetch(zend_object *object)
 {
 	return (extcss3_object *)((char *)(object) - XtOffsetOf(extcss3_object, std));
 }
 
-zend_object *extcss3_new(zend_class_entry *ce)
+zend_object *extcss3_object_new(zend_class_entry *ce)
 {
 	extcss3_object *object = (extcss3_object *)ecalloc(1, sizeof(extcss3_object) + zend_object_properties_size(ce));
 
@@ -34,9 +34,9 @@ zend_object *extcss3_new(zend_class_entry *ce)
 	return &object->std;
 }
 
-void extcss3_free(zend_object *zo)
+void extcss3_object_free(zend_object *zo)
 {
-	extcss3_object *object = extcss3_fetch(zo);
+	extcss3_object *object = extcss3_object_fetch(zo);
 
 	if (object->intern) {
 		extcss3_release_intern(object->intern);
@@ -226,7 +226,7 @@ ZEND_END_ARG_INFO()
 
 PHP_METHOD(CSS3Processor, __construct)
 {
-	extcss3_object *object = extcss3_fetch(Z_OBJ_P(getThis()));
+	extcss3_object *object = extcss3_object_fetch(Z_OBJ_P(getThis()));
 	extcss3_intern *intern = extcss3_create_intern();
 
 	if (intern == NULL) {
@@ -241,7 +241,7 @@ PHP_METHOD(CSS3Processor, __construct)
 
 PHP_METHOD(CSS3Processor, setModifier)
 {
-	extcss3_object *object = extcss3_fetch(Z_OBJ_P(getThis()));
+	extcss3_object *object = extcss3_object_fetch(Z_OBJ_P(getThis()));
 	extcss3_intern *intern = object->intern;
 	zval *callable, *copy;
 	size_t type;
@@ -278,7 +278,7 @@ PHP_METHOD(CSS3Processor, setModifier)
 
 PHP_METHOD(CSS3Processor, dump)
 {
-	extcss3_object *object = extcss3_fetch(Z_OBJ_P(getThis()));
+	extcss3_object *object = extcss3_object_fetch(Z_OBJ_P(getThis()));
 	extcss3_intern *intern = object->intern;
 	char *css, *result;
 	size_t len;
@@ -302,7 +302,7 @@ PHP_METHOD(CSS3Processor, dump)
 
 PHP_METHOD(CSS3Processor, minify)
 {
-	extcss3_object *object = extcss3_fetch(Z_OBJ_P(getThis()));
+	extcss3_object *object = extcss3_object_fetch(Z_OBJ_P(getThis()));
 	extcss3_intern *intern = object->intern;
 	zval *name, *vendors = NULL;
 	char *css, *result;
@@ -375,10 +375,10 @@ PHP_MINIT_FUNCTION(extcss3)
 	memcpy(&oh_extcss3, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	oh_extcss3.offset = XtOffsetOf(extcss3_object, std);
 	oh_extcss3.dtor_obj = zend_objects_destroy_object;
-	oh_extcss3.free_obj = extcss3_free;
+	oh_extcss3.free_obj = extcss3_object_free;
 
 	INIT_CLASS_ENTRY(ce, "CSS3Processor", extcss3_methods);
-	ce.create_object = extcss3_new;
+	ce.create_object = extcss3_object_new;
 	ce_extcss3 = zend_register_internal_class_ex(&ce, NULL);
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
