@@ -112,6 +112,9 @@
 
 /* ==================================================================================================== */
 
+#pragma pack(push)
+#pragma pack()
+
 typedef struct _extcss3_str		extcss3_str;
 
 typedef struct _extcss3_state	extcss3_state;
@@ -238,6 +241,8 @@ struct _extcss3_intern
 
 	extcss3_mod			modifier;
 };
+
+#pragma pack(pop)
 
 /* ==================================================================================================== */
 
