@@ -230,7 +230,7 @@ bool extcss3_minify_hash(char *str, unsigned short int len, extcss3_token *token
 				token->user.str[3] = str[5];
 			}
 		} else {
-			for (i = 0; i < (sizeof(extcss3_hash_colors) / sizeof(extcss3_hash_colors[0])); i++) {
+			for (i = (sizeof(extcss3_hash_colors) / sizeof(extcss3_hash_colors[0])) - 1; i--; ) {
 				if (strncasecmp(str, extcss3_hash_colors[i][0], 6) == 0) {
 					token->user.len = strlen(extcss3_hash_colors[i][1]);
 					if ((token->user.str = (char *)calloc(1, sizeof(char) * (token->user.len))) == NULL) {
@@ -313,7 +313,7 @@ bool extcss3_minify_color(extcss3_token *token, int *error)
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	for (i = 0; i < elements; i++) {
+	for (i = elements - 1; i--; ) {
 		if (
 			(strlen(map[i][0]) == token->data.len) &&
 			(strncasecmp(token->data.str, map[i][0], token->data.len) == 0)
