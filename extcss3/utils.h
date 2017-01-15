@@ -23,7 +23,9 @@
 /* https://www.w3.org/TR/css-syntax-3/#surrogate-code-point (U+D800 - U+DFFF) */
 #define EXTCSS3_FOR_SURROGATE_CP(i)	(((i) >= 55296) && ((i) <= 57343))
 
-#define EXTCSS3_IS_HEX(c)			(EXTCSS3_IS_DIGIT(c) || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F')))
+#define EXTCSS3_IS_HEX(c)			(EXTCSS3_IS_DIGIT(c) || (((c) >= 'a') && ((c) <= 'f')) || (((c) >= 'A') && ((c) <= 'F')))
+
+#define EXTCSS3_IS_NON_ASCII(c)		((((c) >> 7) & 1) != 0)
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -43,7 +45,7 @@
 	((i) == EXTCSS3_TYPE_COMMENT)		   \
 )
 
-#define EXTCSS3_CHARS_EQ(a, b)	( (a == b) || \
+#define EXTCSS3_CHARS_EQ(a, b)	( ((a) == (b)) || \
 	( ((a) >= 'a') && ((a) <= 'z') && ((b) >= 'A') && ((b) <= 'Z') && (((a) - 32) == (b)) ) || \
 	( ((a) >= 'A') && ((a) <= 'Z') && ((b) >= 'a') && ((b) <= 'z') && (((a) + 32) == (b)) ) \
 )

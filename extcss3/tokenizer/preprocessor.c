@@ -12,7 +12,7 @@ static inline bool _extcss3_check_bytes_corruption(extcss3_intern *intern, int *
 {
 	unsigned short int i, j;
 
-	if (((*intern->state.cursor >> 7) & 1) != 0) {
+	if (EXTCSS3_IS_NON_ASCII(*intern->state.cursor)) {
 		i = 7;
 		j = 0;
 
@@ -81,7 +81,7 @@ bool extcss3_preprocess(extcss3_intern *intern, int *error)
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	if ((len = extcss3_char_len(*intern->state.cursor)) != 1) {
+	if (EXTCSS3_IS_NON_ASCII(*intern->state.cursor) && ((len = extcss3_char_len(*intern->state.cursor)) > 1)) {
 		/* Skip the following checks for the multibyte characters */
 		return _extcss3_copy_and_move(intern, intern->state.cursor, len, len);
 	} else if ((intern->state.rest > 0) && (*intern->state.cursor == '\0')) {
