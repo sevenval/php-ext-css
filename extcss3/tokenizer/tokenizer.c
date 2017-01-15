@@ -47,11 +47,11 @@ static bool _extcss3_consume_bad_url_remnants(extcss3_intern *intern, int *error
 static bool _extcss3_consume_name(extcss3_intern *intern, int *error);
 
 /* CHECKER */
-static bool _extcss3_check_start_valid_escape(char *str);
-static bool _extcss3_check_start_name(char *str);
+static bool _extcss3_check_start_valid_escape(const char *str);
+static bool _extcss3_check_start_name(const char *str);
 static bool _extcss3_check_start_ident(char *str);
-static bool _extcss3_check_start_number(char *str);
-static bool _extcss3_check_is_name(char *str);
+static bool _extcss3_check_start_number(const char *str);
+static bool _extcss3_check_is_name(const char *str);
 
 /* ==================================================================================================== */
 
@@ -59,6 +59,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 {
 	extcss3_token *token;
 	unsigned short int i;
+	char *reader;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -91,7 +92,9 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 
 	/* https://www.w3.org/TR/css-syntax-3/#consume-a-token */
 	while ((intern->last_token == NULL) || (intern->last_token->type != EXTCSS3_TYPE_EOF)) {
-		switch (*intern->state.reader) {
+		reader = intern->state.reader;
+
+		switch (*reader) {
 			case ' ':
 			case '\n':
 			case '\t':
@@ -114,8 +117,8 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			case '#':
 			{
 				if (
-					(EXTCSS3_SUCCESS == _extcss3_check_is_name(intern->state.reader + 1)) ||
-					(EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(intern->state.reader + 1))
+					(EXTCSS3_SUCCESS == _extcss3_check_is_name(reader + 1)) ||
+					(EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(reader + 1))
 				) {
 					if (EXTCSS3_SUCCESS != _extcss3_fill_hash_token(intern, token, error)) {
 						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
@@ -128,7 +131,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			}
 			case '$':
 			{
-				if (intern->state.reader[1] == '=') {
+				if (reader[1] == '=') {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_SUFFIX_MATCH, 2, error);
 				} else {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
@@ -183,7 +186,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			}
 			case '*':
 			{
-				if (intern->state.reader[1] == '=') {
+				if (reader[1] == '=') {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_SUBSTR_MATCH, 2, error);
 				} else {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
@@ -194,7 +197,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			case '+':
 			case '.':
 			{
-				if (EXTCSS3_SUCCESS == _extcss3_check_start_number(intern->state.reader)) {
+				if (EXTCSS3_SUCCESS == _extcss3_check_start_number(reader)) {
 					if (EXTCSS3_SUCCESS != _extcss3_fill_number_token(intern, token, error)) {
 						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 					}
@@ -206,15 +209,15 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			}
 			case '-':
 			{
-				if (EXTCSS3_SUCCESS == _extcss3_check_start_number(intern->state.reader)) {
+				if (EXTCSS3_SUCCESS == _extcss3_check_start_number(reader)) {
 					if (EXTCSS3_SUCCESS != _extcss3_fill_number_token(intern, token, error)) {
 						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 					}
-				} else if (EXTCSS3_SUCCESS == _extcss3_check_start_ident(intern->state.reader)) {
+				} else if (EXTCSS3_SUCCESS == _extcss3_check_start_ident(reader)) {
 					if (EXTCSS3_SUCCESS != _extcss3_fill_ident_like_token(intern, token, error)) {
 						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 					}
-				} else if ((intern->state.reader[1] == '-') && (intern->state.reader[2] == '>')) {
+				} else if ((reader[1] == '-') && (reader[2] == '>')) {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_CDC, 3, error);
 				} else {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
@@ -224,7 +227,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			}
 			case '/':
 			{
-				if (intern->state.reader[1] == '*') {
+				if (reader[1] == '*') {
 					if (EXTCSS3_SUCCESS != _extcss3_fill_comment_token(intern, token, error)) {
 						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 					}
@@ -236,7 +239,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			}
 			case '<':
 			{
-				if (intern->state.reader[1] == '!' && intern->state.reader[2] == '-' && intern->state.reader[3] == '-') {
+				if (reader[1] == '!' && reader[2] == '-' && reader[3] == '-') {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_CDO, 4, error);
 				} else {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
@@ -246,7 +249,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			}
 			case '@':
 			{
-				if (EXTCSS3_SUCCESS == _extcss3_check_start_ident(intern->state.reader + 1)) {
+				if (EXTCSS3_SUCCESS == _extcss3_check_start_ident(reader + 1)) {
 					if (EXTCSS3_SUCCESS != _extcss3_fill_at_token(intern, token, error)) {
 						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 					}
@@ -258,7 +261,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			}
 			case '\\':
 			{
-				if (EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(intern->state.reader + 1)) {
+				if (EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(reader + 1)) {
 					if (EXTCSS3_SUCCESS != _extcss3_fill_ident_like_token(intern, token, error)) {
 						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 					}
@@ -270,7 +273,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			}
 			case '^':
 			{
-				if (intern->state.reader[1] == '=') {
+				if (reader[1] == '=') {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_PREFIX_MATCH, 2, error);
 				} else {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
@@ -280,9 +283,9 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			}
 			case '|':
 			{
-				if (intern->state.reader[1] == '=') {
+				if (reader[1] == '=') {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DASH_MATCH, 2, error);
-				} else if (intern->state.reader[1] == '|') {
+				} else if (reader[1] == '|') {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_COLUMN, 2, error);
 				} else {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
@@ -292,7 +295,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			}
 			case '~':
 			{
-				if (intern->state.reader[1] == '=') {
+				if (reader[1] == '=') {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_INCLUDE_MATCH, 2, error);
 				} else {
 					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
@@ -303,7 +306,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			case 'u':
 			case 'U':
 			{
-				if ((intern->state.reader[1] == '+') && ((intern->state.reader[2] == '?') || EXTCSS3_IS_HEX(intern->state.reader[2]))) {
+				if ((reader[1] == '+') && ((reader[2] == '?') || EXTCSS3_IS_HEX(reader[2]))) {
 					if (EXTCSS3_SUCCESS != _extcss3_fill_unicode_range_token(intern, token, error)) {
 						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 					}
@@ -322,11 +325,11 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 			}
 			default:
 			{
-				if (EXTCSS3_IS_DIGIT(*intern->state.reader)) {
+				if (EXTCSS3_IS_DIGIT(*reader)) {
 					if (EXTCSS3_SUCCESS != _extcss3_fill_number_token(intern, token, error)) {
 						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 					}
-				} else if (EXTCSS3_SUCCESS == _extcss3_check_start_name(intern->state.reader)) {
+				} else if (EXTCSS3_SUCCESS == _extcss3_check_start_name(reader)) {
 					if (EXTCSS3_SUCCESS != _extcss3_fill_ident_like_token(intern, token, error)) {
 						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 					}
@@ -778,20 +781,18 @@ static inline bool _extcss3_fill_url_token(extcss3_intern *intern, extcss3_token
  */
 static inline bool _extcss3_fill_string_token(extcss3_intern *intern, extcss3_token *token, int *error)
 {
-	extcss3_token tmp;
-
-	tmp.data.str = intern->state.reader;
+	char *tmp = intern->state.reader;
 
 	// Consume the opening '"' or '\''
 	_EXTCSS3_NEXT(intern, error);
 
 	token->type = EXTCSS3_TYPE_STRING;
 	token->flag = EXTCSS3_FLAG_STRING;
-	token->info.str = tmp.data.str;
+	token->info.str = tmp;
 	token->info.len = 1;
 
 	while (true) {
-		if ((*intern->state.reader == *tmp.data.str) || (*intern->state.reader == '\0')) {
+		if ((*intern->state.reader == *tmp) || (*intern->state.reader == '\0')) {
 			if (*intern->state.reader != '\0') {
 				// Consume the closing '"' or '\''
 				_EXTCSS3_NEXT(intern, error);
@@ -822,8 +823,8 @@ static inline bool _extcss3_fill_string_token(extcss3_intern *intern, extcss3_to
 		_EXTCSS3_NEXT(intern, error);
 	}
 
-	token->data.str = tmp.data.str;
-	token->data.len = intern->state.reader - token->data.str;
+	token->data.str = tmp;
+	token->data.len = intern->state.reader - tmp;
 
 	return EXTCSS3_SUCCESS;
 }
@@ -877,21 +878,21 @@ static inline bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_to
 
 	// !!! The conversion to a number is intentionally skipped !!!
 
-	if (EXTCSS3_SUCCESS == _extcss3_check_start_ident(intern->state.reader)) {
+	if (*intern->state.reader == '%') {
+		token->type = EXTCSS3_TYPE_PERCENTAGE;
+		token->info.str = intern->state.reader;
+
+		// Consume the '%'
+		_EXTCSS3_NEXT(intern, error);
+
+		token->info.len = intern->state.reader - token->info.str;
+	} else if (_extcss3_check_start_ident(intern->state.reader)) {
 		token->type = EXTCSS3_TYPE_DIMENSION;
 		token->info.str = intern->state.reader;
 
 		if (EXTCSS3_SUCCESS != _extcss3_consume_name(intern, error)) {
 			return EXTCSS3_FAILURE;
 		}
-
-		token->info.len = intern->state.reader - token->info.str;
-	} else if (*intern->state.reader == '%') {
-		token->type = EXTCSS3_TYPE_PERCENTAGE;
-		token->info.str = intern->state.reader;
-
-		// Consume the '%'
-		_EXTCSS3_NEXT(intern, error);
 
 		token->info.len = intern->state.reader - token->info.str;
 	} else {
@@ -1009,7 +1010,7 @@ static inline bool _extcss3_consume_name(extcss3_intern *intern, int *error)
 /**
  * https://www.w3.org/TR/css-syntax-3/#starts-with-a-valid-escape
  */
-static inline bool _extcss3_check_start_valid_escape(char *str)
+static inline bool _extcss3_check_start_valid_escape(const char *str)
 {
 	if ((*str != '\\') || (str[1] == '\n')) {
 		return EXTCSS3_FAILURE;
@@ -1021,7 +1022,7 @@ static inline bool _extcss3_check_start_valid_escape(char *str)
 /**
  * https://www.w3.org/TR/css-syntax-3/#name-start-code-point
  */
-static inline bool _extcss3_check_start_name(char *str)
+static inline bool _extcss3_check_start_name(const char *str)
 {
 	if ((*str == '_') || EXTCSS3_IS_LETTER(*str) || EXTCSS3_IS_NON_ASCII(*str)) {
 		return EXTCSS3_SUCCESS;
@@ -1057,7 +1058,7 @@ static inline bool _extcss3_check_start_ident(char *str)
 /**
  * https://www.w3.org/TR/css-syntax-3/#starts-with-a-number
  */
-static inline bool _extcss3_check_start_number(char *str)
+static inline bool _extcss3_check_start_number(const char *str)
 {
 	if ((*str == '+') || (*str == '-')) {
 		if (EXTCSS3_IS_DIGIT(str[1])) {
@@ -1079,7 +1080,7 @@ static inline bool _extcss3_check_start_number(char *str)
 /**
  * https://www.w3.org/TR/css-syntax-3/#name-code-point
  */
-static inline bool _extcss3_check_is_name(char *str)
+static inline bool _extcss3_check_is_name(const char *str)
 {
 	if ((EXTCSS3_SUCCESS == _extcss3_check_start_name(str)) || EXTCSS3_IS_DIGIT(*str) || (*str == '-')) {
 		return EXTCSS3_SUCCESS;
