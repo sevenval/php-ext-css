@@ -91,149 +91,251 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 
 	/* https://www.w3.org/TR/css-syntax-3/#consume-a-token */
 	while ((intern->last_token == NULL) || (intern->last_token->type != EXTCSS3_TYPE_EOF)) {
-		if (EXTCSS3_IS_WS(*intern->state.reader)) {
-			if (EXTCSS3_SUCCESS != _extcss3_fill_ws_token(intern, token, error)) {
-				return _extcss3_cleanup_tokenizer(*error, intern, true, true);
-			}
-		} else if ((*intern->state.reader == '"') || (*intern->state.reader == '\'')) {
-			if (EXTCSS3_SUCCESS != _extcss3_fill_string_token(intern, token, error)) {
-				return _extcss3_cleanup_tokenizer(*error, intern, true, true);
-			}
-		} else if (*intern->state.reader == '#') {
-			if (
-				(EXTCSS3_SUCCESS == _extcss3_check_is_name(intern->state.reader + 1)) ||
-				(EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(intern->state.reader + 1))
-			) {
-				if (EXTCSS3_SUCCESS != _extcss3_fill_hash_token(intern, token, error)) {
+		switch (*intern->state.reader) {
+			case ' ':
+			case '\n':
+			case '\t':
+			{
+				if (EXTCSS3_SUCCESS != _extcss3_fill_ws_token(intern, token, error)) {
 					return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 				}
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+
+				break;
 			}
-		} else if (*intern->state.reader == '$') {
-			if (intern->state.reader[1] == '=') {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_SUFFIX_MATCH, 2, error);
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
-			}
-		} else if (*intern->state.reader == '(') {
-			_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_RO, 1, error);
-		} else if (*intern->state.reader == ')') {
-			_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_RC, 1, error);
-		} else if (*intern->state.reader == '[') {
-			_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_SO, 1, error);
-		} else if (*intern->state.reader == ']') {
-			_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_SC, 1, error);
-		} else if (*intern->state.reader == '{') {
-			_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_CO, 1, error);
-		} else if (*intern->state.reader == '}') {
-			_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_CC, 1, error);
-		} else if (*intern->state.reader == ',') {
-			_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_COMMA, 1, error);
-		} else if (*intern->state.reader == ':') {
-			_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_COLON, 1, error);
-		} else if (*intern->state.reader == ';') {
-			_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_SEMICOLON, 1, error);
-		} else if (*intern->state.reader == '*') {
-			if (intern->state.reader[1] == '=') {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_SUBSTR_MATCH, 2, error);
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
-			}
-		} else if ((*intern->state.reader == '+') || (*intern->state.reader == '.')) {
-			if (EXTCSS3_SUCCESS == _extcss3_check_start_number(intern->state.reader)) {
-				if (EXTCSS3_SUCCESS != _extcss3_fill_number_token(intern, token, error)) {
+			case '"':
+			case '\'':
+			{
+				if (EXTCSS3_SUCCESS != _extcss3_fill_string_token(intern, token, error)) {
 					return _extcss3_cleanup_tokenizer(*error, intern, true, true);
 				}
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+
+				break;
 			}
-		} else if (*intern->state.reader == '-') {
-			if (EXTCSS3_SUCCESS == _extcss3_check_start_number(intern->state.reader)) {
-				if (EXTCSS3_SUCCESS != _extcss3_fill_number_token(intern, token, error)) {
-					return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+			case '#':
+			{
+				if (
+					(EXTCSS3_SUCCESS == _extcss3_check_is_name(intern->state.reader + 1)) ||
+					(EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(intern->state.reader + 1))
+				) {
+					if (EXTCSS3_SUCCESS != _extcss3_fill_hash_token(intern, token, error)) {
+						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+					}
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
 				}
-			} else if (EXTCSS3_SUCCESS == _extcss3_check_start_ident(intern->state.reader)) {
-				if (EXTCSS3_SUCCESS != _extcss3_fill_ident_like_token(intern, token, error)) {
-					return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+
+				break;
+			}
+			case '$':
+			{
+				if (intern->state.reader[1] == '=') {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_SUFFIX_MATCH, 2, error);
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
 				}
-			} else if ((intern->state.reader[1] == '-') && (intern->state.reader[2] == '>')) {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_CDC, 3, error);
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+
+				break;
 			}
-		} else if (*intern->state.reader == '/') {
-			if (intern->state.reader[1] == '*') {
-				if (EXTCSS3_SUCCESS != _extcss3_fill_comment_token(intern, token, error)) {
-					return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+			case '(':
+			{
+				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_RO, 1, error);
+				break;
+			}
+			case ')':
+			{
+				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_RC, 1, error);
+				break;
+			}
+			case '[':
+			{
+				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_SO, 1, error);
+				break;
+			}
+			case ']':
+			{
+				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_SC, 1, error);
+				break;
+			}
+			case '{':
+			{
+				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_CO, 1, error);
+				break;
+			}
+			case '}':
+			{
+				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_BR_CC, 1, error);
+				break;
+			}
+			case ',':
+			{
+				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_COMMA, 1, error);
+				break;
+			}
+			case ':':
+			{
+				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_COLON, 1, error);
+				break;
+			}
+			case ';':
+			{
+				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_SEMICOLON, 1, error);
+				break;
+			}
+			case '*':
+			{
+				if (intern->state.reader[1] == '=') {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_SUBSTR_MATCH, 2, error);
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
 				}
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+
+				break;
 			}
-		} else if (*intern->state.reader == '<') {
-			if (intern->state.reader[1] == '!' && intern->state.reader[2] == '-' && intern->state.reader[3] == '-') {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_CDO, 4, error);
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
-			}
-		} else if (*intern->state.reader == '@') {
-			if (EXTCSS3_SUCCESS == _extcss3_check_start_ident(intern->state.reader + 1)) {
-				if (EXTCSS3_SUCCESS != _extcss3_fill_at_token(intern, token, error)) {
-					return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+			case '+':
+			case '.':
+			{
+				if (EXTCSS3_SUCCESS == _extcss3_check_start_number(intern->state.reader)) {
+					if (EXTCSS3_SUCCESS != _extcss3_fill_number_token(intern, token, error)) {
+						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+					}
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
 				}
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+
+				break;
 			}
-		} else if (*intern->state.reader == '\\') {
-			if (EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(intern->state.reader + 1)) {
-				if (EXTCSS3_SUCCESS != _extcss3_fill_ident_like_token(intern, token, error)) {
-					return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+			case '-':
+			{
+				if (EXTCSS3_SUCCESS == _extcss3_check_start_number(intern->state.reader)) {
+					if (EXTCSS3_SUCCESS != _extcss3_fill_number_token(intern, token, error)) {
+						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+					}
+				} else if (EXTCSS3_SUCCESS == _extcss3_check_start_ident(intern->state.reader)) {
+					if (EXTCSS3_SUCCESS != _extcss3_fill_ident_like_token(intern, token, error)) {
+						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+					}
+				} else if ((intern->state.reader[1] == '-') && (intern->state.reader[2] == '>')) {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_CDC, 3, error);
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
 				}
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+
+				break;
 			}
-		} else if (*intern->state.reader == '^') {
-			if (intern->state.reader[1] == '=') {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_PREFIX_MATCH, 2, error);
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
-			}
-		} else if (EXTCSS3_IS_DIGIT(*intern->state.reader)) {
-			if (EXTCSS3_SUCCESS != _extcss3_fill_number_token(intern, token, error)) {
-				return _extcss3_cleanup_tokenizer(*error, intern, true, true);
-			}
-		} else if (EXTCSS3_CHARS_EQ(*intern->state.reader, 'u')) {
-			if ((intern->state.reader[1] == '+') && ((intern->state.reader[2] == '?') || EXTCSS3_IS_HEX(intern->state.reader[2]))) {
-				if (EXTCSS3_SUCCESS != _extcss3_fill_unicode_range_token(intern, token, error)) {
-					return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+			case '/':
+			{
+				if (intern->state.reader[1] == '*') {
+					if (EXTCSS3_SUCCESS != _extcss3_fill_comment_token(intern, token, error)) {
+						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+					}
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
 				}
-			} else {
-				if (EXTCSS3_SUCCESS != _extcss3_fill_ident_like_token(intern, token, error)) {
-					return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+
+				break;
+			}
+			case '<':
+			{
+				if (intern->state.reader[1] == '!' && intern->state.reader[2] == '-' && intern->state.reader[3] == '-') {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_CDO, 4, error);
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
 				}
+
+				break;
 			}
-		} else if (EXTCSS3_SUCCESS == _extcss3_check_start_name(intern->state.reader)) {
-			if (EXTCSS3_SUCCESS != _extcss3_fill_ident_like_token(intern, token, error)) {
-				return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+			case '@':
+			{
+				if (EXTCSS3_SUCCESS == _extcss3_check_start_ident(intern->state.reader + 1)) {
+					if (EXTCSS3_SUCCESS != _extcss3_fill_at_token(intern, token, error)) {
+						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+					}
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+				}
+
+				break;
 			}
-		} else if (*intern->state.reader == '|') {
-			if (intern->state.reader[1] == '=') {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DASH_MATCH, 2, error);
-			} else if (intern->state.reader[1] == '|') {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_COLUMN, 2, error);
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+			case '\\':
+			{
+				if (EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(intern->state.reader + 1)) {
+					if (EXTCSS3_SUCCESS != _extcss3_fill_ident_like_token(intern, token, error)) {
+						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+					}
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+				}
+
+				break;
 			}
-		} else if (*intern->state.reader == '~') {
-			if (intern->state.reader[1] == '=') {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_INCLUDE_MATCH, 2, error);
-			} else {
-				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+			case '^':
+			{
+				if (intern->state.reader[1] == '=') {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_PREFIX_MATCH, 2, error);
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+				}
+
+				break;
 			}
-		} else if (*intern->state.reader == '\0') {
-			_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_EOF, 1, error);
-		} else {
-			_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+			case '|':
+			{
+				if (intern->state.reader[1] == '=') {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DASH_MATCH, 2, error);
+				} else if (intern->state.reader[1] == '|') {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_COLUMN, 2, error);
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+				}
+
+				break;
+			}
+			case '~':
+			{
+				if (intern->state.reader[1] == '=') {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_INCLUDE_MATCH, 2, error);
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+				}
+
+				break;
+			}
+			case 'u':
+			case 'U':
+			{
+				if ((intern->state.reader[1] == '+') && ((intern->state.reader[2] == '?') || EXTCSS3_IS_HEX(intern->state.reader[2]))) {
+					if (EXTCSS3_SUCCESS != _extcss3_fill_unicode_range_token(intern, token, error)) {
+						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+					}
+				} else {
+					if (EXTCSS3_SUCCESS != _extcss3_fill_ident_like_token(intern, token, error)) {
+						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+					}
+				}
+
+				break;
+			}
+			case '\0':
+			{
+				_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_EOF, 1, error);
+				break;
+			}
+			default:
+			{
+				if (EXTCSS3_IS_DIGIT(*intern->state.reader)) {
+					if (EXTCSS3_SUCCESS != _extcss3_fill_number_token(intern, token, error)) {
+						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+					}
+				} else if (EXTCSS3_SUCCESS == _extcss3_check_start_name(intern->state.reader)) {
+					if (EXTCSS3_SUCCESS != _extcss3_fill_ident_like_token(intern, token, error)) {
+						return _extcss3_cleanup_tokenizer(*error, intern, true, true);
+					}
+				} else {
+					_EXTCSS3_FILL_FIXED_TOKEN(intern, token, EXTCSS3_TYPE_DELIM, 1, error);
+				}
+
+				break;
+			}
 		}
 
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
