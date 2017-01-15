@@ -371,7 +371,7 @@ static inline bool _extcss3_fill_fixed_token(extcss3_intern *intern, extcss3_tok
 	token->data.str = intern->state.reader;
 
 	if (token->type != EXTCSS3_TYPE_EOF) {
-		while (chars-- > 0) {
+		while (chars--) {
 			_EXTCSS3_NEXT(intern, error);
 		}
 	}
@@ -921,7 +921,7 @@ static inline bool _extcss3_check_start_valid_escape(char *str)
  */
 static inline bool _extcss3_check_start_name(char *str)
 {
-	if ((*str == '_') || EXTCSS3_IS_LETTER(*str) || (extcss3_char_len(*str) > 1)) {
+	if ((*str == '_') || EXTCSS3_IS_LETTER(*str) || EXTCSS3_IS_NON_ASCII(*str)) {
 		return EXTCSS3_SUCCESS;
 	}
 
