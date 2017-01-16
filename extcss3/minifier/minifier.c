@@ -35,6 +35,8 @@ static bool _extcss3_check_at_rule_is_valid_charset(extcss3_intern *intern, extc
 static bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule);
 static bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule);
 
+static bool _extcss3_check_minify_color(extcss3_token *name, extcss3_token *value);
+
 /* ==================================================================================================== */
 
 char *extcss3_minify(extcss3_intern *intern, int *error)
@@ -675,13 +677,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 			if (EXTCSS3_SUCCESS != extcss3_minify_hash(value->data.str + 1, value->data.len - 1, value, error)) {
 				return NULL;
 			}
-		} else if (
-			(name->data.len >= 5)				&&
-			(value->user.str == NULL)			&&
-			(value->type == EXTCSS3_TYPE_IDENT)	&&
-			(value->data.len > 4)				&&
-			(strncasecmp(name->data.str + name->data.len - 5, "color", 5) == 0)
-		) {
+		} else if (EXTCSS3_SUCCESS == _extcss3_check_minify_color(name, value)) {
 			if (EXTCSS3_SUCCESS != extcss3_minify_color(value, error)) {
 				return NULL;
 			}
@@ -960,6 +956,43 @@ static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
 	if (
 		(rule->base_selector->data.len == 10) &&
 		(memcmp(rule->base_selector->data.str, "@namespace", 10) == 0)
+	) {
+		return EXTCSS3_SUCCESS;
+	}
+
+	return EXTCSS3_FAILURE;
+}
+
+static inline bool _extcss3_check_minify_color(extcss3_token *name, extcss3_token *value)
+{
+	if (
+		(name->data.len >= 10)				&&
+		(value->user.str == NULL)			&&
+		(value->type == EXTCSS3_TYPE_IDENT)	&&
+		(value->data.len > 4)				&&
+		(
+			(strncasecmp(name->data.str + name->data.len - 10, "background", 10) == 0) ||
+			(strncasecmp(name->data.str + name->data.len - 10, "decoration", 10) == 0)
+		)
+	) {
+		return EXTCSS3_SUCCESS;
+	} else if (
+		(name->data.len >= 6)				&&
+		(value->user.str == NULL)			&&
+		(value->type == EXTCSS3_TYPE_IDENT)	&&
+		(value->data.len > 4)				&&
+		(
+			(strncasecmp(name->data.str + name->data.len - 6, "shadow", 6) == 0) ||
+			(strncasecmp(name->data.str + name->data.len - 6, "filter", 6) == 0)
+		)
+	) {
+		return EXTCSS3_SUCCESS;
+	} else if (
+		(name->data.len >= 5)				&&
+		(value->user.str == NULL)			&&
+		(value->type == EXTCSS3_TYPE_IDENT)	&&
+		(value->data.len > 4)				&&
+		(strncasecmp(name->data.str + name->data.len - 5, "color", 5) == 0)
 	) {
 		return EXTCSS3_SUCCESS;
 	}
