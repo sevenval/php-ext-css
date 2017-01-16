@@ -42,7 +42,7 @@ static inline bool _extcss3_minify_numeric_prevent_dimension(extcss3_token *toke
 
 	elements = sizeof(extcss3_numeric_dimensions) / sizeof(extcss3_numeric_dimensions[0]);
 
-	for (i = elements - 1; i--; ) {
+	for (i = elements; i--; ) {
 		if (
 			(strlen(extcss3_numeric_dimensions[i]) == token->info.len) &&
 			(strncasecmp(token->info.str, extcss3_numeric_dimensions[i], token->info.len) == 0)
