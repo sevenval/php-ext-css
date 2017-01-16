@@ -145,17 +145,16 @@ struct _extcss3_str
 
 struct _extcss3_state
 {
-	size_t				rest;
-
-	char				*cursor;
 	char				*reader;
+	char				*cursor;
 	char				*writer;
+
+	size_t				rest;
 };
 
 struct _extcss3_token
 {
 	unsigned short int	type;
-	unsigned short int	flag;
 
 	extcss3_str			data;
 	extcss3_str			info;
@@ -163,6 +162,8 @@ struct _extcss3_token
 
 	extcss3_token		*prev;
 	extcss3_token		*next;
+
+	unsigned short int	flag;
 };
 
 struct _extcss3_ctxt
@@ -225,19 +226,19 @@ struct _extcss3_rule
 
 struct _extcss3_intern
 {
-	extcss3_str			orig;
-	extcss3_str			copy;
-
 	extcss3_state		state;
 
-	extcss3_vendor		*base_vendor;
-	extcss3_vendor		*last_vendor;
+	extcss3_str			orig;
+	extcss3_str			copy;
 
 	extcss3_token		*base_token;
 	extcss3_token		*last_token;
 
 	extcss3_ctxt		*base_ctxt;
 	extcss3_ctxt		*last_ctxt;
+
+	extcss3_vendor		*base_vendor;
+	extcss3_vendor		*last_vendor;
 
 	extcss3_mod			modifier;
 };
