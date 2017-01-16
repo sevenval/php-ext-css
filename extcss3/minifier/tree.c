@@ -98,7 +98,7 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, int
 					*token = (*token)->next;
 				}
 
-				// The block is consumed above as "invalid" block
+				// The block is consumed as "invalid" block
 				continue;
 			}
 		} else {
@@ -108,7 +108,7 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, int
 				levels = 1, nested = 0;
 				search = (*token)->next;
 
-				while ((search != NULL) && (search->type != EXTCSS3_TYPE_EOF)) {
+				while (search->type != EXTCSS3_TYPE_EOF) {
 					if (search->type == EXTCSS3_TYPE_BR_CO) {
 						levels++;
 						nested++;
