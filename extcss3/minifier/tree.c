@@ -156,7 +156,7 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, int
 					else {
 						last = decl = NULL;
 
-						while ((*token != NULL) && (*token != search)) {
+						while (*token != search) {
 							if (decl == NULL) {
 								// Skip leading whitespaces and comments (if no contain user strings)
 								if (_EXTCSS3_TYPE_EMPTY_EX(*token)) {
