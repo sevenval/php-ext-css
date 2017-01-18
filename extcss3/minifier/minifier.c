@@ -238,6 +238,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 		// Remove whitespaces and comments before...
 		if (
 			(selector->type == EXTCSS3_TYPE_BR_SC)		||
+			(selector->type == EXTCSS3_TYPE_BR_RC)		||
 			(selector->type == EXTCSS3_TYPE_BAD_STRING)	||
 			(
 				(selector->type == EXTCSS3_TYPE_STRING) &&
