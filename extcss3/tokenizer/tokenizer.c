@@ -5,6 +5,7 @@
 #include "tokenizer.h"
 
 #include <string.h>
+#include <strings.h>
 
 /* ==================================================================================================== */
 
@@ -415,7 +416,7 @@ static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *tok
 			}
 
 			if (prev->data.len == 7 /* strlen("@import") */) {
-				if (memcmp(prev->data.str, "@import", 7) == 0) {
+				if (strncasecmp(prev->data.str, "@import", 7) == 0) {
 					token->type		= EXTCSS3_TYPE_URL;
 					token->flag		= EXTCSS3_FLAG_AT_URL_STRING;
 					token->info.str	= token->data.str;

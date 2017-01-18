@@ -188,7 +188,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 			return rule->base_selector = rule->last_selector = NULL;
 		} else if (
 			(rule->base_selector->data.len == 7 /* strlen("@import") */) &&
-			(memcmp(rule->base_selector->data.str, "@import", 7) == 0) &&
+			(strncasecmp(rule->base_selector->data.str, "@import", 7) == 0) &&
 			(
 				(rule->level != 0) || (EXTCSS3_SUCCESS != _extcss3_check_at_rule_is_valid_import(rule))
 			)
@@ -196,7 +196,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 			return rule->base_selector = rule->last_selector = NULL;
 		} else if (
 			(rule->base_selector->data.len == 10 /* strlen("@namespace") */) &&
-			(memcmp(rule->base_selector->data.str, "@namespace", 10) == 0) &&
+			(strncasecmp(rule->base_selector->data.str, "@namespace", 10) == 0) &&
 			(
 				(rule->level != 0) || (EXTCSS3_SUCCESS != _extcss3_check_at_rule_is_valid_namespace(rule))
 			)
@@ -257,7 +257,6 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 		// Remove whitespaces and comments around...
 		if (
 			(selector->flag == EXTCSS3_FLAG_AT_URL_STRING)	||
-			(selector->type == EXTCSS3_TYPE_BR_RC)			||
 			(selector->type == EXTCSS3_TYPE_COMMA)			||
 			(selector->type == EXTCSS3_TYPE_SUFFIX_MATCH)	||
 			(selector->type == EXTCSS3_TYPE_SUBSTR_MATCH)	||
@@ -273,6 +272,12 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 					(*selector->data.str == '~') ||
 					(*selector->data.str == '=')
 				)
+			) ||
+			(
+				(selector->type == EXTCSS3_TYPE_BR_RC) &&
+				(rule->base_selector->type == EXTCSS3_TYPE_AT_KEYWORD) &&
+				(rule->base_selector->data.len == 6 /*strlen("@media")*/) &&
+				(strncasecmp(rule->base_selector->data.str, "@media", 6) == 0)
 			)
 		) {
 			_extcss3_trim_around(selector, &rule->last_selector);
@@ -895,7 +900,7 @@ static inline bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule)
 	} else if (prev != NULL) {
 		if (
 			(prev->base_selector->data.len == 7 /* strlen("@import") */) &&
-			(memcmp(prev->base_selector->data.str, "@import", 7) == 0)
+			(strncasecmp(prev->base_selector->data.str, "@import", 7) == 0)
 		) {
 			// Do nothing. The previous "@import" is already checked.
 		} else if (
@@ -912,7 +917,7 @@ static inline bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule)
 
 	if (
 		(rule->base_selector->data.len == 7) &&
-		(memcmp(rule->base_selector->data.str, "@import", 7) == 0)
+		(strncasecmp(rule->base_selector->data.str, "@import", 7) == 0)
 	) {
 		return EXTCSS3_SUCCESS;
 	}
@@ -933,12 +938,12 @@ static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
 	} else if (prev != NULL) {
 		if (
 			(prev->base_selector->data.len == 10 /* strlen("@namespace") */) &&
-			(memcmp(prev->base_selector->data.str, "@namespace", 10) == 0)
+			(strncasecmp(prev->base_selector->data.str, "@namespace", 10) == 0)
 		) {
 			// Do nothing. The previous "@namespace" is already checked.
 		} else if (
 			(prev->base_selector->data.len == 7 /* strlen("@import") */) &&
-			(memcmp(prev->base_selector->data.str, "@import", 7) == 0)
+			(strncasecmp(prev->base_selector->data.str, "@import", 7) == 0)
 		) {
 			// Do nothing. The previous "@import" is already checked.
 		} else if (
@@ -955,7 +960,7 @@ static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
 
 	if (
 		(rule->base_selector->data.len == 10) &&
-		(memcmp(rule->base_selector->data.str, "@namespace", 10) == 0)
+		(strncasecmp(rule->base_selector->data.str, "@namespace", 10) == 0)
 	) {
 		return EXTCSS3_SUCCESS;
 	}
