@@ -886,7 +886,7 @@ static inline bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_to
 		_EXTCSS3_NEXT(intern, error);
 
 		token->info.len = intern->state.reader - token->info.str;
-	} else if (_extcss3_check_start_ident(intern->state.reader)) {
+	} else if (EXTCSS3_SUCCESS == _extcss3_check_start_ident(intern->state.reader)) {
 		token->type = EXTCSS3_TYPE_DIMENSION;
 		token->info.str = intern->state.reader;
 
@@ -944,6 +944,8 @@ static inline bool _extcss3_consume_escaped(extcss3_intern *intern, int *error)
 	v = (int)strtol(hex, NULL, 16);
 
 	if ((v <= 0) || (v > EXTCSS3_MAX_ALLOWED_CP) || EXTCSS3_FOR_SURROGATE_CP(v)) {
+		i++; // The '\\' has to be removed, too
+
 		if (i < EXTCSS3_REPLACEMENT_LEN) {
 			memmove(intern->state.reader + EXTCSS3_REPLACEMENT_LEN - i, intern->state.reader, intern->state.writer - intern->state.reader + 1);
 			memcpy(intern->state.reader - i, EXTCSS3_REPLACEMENT_CHR, EXTCSS3_REPLACEMENT_LEN);
@@ -995,6 +997,10 @@ static inline bool _extcss3_consume_name(extcss3_intern *intern, int *error)
 		} else if (EXTCSS3_SUCCESS == _extcss3_check_start_valid_escape(intern->state.reader)) {
 			if (EXTCSS3_SUCCESS != _extcss3_consume_escaped(intern, error)) {
 				return EXTCSS3_FAILURE;
+			}
+
+			if (EXTCSS3_SUCCESS != _extcss3_check_start_ident(intern->state.reader)) {
+				break;
 			}
 		} else {
 			break;
