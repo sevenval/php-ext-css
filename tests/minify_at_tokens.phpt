@@ -11,11 +11,11 @@ $aTests = [
 		'out' => '@charset "UTF-8";@import"import.css";@namespace url(www.example.com);'
 	],
 	[
-		'in' => ' @charset "UTF-8"; @import "import.css"; @namespace url(www.example.com);',
-		'out' => '@import"import.css";@namespace url(www.example.com);'
+		'in' => ' @charset "UTF-8"; @Import "import.css"; @namespace url(www.example.com);',
+		'out' => '@Import"import.css";@namespace url(www.example.com);'
 	],
 	[
-		'in' => '@import "import.css"; @charset "UTF-8"; @namespace url(www.example.com);',
+		'in' => '@import "import.css"; @Charset "UTF-8"; @namespace url(www.example.com);',
 		'out' => '@import"import.css";@namespace url(www.example.com);'
 	],
 	[

@@ -180,7 +180,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 	if (rule->base_selector->type == EXTCSS3_TYPE_AT_KEYWORD) {
 		if (
 			(rule->base_selector->data.len == 8 /* strlen("@charset") */) &&
-			(memcmp(rule->base_selector->data.str, "@charset", 8) == 0) &&
+			(strncasecmp(rule->base_selector->data.str, "@charset", 8) == 0) &&
 			(
 				(rule->level != 0) || (EXTCSS3_SUCCESS != _extcss3_check_at_rule_is_valid_charset(intern, rule))
 			)
