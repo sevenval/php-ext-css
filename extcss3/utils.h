@@ -64,6 +64,8 @@
 
 unsigned short int extcss3_char_len(char c);
 
+bool extcss3_ascii_strncasecmp(const char *str1, const char *str2, unsigned char n);
+
 char *extcss3_get_type_str(unsigned short int type);
 char *extcss3_get_flag_str(unsigned short int flag);
 

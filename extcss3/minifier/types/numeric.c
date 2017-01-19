@@ -45,7 +45,7 @@ static inline bool _extcss3_minify_numeric_prevent_dimension(extcss3_token *toke
 	for (i = elements; i--; ) {
 		if (
 			(strlen(extcss3_numeric_dimensions[i]) == token->info.len) &&
-			(strncasecmp(token->info.str, extcss3_numeric_dimensions[i], token->info.len) == 0)
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(token->info.str, extcss3_numeric_dimensions[i], token->info.len))
 		) {
 			prevent = EXTCSS3_FAILURE;
 

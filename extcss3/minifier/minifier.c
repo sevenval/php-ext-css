@@ -180,7 +180,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 	if (rule->base_selector->type == EXTCSS3_TYPE_AT_KEYWORD) {
 		if (
 			(rule->base_selector->data.len == 8 /* strlen("@charset") */) &&
-			(strncasecmp(rule->base_selector->data.str, "@charset", 8) == 0) &&
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(rule->base_selector->data.str, "@charset", 8)) &&
 			(
 				(rule->level != 0) || (EXTCSS3_SUCCESS != _extcss3_check_at_rule_is_valid_charset(intern, rule))
 			)
@@ -188,7 +188,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 			return rule->base_selector = rule->last_selector = NULL;
 		} else if (
 			(rule->base_selector->data.len == 7 /* strlen("@import") */) &&
-			(strncasecmp(rule->base_selector->data.str, "@import", 7) == 0) &&
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(rule->base_selector->data.str, "@import", 7)) &&
 			(
 				(rule->level != 0) || (EXTCSS3_SUCCESS != _extcss3_check_at_rule_is_valid_import(rule))
 			)
@@ -196,7 +196,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 			return rule->base_selector = rule->last_selector = NULL;
 		} else if (
 			(rule->base_selector->data.len == 10 /* strlen("@namespace") */) &&
-			(strncasecmp(rule->base_selector->data.str, "@namespace", 10) == 0) &&
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(rule->base_selector->data.str, "@namespace", 10)) &&
 			(
 				(rule->level != 0) || (EXTCSS3_SUCCESS != _extcss3_check_at_rule_is_valid_namespace(rule))
 			)
@@ -278,7 +278,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 				(selector->type == EXTCSS3_TYPE_BR_RC) &&
 				(rule->base_selector->type == EXTCSS3_TYPE_AT_KEYWORD) &&
 				(rule->base_selector->data.len == 6 /*strlen("@media")*/) &&
-				(strncasecmp(rule->base_selector->data.str, "@media", 6) == 0)
+				(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(rule->base_selector->data.str, "@media", 6))
 			)
 		) {
 			_extcss3_trim_around(selector, &rule->last_selector);
@@ -374,7 +374,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 					(selector->data.len > vendor->name.len)				&&
 					(selector->data.str[1] == '-')						&&
 					(selector->data.str[vendor->name.len + 1] == '-')	&&
-					(strncasecmp(selector->data.str + 2, vendor->name.str + 1, vendor->name.len - 1) == 0)
+					(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(selector->data.str + 2, vendor->name.str + 1, vendor->name.len - 1))
 				) {
 					return rule->base_selector = rule->last_selector = NULL;
 				} else if (
@@ -386,7 +386,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 					(selector->next->data.len > vendor->name.len)		&&
 					(selector->next->data.str[0] == '-')				&&
 					(selector->next->data.str[vendor->name.len] == '-')	&&
-					(strncasecmp(selector->next->data.str + 1, vendor->name.str + 1, vendor->name.len - 1) == 0)
+					(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(selector->next->data.str + 1, vendor->name.str + 1, vendor->name.len - 1))
 				) {
 					range_base = range_last = selector;
 
@@ -557,7 +557,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 					(name->data.len > vendor->name.len)			&&
 					(name->data.str[0] == '-')					&&
 					(name->data.str[vendor->name.len] == '-')	&&
-					(strncasecmp(name->data.str + 1, vendor->name.str + 1, vendor->name.len - 1) == 0)
+					(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + 1, vendor->name.str + 1, vendor->name.len - 1))
 				) {
 					return NULL;
 				}
@@ -662,7 +662,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 					(value->data.len > vendor->name.len)		&&
 					(value->data.str[0] == '-')					&&
 					(value->data.str[vendor->name.len] == '-')	&&
-					(strncasecmp(value->data.str + 1, vendor->name.str + 1, vendor->name.len - 1) == 0)
+					(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(value->data.str + 1, vendor->name.str + 1, vendor->name.len - 1))
 				) {
 					return NULL;
 				}
@@ -699,13 +699,13 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 			// RGB and RGBA version:
 			//if (
 			//	((value->data.len == 3) || (value->data.len == 4)) &&
-			//	(strncasecmp(value->data.str, "rgba", value->data.len) == 0)
+			//	(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(value->data.str, "rgba", value->data.len))
 			//)
 
 			// RGB only version:
 			if (
 				(value->data.len == 3) &&
-				(strncasecmp(value->data.str, "rgb", 3) == 0)
+				(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(value->data.str, "rgb", 3))
 			) {
 				if (EXTCSS3_SUCCESS != extcss3_minify_function_rgb_a(&value, decl, error)) {
 					return NULL;
@@ -901,12 +901,12 @@ static inline bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule)
 	} else if (prev != NULL) {
 		if (
 			(prev->base_selector->data.len == 7 /* strlen("@import") */) &&
-			(strncasecmp(prev->base_selector->data.str, "@import", 7) == 0)
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(prev->base_selector->data.str, "@import", 7))
 		) {
 			// Do nothing. The previous "@import" is already checked.
 		} else if (
 			(prev->base_selector->data.len == 8 /* strlen("@charset") */) &&
-			(memcmp(prev->base_selector->data.str, "@charset", 8) == 0)
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(prev->base_selector->data.str, "@charset", 8))
 		) {
 			// Do nothing. The previous "@charset" is already checked.
 		} else {
@@ -918,7 +918,7 @@ static inline bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule)
 
 	if (
 		(rule->base_selector->data.len == 7) &&
-		(strncasecmp(rule->base_selector->data.str, "@import", 7) == 0)
+		(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(rule->base_selector->data.str, "@import", 7))
 	) {
 		return EXTCSS3_SUCCESS;
 	}
@@ -939,17 +939,17 @@ static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
 	} else if (prev != NULL) {
 		if (
 			(prev->base_selector->data.len == 10 /* strlen("@namespace") */) &&
-			(strncasecmp(prev->base_selector->data.str, "@namespace", 10) == 0)
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(prev->base_selector->data.str, "@namespace", 10))
 		) {
 			// Do nothing. The previous "@namespace" is already checked.
 		} else if (
 			(prev->base_selector->data.len == 7 /* strlen("@import") */) &&
-			(strncasecmp(prev->base_selector->data.str, "@import", 7) == 0)
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(prev->base_selector->data.str, "@import", 7))
 		) {
 			// Do nothing. The previous "@import" is already checked.
 		} else if (
 			(prev->base_selector->data.len == 8 /* strlen("@charset") */) &&
-			(memcmp(prev->base_selector->data.str, "@charset", 8) == 0)
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(prev->base_selector->data.str, "@charset", 8))
 		) {
 			// Do nothing. The previous "@charset" is already checked.
 		} else {
@@ -961,7 +961,7 @@ static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
 
 	if (
 		(rule->base_selector->data.len == 10) &&
-		(strncasecmp(rule->base_selector->data.str, "@namespace", 10) == 0)
+		(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(rule->base_selector->data.str, "@namespace", 10))
 	) {
 		return EXTCSS3_SUCCESS;
 	}
@@ -977,8 +977,8 @@ static inline bool _extcss3_check_minify_color(extcss3_token *name, extcss3_toke
 		(value->type == EXTCSS3_TYPE_IDENT)	&&
 		(value->data.len > 4)				&&
 		(
-			(strncasecmp(name->data.str + name->data.len - 10, "background", 10) == 0) ||
-			(strncasecmp(name->data.str + name->data.len - 10, "decoration", 10) == 0)
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + name->data.len - 10, "background", 10)) ||
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + name->data.len - 10, "decoration", 10))
 		)
 	) {
 		return EXTCSS3_SUCCESS;
@@ -988,8 +988,8 @@ static inline bool _extcss3_check_minify_color(extcss3_token *name, extcss3_toke
 		(value->type == EXTCSS3_TYPE_IDENT)	&&
 		(value->data.len > 4)				&&
 		(
-			(strncasecmp(name->data.str + name->data.len - 6, "shadow", 6) == 0) ||
-			(strncasecmp(name->data.str + name->data.len - 6, "filter", 6) == 0)
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + name->data.len - 6, "shadow", 6)) ||
+			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + name->data.len - 6, "filter", 6))
 		)
 	) {
 		return EXTCSS3_SUCCESS;
@@ -998,7 +998,7 @@ static inline bool _extcss3_check_minify_color(extcss3_token *name, extcss3_toke
 		(value->user.str == NULL)			&&
 		(value->type == EXTCSS3_TYPE_IDENT)	&&
 		(value->data.len > 4)				&&
-		(strncasecmp(name->data.str + name->data.len - 5, "color", 5) == 0)
+		(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + name->data.len - 5, "color", 5))
 	) {
 		return EXTCSS3_SUCCESS;
 	}

@@ -416,7 +416,7 @@ static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *tok
 			}
 
 			if (prev->data.len == 7 /* strlen("@import") */) {
-				if (strncasecmp(prev->data.str, "@import", 7) == 0) {
+				if (EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(prev->data.str, "@import", 7)) {
 					token->type		= EXTCSS3_TYPE_URL;
 					token->flag		= EXTCSS3_FLAG_AT_URL_STRING;
 					token->info.str	= token->data.str;

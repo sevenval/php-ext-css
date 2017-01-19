@@ -18,6 +18,30 @@ inline unsigned short int extcss3_char_len(char c)
 }
 
 /**
+ * Compare up to "n" ASCII characters of "str1" and "str2" without sensitivity to case
+ */
+bool extcss3_ascii_strncasecmp(const char *str1, const char *str2, unsigned char n)
+{
+	unsigned char i;
+
+	if ((str1 == NULL) || (str2 == NULL)) {
+		return EXTCSS3_FAILURE;
+	}
+
+	for (i = 0; i < n; i++) {
+		if ((str1[i] == '\0') || (str2[i] == '\0')) {
+			return str1[i] == str2[i];
+		} else if (str1[i] != str2[i]) {
+			if (!EXTCSS3_CHARS_EQ(str1[i], str2[i])) {
+				return EXTCSS3_FAILURE;
+			}
+		}
+	}
+
+	return EXTCSS3_SUCCESS;
+}
+
+/**
  * Get the string representation of a token type
  */
 char *extcss3_get_type_str(unsigned short int type)
