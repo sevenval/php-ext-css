@@ -20,7 +20,7 @@ inline unsigned short int extcss3_char_len(char c)
 /**
  * Compare up to "n" ASCII characters of "str1" and "str2" without sensitivity to case
  */
-bool extcss3_ascii_strncasecmp(const char *str1, const char *str2, unsigned char n)
+inline bool extcss3_ascii_strncasecmp(const char *str1, const char *str2, unsigned char n)
 {
 	unsigned char i;
 
