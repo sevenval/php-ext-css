@@ -326,7 +326,7 @@ PHP_METHOD(CSS3Processor, minify)
 		intern->base_vendor = intern->last_vendor = NULL;
 	}
 
-	if (vendors && (Z_TYPE_P(vendors) == IS_ARRAY)) {
+	if ((vendors != NULL) && (Z_TYPE_P(vendors) == IS_ARRAY)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(vendors), name) {
 			if (Z_TYPE_P(name) != IS_STRING) {
 				convert_to_string(name);
