@@ -79,34 +79,34 @@ static inline void php_extcss3_make_data_array(extcss3_intern *intern, zval *dat
 	ZVAL_ARR(data, zend_array_dup(Z_ARRVAL(empty)));
 
 	ZVAL_LONG(&value, intern->last_token->type);
-	zend_hash_str_update(Z_ARRVAL_P(data), "type", strlen("type"), &value);
+	zend_hash_str_update(Z_ARRVAL_P(data), "type", 4 /*strlen("type")*/, &value);
 
 	ZVAL_STRING(&value, extcss3_get_type_str(intern->last_token->type));
-	zend_hash_str_update(Z_ARRVAL_P(data), "name", strlen("name"), &value);
+	zend_hash_str_update(Z_ARRVAL_P(data), "name", 4 /*strlen("name")*/, &value);
 
 	ZVAL_STRINGL(&value, intern->last_token->data.str, intern->last_token->data.len);
-	zend_hash_str_update(Z_ARRVAL_P(data), "value", strlen("value"), &value);
+	zend_hash_str_update(Z_ARRVAL_P(data), "value", 5 /*strlen("value")*/, &value);
 
 	if (intern->last_token->user.str) {
 		ZVAL_STRINGL(&value, intern->last_token->user.str, intern->last_token->user.len);
-		zend_hash_str_update(Z_ARRVAL_P(data), "user", strlen("user"), &value);
+		zend_hash_str_update(Z_ARRVAL_P(data), "user", 4 /*strlen("user")*/, &value);
 	}
 
 	if (intern->last_token->flag) {
 		ZVAL_ARR(&info, zend_array_dup(Z_ARRVAL(empty)));
 
 		ZVAL_LONG(&value, intern->last_token->flag);
-		zend_hash_str_update(Z_ARRVAL(info), "flag", strlen("flag"), &value);
+		zend_hash_str_update(Z_ARRVAL(info), "flag", 4 /*strlen("flag")*/, &value);
 
 		ZVAL_STRING(&value, extcss3_get_flag_str(intern->last_token->flag));
-		zend_hash_str_update(Z_ARRVAL(info), "name", strlen("name"), &value);
+		zend_hash_str_update(Z_ARRVAL(info), "name", 4 /*strlen("name")*/, &value);
 
 		if (intern->last_token->info.len) {
 			ZVAL_STRINGL(&value, intern->last_token->info.str, intern->last_token->info.len);
-			zend_hash_str_update(Z_ARRVAL(info), "value", strlen("value"), &value);
+			zend_hash_str_update(Z_ARRVAL(info), "value", 5 /*strlen("value")*/, &value);
 		}
 
-		zend_hash_str_update(Z_ARRVAL_P(data), "info", strlen("info"), &info);
+		zend_hash_str_update(Z_ARRVAL_P(data), "info", 4 /*strlen("info")*/, &info);
 	}
 
 	if (ctxt && ctxt->level) {
@@ -116,23 +116,23 @@ static inline void php_extcss3_make_data_array(extcss3_intern *intern, zval *dat
 			ZVAL_ARR(&context, zend_array_dup(Z_ARRVAL(empty)));
 
 			ZVAL_LONG(&value, ctxt->level);
-			zend_hash_str_update(Z_ARRVAL(context), "level", strlen("level"), &value);
+			zend_hash_str_update(Z_ARRVAL(context), "level", 5 /*strlen("level")*/, &value);
 
 			ZVAL_LONG(&value, ctxt->token->type);
-			zend_hash_str_update(Z_ARRVAL(context), "type", strlen("type"), &value);
+			zend_hash_str_update(Z_ARRVAL(context), "type", 4 /*strlen("type")*/, &value);
 
 			ZVAL_STRING(&value, extcss3_get_type_str(ctxt->token->type));
-			zend_hash_str_update(Z_ARRVAL(context), "name", strlen("name"), &value);
+			zend_hash_str_update(Z_ARRVAL(context), "name", 4 /*strlen("name")*/, &value);
 
 			ZVAL_STRINGL(&value, ctxt->token->data.str, ctxt->token->data.len);
-			zend_hash_str_update(Z_ARRVAL(context), "value", strlen("value"), &value);
+			zend_hash_str_update(Z_ARRVAL(context), "value", 5 /*strlen("value")*/, &value);
 
 			zend_hash_next_index_insert(Z_ARRVAL(contexts), &context);
 
 			ctxt = ctxt->prev;
 		}
 
-		zend_hash_str_update(Z_ARRVAL_P(data), "context", strlen("context"), &contexts);
+		zend_hash_str_update(Z_ARRVAL_P(data), "context", 7 /*strlen("context")*/, &contexts);
 	}
 
 	zval_ptr_dtor(&empty);
