@@ -367,90 +367,101 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 			}
 		}
 
-		if ((vendor = intern->base_vendor) != NULL) {
-			while (vendor != NULL) {
-				if (
-					(selector->type == EXTCSS3_TYPE_AT_KEYWORD)			&&
-					(selector->data.len > vendor->name.len)				&&
-					(selector->data.str[1] == '-')						&&
-					(selector->data.str[vendor->name.len + 1] == '-')	&&
-					(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(selector->data.str + 2, vendor->name.str + 1, vendor->name.len - 1))
-				) {
-					return rule->base_selector = rule->last_selector = NULL;
-				} else if (
-					(selector->prev != NULL)							&&
-					(selector->prev->type == EXTCSS3_TYPE_COLON)		&&
-					(selector->type == EXTCSS3_TYPE_COLON)				&&
-					(selector->next != NULL)							&&
-					(selector->next->type == EXTCSS3_TYPE_IDENT)		&&
-					(selector->next->data.len > vendor->name.len)		&&
-					(selector->next->data.str[0] == '-')				&&
-					(selector->next->data.str[vendor->name.len] == '-')	&&
-					(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(selector->next->data.str + 1, vendor->name.str + 1, vendor->name.len - 1))
-				) {
-					range_base = range_last = selector;
-
-					while (range_base != NULL) {
-						range_base = range_base->prev;
-
-						if ((range_base == rule->base_selector) || (range_base->type == EXTCSS3_TYPE_COMMA)) {
-							break;
-						}
-					}
-
-					while (selector != NULL) {
-						range_last = selector;
-
-						if (selector == rule->last_selector) {
-							break;
-						} else if (selector->type == EXTCSS3_TYPE_COMMA) {
-							_extcss3_trim_around(selector, &rule->last_selector);
-							break;
-						}
-
-						selector = selector->next;
-					}
-
-					if ((range_base == rule->base_selector) && (range_last == rule->last_selector)) {
-						// |------|
-						// A------B
-						// XXXXXXXX
+		if ((selector->type == EXTCSS3_TYPE_AT_KEYWORD) && (selector->data.str[1] == '-')) {
+			if ((vendor = intern->base_vendor) != NULL) {
+				while (vendor != NULL) {
+					if (
+						(selector->data.len > vendor->name.len)				&&
+						(selector->data.str[vendor->name.len + 1] == '-')	&&
+						(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(selector->data.str + 2, vendor->name.str + 1, vendor->name.len - 1))
+					) {
 						return rule->base_selector = rule->last_selector = NULL;
-					} else if (range_base == rule->base_selector) {
-						// |--,----|
-						// A-B,----|
-						// >>>>|---|
-						rule->base_selector = range_last->next;
-					} else if (range_last == rule->last_selector) {
-						// |---,---|
-						// |----,A-B
-						// |---|<<<<
-						rule->last_selector = range_base->prev;
+					}
 
-						selector = rule->last_selector;
-					} else {
-						// |-,---,-|
-						// |-,A-B,-|
-						// |-,XXXX-|
-						if ((range_base->type == EXTCSS3_TYPE_COMMA) && (range_last->type == EXTCSS3_TYPE_COMMA)) {
-							range_base = range_base->next;
+					vendor = vendor->next;
+				}
+			}
+		} else if (
+			(selector->type == EXTCSS3_TYPE_COLON)				&&
+			(selector->prev != NULL)							&&
+			(selector->prev->type == EXTCSS3_TYPE_COLON)		&&
+			(selector->next != NULL)							&&
+			(selector->next->type == EXTCSS3_TYPE_IDENT)		&&
+			(selector->next->data.str[0] == '-')
+		) {
+			if ((vendor = intern->base_vendor) != NULL) {
+				while (vendor != NULL) {
+					if (
+						(selector->next->data.len > vendor->name.len)		&&
+						(selector->next->data.str[vendor->name.len] == '-')	&&
+						(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(selector->next->data.str + 1, vendor->name.str + 1, vendor->name.len - 1))
+					) {
+						range_base = range_last = selector;
+
+						while (range_base != NULL) {
+							range_base = range_base->prev;
+
+							if ((range_base == rule->base_selector) || (range_base->type == EXTCSS3_TYPE_COMMA)) {
+								break;
+							}
 						}
 
-						while ((range_base != NULL) && (range_base != range_last)) {
-							_extcss3_remove_token(&rule->base_selector, &range_base, range_base->next);
+						while (selector != NULL) {
+							range_last = selector;
 
-							selector = range_base;
+							if (selector == rule->last_selector) {
+								break;
+							} else if (selector->type == EXTCSS3_TYPE_COMMA) {
+								_extcss3_trim_around(selector, &rule->last_selector);
+								break;
+							}
+
+							selector = selector->next;
 						}
 
-						if ((range_base != NULL) && (range_base == range_last)) {
-							_extcss3_remove_token(&rule->base_selector, &range_base, NULL);
+						if ((range_base == rule->base_selector) && (range_last == rule->last_selector)) {
+							// |------|
+							// A------B
+							// XXXXXXXX
+							return rule->base_selector = rule->last_selector = NULL;
+						} else if (range_base == rule->base_selector) {
+							// |--,----|
+							// A-B,----|
+							// >>>>|---|
+							rule->base_selector = range_last->next;
+						} else if (range_last == rule->last_selector) {
+							// |---,---|
+							// |----,A-B
+							// |---|<<<<
+							rule->last_selector = range_base->prev;
 
 							selector = rule->last_selector;
-						}
-					}
-				}
+						} else {
+							// |-,---,-|
+							// |-,A-B,-|
+							// |-,XXXX-|
+							if ((range_base->type == EXTCSS3_TYPE_COMMA) && (range_last->type == EXTCSS3_TYPE_COMMA)) {
+								range_base = range_base->next;
+							}
 
-				vendor = vendor->next;
+							while ((range_base != NULL) && (range_base != range_last)) {
+								_extcss3_remove_token(&rule->base_selector, &range_base, range_base->next);
+
+								selector = range_base;
+							}
+
+							if ((range_base != NULL) && (range_base == range_last)) {
+								_extcss3_remove_token(&rule->base_selector, &range_base, NULL);
+
+								selector = rule->last_selector;
+							}
+						}
+
+						break;
+					}
+
+					vendor = vendor->next;
+				}
 			}
 		}
 
@@ -550,12 +561,11 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	if (name->type == EXTCSS3_TYPE_IDENT) {
+	if ((name->type == EXTCSS3_TYPE_IDENT) && (name->data.str[0] == '-')) {
 		if ((vendor = intern->base_vendor) != NULL) {
 			while (vendor != NULL) {
 				if (
 					(name->data.len > vendor->name.len)			&&
-					(name->data.str[0] == '-')					&&
 					(name->data.str[vendor->name.len] == '-')	&&
 					(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + 1, vendor->name.str + 1, vendor->name.len - 1))
 				) {
@@ -655,19 +665,19 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-		if ((vendor = intern->base_vendor) != NULL) {
-			while (vendor != NULL) {
-				if (
-					(value->type == EXTCSS3_TYPE_FUNCTION)		&&
-					(value->data.len > vendor->name.len)		&&
-					(value->data.str[0] == '-')					&&
-					(value->data.str[vendor->name.len] == '-')	&&
-					(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(value->data.str + 1, vendor->name.str + 1, vendor->name.len - 1))
-				) {
-					return NULL;
-				}
+		if ((value->data.str[0] == '-')) {
+			if ((vendor = intern->base_vendor) != NULL) {
+				while (vendor != NULL) {
+					if (
+						(value->data.len > vendor->name.len)		&&
+						(value->data.str[vendor->name.len] == '-')	&&
+						(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(value->data.str + 1, vendor->name.str + 1, vendor->name.len - 1))
+					) {
+						return NULL;
+					}
 
-				vendor = vendor->next;
+					vendor = vendor->next;
+				}
 			}
 		}
 
