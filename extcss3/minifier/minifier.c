@@ -607,14 +607,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 		// Remove whitespaces and comments before...
 		if (
 			(value->type == EXTCSS3_TYPE_BR_RC) ||
-			(
-				(value->type == EXTCSS3_TYPE_DELIM) &&
-				(
-					(*value->data.str == '!') ||
-					(*value->data.str == '+') ||
-					(*value->data.str == '-')
-				)
-			)
+			((value->type == EXTCSS3_TYPE_DELIM) && (*value->data.str == '!'))
 		) {
 			_extcss3_trim_left(value);
 
