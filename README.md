@@ -5,41 +5,37 @@
 
 `extcss3` is a fast PHP7 extension for the handling of CSS3 strings
 (see [W3C Candidate Recommendation](https://www.w3.org/TR/css-syntax-3/)).
-It implements the preprocessing, tokenizing and minifying. Furthermore,
-the `extcss3` implements an API for intervention in the processing to
-make analysises, additions or corrections.
-
-Attention: The `extcss3` is currently in an undefined state between `beta`
-and `stable`. Be aware to use the `minify()` method in production systems
-without testing it previously locally.
+It supports preprocessing, tokenizing and minifying. Furthermore,
+`extcss3` implements an API that can be used to analyse, augment or
+correct the style sheet while it is being processed.
 
 
 ## Library Features
 
-* written in pure C99
-* doesn't require any external libraries
-* implements an intervention API
-* PHP 7 and PHP 7.1 ready
+* Written in pure C99.
+* Doesn't require any external libraries.
+* Implements an intervention API.
+* PHP 7 and PHP 7.1 ready.
 
 
 ## Minifying Features
 
-* Removing of unnecessary whitespaces, comments and semicolons
-* Removing of invalid or empty declarations and qualified rules
-* Color name transformations (e.g. `MediumSpringGreen` to `#00FA9A`)
-* Hexadecimal color transformations (e.g. `#FF0000` to `red`)
-* Function transformations (e.g. `rgb(255, 255, 255)` to `#FFF`)
-* Minifying of numeric values (e.g. `005` to `5` or `0.1em` to `.1em`)
-* Optionally: Removing of verdor-prefixed declarations
+* Removes unnecessary whitespace, comments and semicolons.
+* Removes invalid or empty declarations and qualified rules.
+* Color name transformations (e.g. `MediumSpringGreen` to `#00FA9A`).
+* Hexadecimal color transformations (e.g. `#FF0000` to `red`).
+* Function transformations (e.g. `rgb(255, 255, 255)` to `#FFF`).
+* Minifying of numeric values (e.g. `005` to `5` or `0.1em` to `.1em`).
+* Optional: Removal of vendor-prefixed declarations.
 
 
 ## Current Limitations
 
-* The CSS string must be UFT-8 encoded
+* The CSS string must be UTF-8 encoded.
 * String and URL tokens are returned to the registered callbacks with
-  quotes ("xxx" or 'xxx') like defined in the original CSS string
+  quotes ("xxx" or 'xxx') as given in the original CSS string.
 * The code compiles and runs on Linux systems. Other platforms have not
-  been tested
+  been tested.
 
 
 ## PHP Class (`CSS3Processor`)
@@ -48,8 +44,8 @@ without testing it previously locally.
 public CSS3Processor::__construct(void) : CSS3Processor
 ```
 
-* Constructs a new `CSS3Processor` object
-* Throws exceptions on errors
+* Constructs a new `CSS3Processor` object.
+* Throws exceptions on errors.
 
 
 ```
@@ -57,33 +53,35 @@ public CSS3Processor::setModifier(int $type, callable $callback) : bool
 ```
 
 * Registers a callback for the given token `$type` that will be called
-  while the tokenization. The callback gets an info array of the current
+  during tokenisation. The callback gets an info array of the current
   token and context.
-* The callback should return a string with a (new) value that is applied
-  to the result string. If no string is returned, the original value
-  is taken.
-* The `$type` parameter is one of the modifiable `extcss3` class constants
-* Only one modifier per type is possible
-* Returns `true` on success
-* Throws exceptions on errors
+* The callback should return a string with a (new) value that replaces
+  the given token in the result string. If the return value is not a string,
+  the original value is left unmodified.
+* The parameter `$type` can be set to any of the `extcss3` Type Constants
+  listed below that are marked as `modifiable`.
+* Only one modifier callback per token type is possible. Any subsequent call
+  to `::setModifier()` replaces previously set callbacks for the same type.
+* Returns `true` on success.
+* Throws exceptions on errors.
 
 
 ```
 public CSS3Processor::dump(string $css) : string
 ```
 
-* Creates the result string considering the preprocessing and the
-  registered modifiers
-* Throws exceptions on errors
+* Applies preprocessing and the registered modifiers to `$css`
+  and returns the resulting string.
+* Throws exceptions on errors.
 
 
 ```
 public CSS3Processor::minify(string $css [, array $vendors ]) : string
 ```
 
-* Creates the minimized result string considering the registered modifier
-  and the blacklist of vendor prefixes given in the `$vendors` array
-* Throws exceptions on errors
+* Returns the minimized result string considering the registered modifiers
+  and the blacklist of vendor prefixes given in the `$vendors` array.
+* Throws exceptions on errors.
 
 
 ### PHP Class Constants
@@ -142,6 +140,7 @@ public CSS3Processor::minify(string $css [, array $vendors ]) : string
 * `ERR_BYTES_CORRUPTION`	2
 * `ERR_NULL_PTR`			3
 * `ERR_INV_PARAM`			4
+
 
 ### Examples
 
