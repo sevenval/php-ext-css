@@ -931,7 +931,6 @@ static inline bool _extcss3_consume_escaped(extcss3_intern *intern, int *error)
 
 	for (i = 0; i < 6; i++) {
 		if (!EXTCSS3_IS_HEX(*intern->state.reader)) {
-			hex[i] = '\0';
 			break;
 		}
 
@@ -940,13 +939,14 @@ static inline bool _extcss3_consume_escaped(extcss3_intern *intern, int *error)
 		_EXTCSS3_NEXT(intern, error);
 	}
 
+	hex[i] = '\0';
+
 	if (EXTCSS3_IS_WS(*intern->state.reader)) {
 		_EXTCSS3_NEXT(intern, error);
 
 		i++;
 	}
 
-	hex[6] = '\0';
 	v = (int)strtol(hex, NULL, 16);
 
 	if ((v <= 0) || (v > EXTCSS3_MAX_ALLOWED_CP) || EXTCSS3_FOR_SURROGATE_CP(v)) {
