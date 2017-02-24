@@ -916,6 +916,10 @@ static inline bool _extcss3_consume_escaped(extcss3_intern *intern, int *error)
 	unsigned short int i;
 	unsigned int v;
 	char hex[7];
+	char *reader_start, *writer_start;
+
+	reader_start = intern->state.reader;
+	writer_start = intern->state.writer;
 
 	// Consume '\\'
 	if (EXTCSS3_SUCCESS != _extcss3_next_char(intern, error)) {
@@ -947,18 +951,14 @@ static inline bool _extcss3_consume_escaped(extcss3_intern *intern, int *error)
 	if ((v <= 0) || (v > EXTCSS3_MAX_ALLOWED_CP) || EXTCSS3_FOR_SURROGATE_CP(v)) {
 		i++; // The '\\' has to be removed, too
 
-		if (i < EXTCSS3_REPLACEMENT_LEN) {
-			memmove(intern->state.reader + EXTCSS3_REPLACEMENT_LEN - i, intern->state.reader, intern->state.writer - intern->state.reader + 1);
-			memcpy(intern->state.reader - i, EXTCSS3_REPLACEMENT_CHR, EXTCSS3_REPLACEMENT_LEN);
-			intern->state.writer += EXTCSS3_REPLACEMENT_LEN - i;
-			intern->state.reader += EXTCSS3_REPLACEMENT_LEN - i;
-		} else if (i > EXTCSS3_REPLACEMENT_LEN) {
-			memcpy(intern->state.reader - i, EXTCSS3_REPLACEMENT_CHR, EXTCSS3_REPLACEMENT_LEN);
-			memmove(intern->state.reader - i + EXTCSS3_REPLACEMENT_LEN, intern->state.reader, intern->state.writer - intern->state.reader + 1);
-			intern->state.reader -= i-EXTCSS3_REPLACEMENT_LEN;
-			intern->state.writer -= i-EXTCSS3_REPLACEMENT_LEN;
+		if (i != EXTCSS3_REPLACEMENT_LEN) {
+			memmove(reader_start + EXTCSS3_REPLACEMENT_LEN, intern->state.reader, intern->state.writer - intern->state.reader + 1);
+			memcpy(reader_start, EXTCSS3_REPLACEMENT_CHR, EXTCSS3_REPLACEMENT_LEN);
+
+			intern->state.writer = writer_start + EXTCSS3_REPLACEMENT_LEN;
+			intern->state.reader = reader_start + EXTCSS3_REPLACEMENT_LEN;
 		} else {
-			memcpy(intern->state.reader - i, EXTCSS3_REPLACEMENT_CHR, EXTCSS3_REPLACEMENT_LEN);
+			memcpy(reader_start, EXTCSS3_REPLACEMENT_CHR, EXTCSS3_REPLACEMENT_LEN);
 		}
 	}
 
