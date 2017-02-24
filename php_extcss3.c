@@ -63,7 +63,7 @@ static inline void php_extcss3_throw_exception(int error)
 			zend_throw_exception(zend_ce_exception, "extcss3: Invalid paramenter or parameter type given", EXTCSS3_ERR_INV_PARAM);
 			break;
 		default:
-			zend_throw_exception(zend_ce_exception, "extcss3: Undefined internal error", 0);
+			zend_throw_exception(zend_ce_exception, "extcss3: Unknown internal error", 0);
 	}
 }
 
@@ -200,7 +200,7 @@ static void php_extcss3_modifier_destructor(void *modifier)
 	}
 
 	zval_ptr_dtor(ptr);
-	free(ptr);
+	efree(ptr);
 }
 
 /* ==================================================================================================== */
@@ -257,7 +257,7 @@ PHP_METHOD(CSS3Processor, setModifier)
 		return;
 	}
 
-	copy = (zval *)calloc(1, sizeof(zval));
+	copy = (zval *)ecalloc(1, sizeof(zval));
 
 	if (copy == NULL) {
 		php_extcss3_throw_exception(EXTCSS3_ERR_MEMORY);
