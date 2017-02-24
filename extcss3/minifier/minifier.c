@@ -172,7 +172,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 {
 	extcss3_token *selector, *range_base, *range_last;
 	extcss3_vendor *vendor;
-	bool prevent_sign;
+	bool preserve_sign;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -346,22 +346,22 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 					)
 				)
 			) {
-				prevent_sign = true;
+				preserve_sign = true;
 			} else if (
 				(selector->prev != NULL) &&
 				(selector->prev->type == EXTCSS3_TYPE_DIMENSION) &&
 				(selector->prev->info.len == 1) &&
 				(selector->prev->info.str[0] == 'n')
 			) {
-				prevent_sign = true;
+				preserve_sign = true;
 			} else {
-				prevent_sign = false;
+				preserve_sign = false;
 			}
 
 			if (selector->type == EXTCSS3_TYPE_PERCENTAGE && rule->base_selector == selector && rule->last_selector == selector) {
 				// Do nothing
 			} else {
-				if (EXTCSS3_SUCCESS != extcss3_minify_numeric(selector, prevent_sign, error)) {
+				if (EXTCSS3_SUCCESS != extcss3_minify_numeric(selector, preserve_sign, error)) {
 					return NULL;
 				}
 			}

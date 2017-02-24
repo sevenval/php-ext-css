@@ -31,10 +31,9 @@ const char *extcss3_numeric_dimensions[19] = {
 	"turn"
 };
 
-static inline bool _extcss3_minify_numeric_prevent_dimension(extcss3_token *token)
+static inline bool _extcss3_minify_numeric_preserve_dimension(extcss3_token *token)
 {
 	unsigned short int i, elements;
-	bool prevent = true;
 
 	if (token->type != EXTCSS3_TYPE_DIMENSION) {
 		return EXTCSS3_FAILURE;
@@ -47,18 +46,16 @@ static inline bool _extcss3_minify_numeric_prevent_dimension(extcss3_token *toke
 			(strlen(extcss3_numeric_dimensions[i]) == token->info.len) &&
 			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(token->info.str, extcss3_numeric_dimensions[i], token->info.len))
 		) {
-			prevent = EXTCSS3_FAILURE;
-
-			break;
+			return EXTCSS3_FAILURE;
 		}
 	}
 
-	return prevent;
+	return EXTCSS3_SUCCESS;
 }
 
 /* ==================================================================================================== */
 
-bool extcss3_minify_numeric(extcss3_token *token, bool prevent_sign, int *error)
+bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, int *error)
 {
 	char *base, *last;
 	double num;
@@ -80,8 +77,8 @@ bool extcss3_minify_numeric(extcss3_token *token, bool prevent_sign, int *error)
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	if ((num = atof(token->data.str)) == 0) {
-		if (prevent_sign && ((*token->data.str == '-') || (*token->data.str == '+'))) {
-			token->user.len = 1 + token->info.len + (int)prevent_sign;
+		if (preserve_sign && ((*token->data.str == '-') || (*token->data.str == '+'))) {
+			token->user.len = 1 + token->info.len + (int)preserve_sign;
 		} else {
 			token->user.len = 1 + token->info.len;
 		}
@@ -91,14 +88,14 @@ bool extcss3_minify_numeric(extcss3_token *token, bool prevent_sign, int *error)
 			return EXTCSS3_FAILURE;
 		}
 
-		if (prevent_sign && ((*token->data.str == '-') || (*token->data.str == '+'))) {
+		if (preserve_sign && ((*token->data.str == '-') || (*token->data.str == '+'))) {
 			token->user.str[0] = *token->data.str;
-			token->user.str[0 + (int)prevent_sign] = '0';
+			token->user.str[0 + (int)preserve_sign] = '0';
 		} else {
 			*token->user.str = '0';
 		}
 	} else {
-		if ((*token->data.str == '-') || (prevent_sign && (*token->data.str == '+'))) {
+		if ((*token->data.str == '-') || (preserve_sign && (*token->data.str == '+'))) {
 			val_is_signed = 1;
 		} else if (*token->data.str == '+') {
 			token->data.str++;
@@ -154,7 +151,7 @@ bool extcss3_minify_numeric(extcss3_token *token, bool prevent_sign, int *error)
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	if ((num != 0) || _extcss3_minify_numeric_prevent_dimension(token) ) {
+	if ((num != 0) || (EXTCSS3_SUCCESS == _extcss3_minify_numeric_preserve_dimension(token))) {
 		memcpy(token->user.str + token->user.len - token->info.len, token->info.str, token->info.len);
 	} else if (token->user.str != NULL) {
 		token->user.len -= token->info.len;
