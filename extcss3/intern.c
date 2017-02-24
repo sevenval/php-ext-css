@@ -274,7 +274,7 @@ bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len, int *
 	 */
 
 	intern->copy.len = len * 3;
-	intern->copy.str = (char *)calloc(1, sizeof(char) * (intern->copy.len + 1));
+	intern->copy.str = (char *)calloc(intern->copy.len + 1, sizeof(char));
 
 	if (intern->copy.str == NULL) {
 		*error = EXTCSS3_ERR_MEMORY;
@@ -372,7 +372,7 @@ bool extcss3_set_vendor_string(extcss3_intern *intern, char *name, size_t len, i
 	}
 
 	intern->last_vendor->name.len = len;
-	intern->last_vendor->name.str = (char *)calloc(1, sizeof(char) * (intern->last_vendor->name.len));
+	intern->last_vendor->name.str = (char *)calloc(intern->last_vendor->name.len, sizeof(char));
 
 	if (intern->last_vendor->name.str == NULL) {
 		*error = EXTCSS3_ERR_MEMORY;

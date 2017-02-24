@@ -178,7 +178,7 @@ static void php_extcss3_modifier_callback(extcss3_intern *intern)
 	if (SUCCESS == call_user_function_ex(EG(function_table), NULL, callable, &retval, 1, args, 0, NULL)) {
 		if (Z_TYPE(retval) == IS_STRING) {
 			intern->last_token->user.len = Z_STRLEN(retval);
-			intern->last_token->user.str = (char *)calloc(1, sizeof(char) * intern->last_token->user.len);
+			intern->last_token->user.str = (char *)calloc(intern->last_token->user.len, sizeof(char));
 
 			memcpy(intern->last_token->user.str, Z_STRVAL(retval), Z_STRLEN(retval));
 		}

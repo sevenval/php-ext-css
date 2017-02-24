@@ -81,11 +81,11 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 			return EXTCSS3_FAILURE;
 		}
 
-		// It was nothing to do for the extcss3_minify_hash() function
+		// There was nothing to do for the extcss3_minify_hash() function
 		if ((*token)->user.str == NULL) {
 			(*token)->user.len = idx + 1;
 
-			if (((*token)->user.str = (char *)calloc(1, sizeof(char) * (*token)->user.len)) == NULL) {
+			if (((*token)->user.str = (char *)calloc((*token)->user.len, sizeof(char))) == NULL) {
 				*error = EXTCSS3_ERR_MEMORY;
 				return EXTCSS3_FAILURE;
 			}
