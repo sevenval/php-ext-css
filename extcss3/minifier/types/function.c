@@ -15,14 +15,14 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 	double value;
 	char hex[9];
 	unsigned short int idx = 0, percentages = 0, numbers = 0;
-	bool validity = true;
+	bool valid = true;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	while ((curr->next != NULL) && (curr->type != EXTCSS3_TYPE_BR_RC)) {
 		if ((curr->type == EXTCSS3_TYPE_NUMBER) || (curr->type == EXTCSS3_TYPE_PERCENTAGE)) {
-			if (!validity || (((*token)->data.len == 3) && (idx > 4)) || (((*token)->data.len == 4) && (idx > 6))) {
-				return EXTCSS3_FAILURE; // Too much values
+			if (!valid || (((*token)->data.len == 3) && (idx > 4)) || (((*token)->data.len == 4) && (idx > 6))) {
+				return EXTCSS3_FAILURE; // Too many values
 			}
 
 			value = atof(curr->data.str);
@@ -58,12 +58,12 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, in
 			sprintf(&hex[idx], "%02x", (int)value);
 			idx += 2;
 
-			validity = false;
+			valid = false;
 		} else if (!_EXTCSS3_TYPE_EMPTY(curr->type)) {
-			if (validity) {
+			if (valid) {
 				return EXTCSS3_FAILURE;
 			} else if (curr->type == EXTCSS3_TYPE_COMMA) {
-				validity = true;
+				valid = true;
 			}
 		}
 
