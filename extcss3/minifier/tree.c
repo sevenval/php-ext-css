@@ -31,7 +31,7 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, int
 	while ((*token != NULL) && (*token != max)) {
 		// Every new rule initially has no "base_selector"
 		if (rule->base_selector == NULL) {
-			// Simulated rule for <commment> tokens contain user strings
+			// Pseudo-rule for <commment> tokens that contain user strings
 			if (((*token)->type == EXTCSS3_TYPE_COMMENT) && ((*token)->user.str != NULL)) {
 				rule->base_selector = rule->last_selector = *token;
 
@@ -72,7 +72,7 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, int
 				}
 			}
 
-			// Simulated rule for the <eof> token
+			// Pseudo-rule for the <eof> token
 			if ((*token)->type == EXTCSS3_TYPE_EOF) {
 				rule->base_selector = rule->last_selector = *token;
 				break;
@@ -158,7 +158,7 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, int
 
 						while (*token != search) {
 							if (decl == NULL) {
-								// Skip leading whitespaces and comments (if no contain user strings)
+								// Skip leading whitespace and comment tokens (unless they contain user strings)
 								if (_EXTCSS3_TYPE_EMPTY_EX(*token)) {
 									*token = (*token)->next;
 									continue;
@@ -196,13 +196,13 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, int
 					}
 				}
 
-				// Simulated rule for the <eof> token
+				// Pseudo-rule for the <eof> token
 				if ((*token)->type == EXTCSS3_TYPE_EOF) {
 					rule->base_selector = rule->last_selector = *token;
 					break;
 				}
 			} else {
-				// Simulated rule for the <eof> token
+				// Pseudo-rule for the <eof> token
 				if ((*token)->type == EXTCSS3_TYPE_EOF) {
 					// Fork the next rule
 					if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(&rule, error)) {

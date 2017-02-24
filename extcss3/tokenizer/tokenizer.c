@@ -78,10 +78,10 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	/**
-	 * To be able to identify some token types we must be able to
-	 * look forward in the "prepared" string. Therefor we "preload"
+	 * To be able to identify some token types, we must be able to
+	 * look forward in the "prepared" string. Therefore we "preload"
 	 * "i" characters. The "reader" and "writer" pointers of the
-	 * state machine run parallel but offset by "i" characters.
+	 * state machine run in parallel but offset by "i" characters.
 	 */
 	for (i = 5; i--; ) {
 		if (EXTCSS3_SUCCESS != extcss3_preprocess(intern, error)) {
@@ -599,7 +599,8 @@ static inline bool _extcss3_fill_unicode_range_token(extcss3_intern *intern, ext
 		_EXTCSS3_NEXT(intern, error);
 	}
 
-	// !!! The intepretaion of the start and the end of the range is intentionally skipped !!!
+	// While the standard would require us to interpret/decode the start and the end of
+	// the range, the string representation is good enough for now. We are not a parser.
 
 	if (q || (*intern->state.reader != '-') || !EXTCSS3_IS_HEX(intern->state.reader[1])) {
 		token->data.len = intern->state.reader - token->data.str;
@@ -664,7 +665,7 @@ static inline bool _extcss3_fill_url_token(extcss3_intern *intern, extcss3_token
 	// Consume the '(' after "url"
 	_EXTCSS3_NEXT(intern, error);
 
-	// Consume all leading whitespaces
+	// Consume all leading whitespace
 	while (EXTCSS3_IS_WS(*intern->state.reader)) {
 		_EXTCSS3_NEXT(intern, error);
 	}
@@ -695,7 +696,7 @@ static inline bool _extcss3_fill_url_token(extcss3_intern *intern, extcss3_token
 			token->info.str = token->data.str;
 			token->info.len = 1;
 
-			// Consume all trailing whitespaces
+			// Consume all trailing whitespace
 			while (EXTCSS3_IS_WS(*intern->state.reader)) {
 				_EXTCSS3_NEXT(intern, error);
 			}
@@ -719,7 +720,7 @@ static inline bool _extcss3_fill_url_token(extcss3_intern *intern, extcss3_token
 			if ((*intern->state.reader == ')') || (*intern->state.reader == '\0')) {
 				return _extcss3_next_char(intern, error);
 			} else if (EXTCSS3_IS_WS(*intern->state.reader)) {
-				// Consume all trailing whitespaces
+				// Consume all trailing whitespace
 				while (EXTCSS3_IS_WS(*intern->state.reader)) {
 					_EXTCSS3_NEXT(intern, error);
 				}

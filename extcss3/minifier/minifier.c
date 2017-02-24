@@ -210,7 +210,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 	selector = rule->last_selector;
 
 	while ((selector != NULL) && _EXTCSS3_TYPE_EMPTY_EX(selector)) {
-		// Trim the trailing whitespaces and comments
+		// Trim the trailing whitespace and comments
 		rule->last_selector = selector = selector->prev;
 	}
 
@@ -224,7 +224,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 	selector = rule->base_selector;
 
 	while (selector != NULL) {
-		// Remove whitespaces and comments after...
+		// Remove whitespace and comments after...
 		if (
 			(selector->type == EXTCSS3_TYPE_BR_SO)		||
 			(selector->type == EXTCSS3_TYPE_BR_RO)		||
@@ -235,7 +235,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 			_extcss3_trim_right(selector, &rule->last_selector);
 		}
 
-		// Remove whitespaces and comments before...
+		// Remove whitespace and comments before...
 		if (
 			(selector->type == EXTCSS3_TYPE_BR_SC)		||
 			(selector->type == EXTCSS3_TYPE_BR_RC)		||
@@ -255,7 +255,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 			_extcss3_trim_left(selector);
 		}
 
-		// Remove whitespaces and comments around...
+		// Remove whitespace and comments around...
 		if (
 			(selector->flag == EXTCSS3_FLAG_AT_URL_STRING)	||
 			(selector->type == EXTCSS3_TYPE_COMMA)			||
@@ -579,7 +579,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	// Remove the leading whitespaces and comments
+	// Remove the leading whitespace and comments
 	while (decl->last != decl->base) {
 		if (_EXTCSS3_TYPE_EMPTY_EX(decl->last)) {
 			decl->last = decl->last->prev;
@@ -596,7 +596,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 			return NULL;
 		}
 
-		// Remove whitespaces and comments after...
+		// Remove whitespace and comments after...
 		if (
 			(value->type == EXTCSS3_TYPE_FUNCTION) ||
 			(value->type == EXTCSS3_TYPE_BR_RO)
@@ -604,7 +604,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 			_extcss3_trim_right(value, &decl->last);
 		}
 
-		// Remove whitespaces and comments before...
+		// Remove whitespace and comments before...
 		if (
 			(value->type == EXTCSS3_TYPE_BR_RC) ||
 			((value->type == EXTCSS3_TYPE_DELIM) && (*value->data.str == '!'))
@@ -630,7 +630,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 			}
 		}
 
-		// Remove whitespaces and comments around...
+		// Remove whitespace and comments around...
 		if (
 			(value->type == EXTCSS3_TYPE_COMMA) ||
 			(value->type == EXTCSS3_TYPE_STRING) ||
@@ -906,12 +906,12 @@ static inline bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule)
 			(prev->base_selector->data.len == 7 /* strlen("@import") */) &&
 			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(prev->base_selector->data.str, "@import", 7))
 		) {
-			// Do nothing. The previous "@import" is already checked.
+			// Do nothing. The previous "@import" was already checked.
 		} else if (
 			(prev->base_selector->data.len == 8 /* strlen("@charset") */) &&
 			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(prev->base_selector->data.str, "@charset", 8))
 		) {
-			// Do nothing. The previous "@charset" is already checked.
+			// Do nothing. The previous "@charset" was already checked.
 		} else {
 			return EXTCSS3_FAILURE;
 		}
@@ -944,17 +944,17 @@ static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
 			(prev->base_selector->data.len == 10 /* strlen("@namespace") */) &&
 			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(prev->base_selector->data.str, "@namespace", 10))
 		) {
-			// Do nothing. The previous "@namespace" is already checked.
+			// Do nothing. The previous "@namespace" was already checked.
 		} else if (
 			(prev->base_selector->data.len == 7 /* strlen("@import") */) &&
 			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(prev->base_selector->data.str, "@import", 7))
 		) {
-			// Do nothing. The previous "@import" is already checked.
+			// Do nothing. The previous "@import" was already checked.
 		} else if (
 			(prev->base_selector->data.len == 8 /* strlen("@charset") */) &&
 			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(prev->base_selector->data.str, "@charset", 8))
 		) {
-			// Do nothing. The previous "@charset" is already checked.
+			// Do nothing. The previous "@charset" was already checked.
 		} else {
 			return EXTCSS3_FAILURE;
 		}
