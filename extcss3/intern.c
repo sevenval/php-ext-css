@@ -250,7 +250,7 @@ void extcss3_release_decls_list(extcss3_decl *list)
 
 /* ==================================================================================================== */
 
-bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len, int *error)
+bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len, unsigned int *error)
 {
 	if ((intern == NULL) || (css == NULL)) {
 		*error = EXTCSS3_ERR_NULL_PTR;
@@ -298,7 +298,7 @@ bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len, int *
 	return EXTCSS3_SUCCESS;
 }
 
-bool extcss3_set_modifier(extcss3_intern *intern, short int type, void *callable, int *error)
+bool extcss3_set_modifier(extcss3_intern *intern, unsigned int type, void *callable, unsigned int *error)
 {
 	if ((intern == NULL) || (intern->modifier.destructor == NULL) || (intern->modifier.callback == NULL) || (callable == NULL)) {
 		*error = EXTCSS3_ERR_NULL_PTR;
@@ -363,7 +363,7 @@ bool extcss3_set_modifier(extcss3_intern *intern, short int type, void *callable
 	return EXTCSS3_SUCCESS;
 }
 
-bool extcss3_set_vendor_string(extcss3_intern *intern, char *name, size_t len, int *error)
+bool extcss3_set_vendor_string(extcss3_intern *intern, char *name, size_t len, unsigned int *error)
 {
 	if ((intern == NULL) || (name == NULL)) {
 		*error = EXTCSS3_ERR_NULL_PTR;

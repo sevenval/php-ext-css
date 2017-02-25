@@ -5,9 +5,9 @@
 /**
  * Return the size of the given (UTF-8 multibyte) character in bytes
  */
-inline unsigned short int extcss3_char_len(char c)
+inline unsigned int extcss3_char_len(char c)
 {
-	unsigned short int i = 7, j = 0;
+	unsigned int i = 7, j = 0;
 
 	while ((i >= 0) && ((c >> i) & 1)) {
 		i--;
@@ -44,7 +44,7 @@ inline bool extcss3_ascii_strncasecmp(const char *str1, const char *str2, unsign
 /**
  * Get the string representation of a token type
  */
-char *extcss3_get_type_str(unsigned short int type)
+char *extcss3_get_type_str(unsigned int type)
 {
 	switch (type) {
 		case EXTCSS3_TYPE_IDENT:
@@ -118,7 +118,7 @@ char *extcss3_get_type_str(unsigned short int type)
 	}
 }
 
-char *extcss3_get_flag_str(unsigned short int flag)
+char *extcss3_get_flag_str(unsigned int flag)
 {
 	switch (flag) {
 		case EXTCSS3_FLAG_ID:

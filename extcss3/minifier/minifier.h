@@ -5,6 +5,6 @@
 
 /* ==================================================================================================== */
 
-char *extcss3_minify(extcss3_intern *intern, int *error);
+char *extcss3_minify(extcss3_intern *intern, unsigned int *error);
 
 #endif /* EXTCSS3_MINIFIER_H */

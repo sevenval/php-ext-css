@@ -13,13 +13,13 @@
 
 /* ==================================================================================================== */
 
-static void *_extcss3_set_error_code(int *error, int code, extcss3_rule *tree, extcss3_intern *intern);
+static void *_extcss3_set_error_code(unsigned int *error, unsigned int code, extcss3_rule *tree, extcss3_intern *intern);
 
-static extcss3_rule *_extcss3_minify_tree(extcss3_intern *intern, extcss3_rule **tree, int *error);
-static extcss3_rule *_extcss3_minify_rule(extcss3_intern *intern, extcss3_rule *rule, int *error);
-static extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, extcss3_rule *rule, int *error);
-static extcss3_block *_extcss3_minify_declarations(extcss3_intern *intern, extcss3_block *block, int *error);
-static extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, extcss3_decl *decl, int *error);
+static extcss3_rule *_extcss3_minify_tree(extcss3_intern *intern, extcss3_rule **tree, unsigned int *error);
+static extcss3_rule *_extcss3_minify_rule(extcss3_intern *intern, extcss3_rule *rule, unsigned int *error);
+static extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, extcss3_rule *rule, unsigned int *error);
+static extcss3_block *_extcss3_minify_declarations(extcss3_intern *intern, extcss3_block *block, unsigned int *error);
+static extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, extcss3_decl *decl, unsigned int *error);
 
 static extcss3_token *_extcss3_get_decl_name(extcss3_decl *decl);
 static extcss3_token *_extcss3_get_decl_sep(extcss3_token *name, extcss3_decl *decl);
@@ -39,7 +39,7 @@ static bool _extcss3_check_minify_color(extcss3_token *name, extcss3_token *valu
 
 /* ==================================================================================================== */
 
-char *extcss3_minify(extcss3_intern *intern, int *error)
+char *extcss3_minify(extcss3_intern *intern, unsigned int *error)
 {
 	extcss3_token *token;
 	extcss3_rule *tree;
@@ -80,7 +80,7 @@ char *extcss3_minify(extcss3_intern *intern, int *error)
 
 /* ==================================================================================================== */
 
-static inline void *_extcss3_set_error_code(int *error, int code, extcss3_rule *tree, extcss3_intern *intern)
+static inline void *_extcss3_set_error_code(unsigned int *error, unsigned int code, extcss3_rule *tree, extcss3_intern *intern)
 {
 	*error = code;
 
@@ -98,7 +98,7 @@ static inline void *_extcss3_set_error_code(int *error, int code, extcss3_rule *
 
 /* ==================================================================================================== */
 
-static extcss3_rule *_extcss3_minify_tree(extcss3_intern *intern, extcss3_rule **tree, int *error)
+static extcss3_rule *_extcss3_minify_tree(extcss3_intern *intern, extcss3_rule **tree, unsigned int *error)
 {
 	extcss3_rule *next, *curr = *tree;
 
@@ -139,7 +139,7 @@ static extcss3_rule *_extcss3_minify_tree(extcss3_intern *intern, extcss3_rule *
 	return *tree;
 }
 
-static extcss3_rule *_extcss3_minify_rule(extcss3_intern *intern, extcss3_rule *rule, int *error)
+static extcss3_rule *_extcss3_minify_rule(extcss3_intern *intern, extcss3_rule *rule, unsigned int *error)
 {
 	if ((rule == NULL) && (rule->base_selector == NULL)) {
 		return NULL;
@@ -168,7 +168,7 @@ static extcss3_rule *_extcss3_minify_rule(extcss3_intern *intern, extcss3_rule *
 	return rule;
 }
 
-static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, extcss3_rule *rule, int *error)
+static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, extcss3_rule *rule, unsigned int *error)
 {
 	extcss3_token *selector, *range_base, *range_last;
 	extcss3_vendor *vendor;
@@ -479,7 +479,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 	return rule->base_selector;
 }
 
-static inline extcss3_block *_extcss3_minify_declarations(extcss3_intern *intern, extcss3_block *block, int *error)
+static inline extcss3_block *_extcss3_minify_declarations(extcss3_intern *intern, extcss3_block *block, unsigned int *error)
 {
 	extcss3_decl *curr, *temp;
 
@@ -530,7 +530,7 @@ static inline extcss3_block *_extcss3_minify_declarations(extcss3_intern *intern
 	return block;
 }
 
-static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, extcss3_decl *decl, int *error)
+static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, extcss3_decl *decl, unsigned int *error)
 {
 	extcss3_token *name = NULL, *sep = NULL, *value = NULL, *temp;
 	extcss3_vendor *vendor;

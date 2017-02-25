@@ -5,6 +5,6 @@
 
 /* ==================================================================================================== */
 
-bool extcss3_tokenize(extcss3_intern *intern, int *error);
+bool extcss3_tokenize(extcss3_intern *intern, unsigned int *error);
 
 #endif /* EXTCSS3_TOKENIZER_H */

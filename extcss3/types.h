@@ -11,24 +11,24 @@
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#define EXTCSS3_ERR_MEMORY				((unsigned short int)1)
-#define EXTCSS3_ERR_BYTES_CORRUPTION	((unsigned short int)2)
-#define EXTCSS3_ERR_NULL_PTR			((unsigned short int)3)
-#define EXTCSS3_ERR_INV_PARAM			((unsigned short int)4)
+#define EXTCSS3_ERR_MEMORY				((unsigned int)1)
+#define EXTCSS3_ERR_BYTES_CORRUPTION	((unsigned int)2)
+#define EXTCSS3_ERR_NULL_PTR			((unsigned int)3)
+#define EXTCSS3_ERR_INV_PARAM			((unsigned int)4)
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #define EXTCSS3_REPLACEMENT_CHR			("\xEF\xBF\xBD")
-#define EXTCSS3_REPLACEMENT_LEN			((unsigned short int)3)
+#define EXTCSS3_REPLACEMENT_LEN			((unsigned int)3)
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#define EXTCSS3_FLAG_ID					((unsigned short int)1)
-#define EXTCSS3_FLAG_UNRESTRICTED		((unsigned short int)2)
-#define EXTCSS3_FLAG_INTEGER			((unsigned short int)3)
-#define EXTCSS3_FLAG_NUMBER				((unsigned short int)4)
-#define EXTCSS3_FLAG_STRING				((unsigned short int)5)
-#define EXTCSS3_FLAG_AT_URL_STRING		((unsigned short int)6)
+#define EXTCSS3_FLAG_ID					((unsigned int)1)
+#define EXTCSS3_FLAG_UNRESTRICTED		((unsigned int)2)
+#define EXTCSS3_FLAG_INTEGER			((unsigned int)3)
+#define EXTCSS3_FLAG_NUMBER				((unsigned int)4)
+#define EXTCSS3_FLAG_STRING				((unsigned int)5)
+#define EXTCSS3_FLAG_AT_URL_STRING		((unsigned int)6)
 
 #define EXTCSS3_FLAG_ID_STR				("id")
 #define EXTCSS3_FLAG_UNRESTRICTED_STR	("unrestricted")
@@ -39,42 +39,42 @@
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#define EXTCSS3_UNDEFINED				((unsigned short int)0)
+#define EXTCSS3_UNDEFINED				((unsigned int)0)
 #define EXTCSS3_UNDEFINED_STR			("undefined")
 
-#define EXTCSS3_TYPE_IDENT				((unsigned short int)1)
-#define EXTCSS3_TYPE_FUNCTION			((unsigned short int)2)
-#define EXTCSS3_TYPE_AT_KEYWORD			((unsigned short int)3)
-#define EXTCSS3_TYPE_HASH				((unsigned short int)4)
-#define EXTCSS3_TYPE_STRING				((unsigned short int)5)
-#define EXTCSS3_TYPE_BAD_STRING			((unsigned short int)6)
-#define EXTCSS3_TYPE_URL				((unsigned short int)7)
-#define EXTCSS3_TYPE_BAD_URL			((unsigned short int)8)
-#define EXTCSS3_TYPE_DELIM				((unsigned short int)9)
-#define EXTCSS3_TYPE_NUMBER				((unsigned short int)10)
-#define EXTCSS3_TYPE_PERCENTAGE			((unsigned short int)11)
-#define EXTCSS3_TYPE_DIMENSION			((unsigned short int)12)
-#define EXTCSS3_TYPE_UNICODE_RANGE		((unsigned short int)13)
-#define EXTCSS3_TYPE_INCLUDE_MATCH		((unsigned short int)14)
-#define EXTCSS3_TYPE_DASH_MATCH			((unsigned short int)15)
-#define EXTCSS3_TYPE_PREFIX_MATCH		((unsigned short int)16)
-#define EXTCSS3_TYPE_SUFFIX_MATCH		((unsigned short int)17)
-#define EXTCSS3_TYPE_SUBSTR_MATCH		((unsigned short int)18)
-#define EXTCSS3_TYPE_COLUMN				((unsigned short int)19)
-#define EXTCSS3_TYPE_WS					((unsigned short int)20)
-#define EXTCSS3_TYPE_CDO				((unsigned short int)21)
-#define EXTCSS3_TYPE_CDC				((unsigned short int)22)
-#define EXTCSS3_TYPE_COLON				((unsigned short int)23)
-#define EXTCSS3_TYPE_SEMICOLON			((unsigned short int)24)
-#define EXTCSS3_TYPE_COMMA				((unsigned short int)25)
-#define EXTCSS3_TYPE_BR_RO				((unsigned short int)26)
-#define EXTCSS3_TYPE_BR_RC				((unsigned short int)27)
-#define EXTCSS3_TYPE_BR_SO				((unsigned short int)28)
-#define EXTCSS3_TYPE_BR_SC				((unsigned short int)29)
-#define EXTCSS3_TYPE_BR_CO				((unsigned short int)30)
-#define EXTCSS3_TYPE_BR_CC				((unsigned short int)31)
-#define EXTCSS3_TYPE_COMMENT			((unsigned short int)32)
-#define EXTCSS3_TYPE_EOF				((unsigned short int)33)
+#define EXTCSS3_TYPE_IDENT				((unsigned int)1)
+#define EXTCSS3_TYPE_FUNCTION			((unsigned int)2)
+#define EXTCSS3_TYPE_AT_KEYWORD			((unsigned int)3)
+#define EXTCSS3_TYPE_HASH				((unsigned int)4)
+#define EXTCSS3_TYPE_STRING				((unsigned int)5)
+#define EXTCSS3_TYPE_BAD_STRING			((unsigned int)6)
+#define EXTCSS3_TYPE_URL				((unsigned int)7)
+#define EXTCSS3_TYPE_BAD_URL			((unsigned int)8)
+#define EXTCSS3_TYPE_DELIM				((unsigned int)9)
+#define EXTCSS3_TYPE_NUMBER				((unsigned int)10)
+#define EXTCSS3_TYPE_PERCENTAGE			((unsigned int)11)
+#define EXTCSS3_TYPE_DIMENSION			((unsigned int)12)
+#define EXTCSS3_TYPE_UNICODE_RANGE		((unsigned int)13)
+#define EXTCSS3_TYPE_INCLUDE_MATCH		((unsigned int)14)
+#define EXTCSS3_TYPE_DASH_MATCH			((unsigned int)15)
+#define EXTCSS3_TYPE_PREFIX_MATCH		((unsigned int)16)
+#define EXTCSS3_TYPE_SUFFIX_MATCH		((unsigned int)17)
+#define EXTCSS3_TYPE_SUBSTR_MATCH		((unsigned int)18)
+#define EXTCSS3_TYPE_COLUMN				((unsigned int)19)
+#define EXTCSS3_TYPE_WS					((unsigned int)20)
+#define EXTCSS3_TYPE_CDO				((unsigned int)21)
+#define EXTCSS3_TYPE_CDC				((unsigned int)22)
+#define EXTCSS3_TYPE_COLON				((unsigned int)23)
+#define EXTCSS3_TYPE_SEMICOLON			((unsigned int)24)
+#define EXTCSS3_TYPE_COMMA				((unsigned int)25)
+#define EXTCSS3_TYPE_BR_RO				((unsigned int)26)
+#define EXTCSS3_TYPE_BR_RC				((unsigned int)27)
+#define EXTCSS3_TYPE_BR_SO				((unsigned int)28)
+#define EXTCSS3_TYPE_BR_SC				((unsigned int)29)
+#define EXTCSS3_TYPE_BR_CO				((unsigned int)30)
+#define EXTCSS3_TYPE_BR_CC				((unsigned int)31)
+#define EXTCSS3_TYPE_COMMENT			((unsigned int)32)
+#define EXTCSS3_TYPE_EOF				((unsigned int)33)
 
 #define EXTCSS3_TYPE_IDENT_STR			("ident")
 #define EXTCSS3_TYPE_FUNCTION_STR		("function")
@@ -154,7 +154,7 @@ struct _extcss3_state
 
 struct _extcss3_token
 {
-	unsigned short int	type;
+	unsigned int		type;
 
 	extcss3_str			data;
 	extcss3_str			info;
@@ -163,7 +163,7 @@ struct _extcss3_token
 	extcss3_token		*prev;
 	extcss3_token		*next;
 
-	unsigned short int	flag;
+	unsigned int		flag;
 };
 
 struct _extcss3_ctxt

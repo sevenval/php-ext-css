@@ -33,7 +33,7 @@ const char *extcss3_numeric_dimensions[19] = {
 
 static inline bool _extcss3_minify_numeric_preserve_dimension(extcss3_token *token)
 {
-	unsigned short int i, elements;
+	unsigned int i, elements;
 
 	if (token->type != EXTCSS3_TYPE_DIMENSION) {
 		return EXTCSS3_FAILURE;
@@ -55,11 +55,11 @@ static inline bool _extcss3_minify_numeric_preserve_dimension(extcss3_token *tok
 
 /* ==================================================================================================== */
 
-bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, int *error)
+bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, unsigned int *error)
 {
 	char *base, *last;
 	double num;
-	unsigned short int val_is_signed = 0;
+	unsigned int val_is_signed = 0;
 
 	if (token == NULL) {
 		*error = EXTCSS3_ERR_NULL_PTR;

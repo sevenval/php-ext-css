@@ -167,9 +167,9 @@ const char *extcss3_color_hashes_xx[11][2] = {
 
 /* ==================================================================================================== */
 
-bool extcss3_minify_hash(char *str, unsigned short int len, extcss3_token *token, int *error)
+bool extcss3_minify_hash(char *str, unsigned int len, extcss3_token *token, unsigned int *error)
 {
-	unsigned short int i;
+	unsigned int i;
 
 	if ((token == NULL) || (str == NULL)) {
 		*error = EXTCSS3_ERR_NULL_PTR;
@@ -257,9 +257,9 @@ bool extcss3_minify_hash(char *str, unsigned short int len, extcss3_token *token
 	return EXTCSS3_SUCCESS;
 }
 
-bool extcss3_minify_color(extcss3_token *token, int *error)
+bool extcss3_minify_color(extcss3_token *token, unsigned int *error)
 {
-	unsigned short int i, elements;
+	unsigned int i, elements;
 	const char *(*map)[2];
 
 	if (token == NULL) {

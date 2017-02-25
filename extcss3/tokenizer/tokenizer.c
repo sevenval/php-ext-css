@@ -26,26 +26,26 @@
 /* ==================================================================================================== */
 
 /* HELPER */
-static bool _extcss3_cleanup_tokenizer(int error, extcss3_intern *intern, bool token, bool ctxt);
-static bool _extcss3_next_char(extcss3_intern *intern, int *error);
-static bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *token, int *error);
+static bool _extcss3_cleanup_tokenizer(unsigned int error, extcss3_intern *intern, bool token, bool ctxt);
+static bool _extcss3_next_char(extcss3_intern *intern, unsigned int *error);
+static bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *token, unsigned int *error);
 
 /* TOKEN FILLER */
-static bool _extcss3_fill_fixed_token(extcss3_intern *intern, extcss3_token *token, short int type, unsigned short int chars, int *error);
-static bool _extcss3_fill_ws_token(extcss3_intern *intern, extcss3_token *token, int *error);
-static bool _extcss3_fill_hash_token(extcss3_intern *intern, extcss3_token *token, int *error);
-static bool _extcss3_fill_at_token(extcss3_intern *intern, extcss3_token *token, int *error);
-static bool _extcss3_fill_comment_token(extcss3_intern *intern, extcss3_token *token, int *error);
-static bool _extcss3_fill_unicode_range_token(extcss3_intern *intern, extcss3_token *token, int *error);
-static bool _extcss3_fill_ident_like_token(extcss3_intern *intern, extcss3_token *token, int *error);
-static bool _extcss3_fill_url_token(extcss3_intern *intern, extcss3_token *token, int *error);
-static bool _extcss3_fill_string_token(extcss3_intern *intern, extcss3_token *token, int *error);
-static bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_token *token, int *error);
+static bool _extcss3_fill_fixed_token(extcss3_intern *intern, extcss3_token *token, unsigned int type, unsigned int chars, unsigned int *error);
+static bool _extcss3_fill_ws_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error);
+static bool _extcss3_fill_hash_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error);
+static bool _extcss3_fill_at_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error);
+static bool _extcss3_fill_comment_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error);
+static bool _extcss3_fill_unicode_range_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error);
+static bool _extcss3_fill_ident_like_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error);
+static bool _extcss3_fill_url_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error);
+static bool _extcss3_fill_string_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error);
+static bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error);
 
 /* CONSUMER */
-static bool _extcss3_consume_escaped(extcss3_intern *intern, int *error);
-static bool _extcss3_consume_bad_url_remnants(extcss3_intern *intern, int *error);
-static bool _extcss3_consume_name(extcss3_intern *intern, int *error);
+static bool _extcss3_consume_escaped(extcss3_intern *intern, unsigned int *error);
+static bool _extcss3_consume_bad_url_remnants(extcss3_intern *intern, unsigned int *error);
+static bool _extcss3_consume_name(extcss3_intern *intern, unsigned int *error);
 
 /* CHECKER */
 static bool _extcss3_check_start_valid_escape(const char *str);
@@ -56,10 +56,10 @@ static bool _extcss3_check_is_name(const char *str);
 
 /* ==================================================================================================== */
 
-bool extcss3_tokenize(extcss3_intern *intern, int *error)
+bool extcss3_tokenize(extcss3_intern *intern, unsigned int *error)
 {
 	extcss3_token *token;
-	unsigned short int i;
+	unsigned int i;
 	char *reader;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -365,7 +365,7 @@ bool extcss3_tokenize(extcss3_intern *intern, int *error)
 /* ==================================================================================================== */
 /* HELPER */
 
-static inline bool _extcss3_cleanup_tokenizer(int error, extcss3_intern *intern, bool token, bool ctxt)
+static inline bool _extcss3_cleanup_tokenizer(unsigned int error, extcss3_intern *intern, bool token, bool ctxt)
 {
 	if (intern != NULL) {
 		if (token && (intern->base_token != NULL)) {
@@ -382,7 +382,7 @@ static inline bool _extcss3_cleanup_tokenizer(int error, extcss3_intern *intern,
 	return error == 0 ? EXTCSS3_SUCCESS : EXTCSS3_FAILURE;
 }
 
-static inline bool _extcss3_next_char(extcss3_intern *intern, int *error)
+static inline bool _extcss3_next_char(extcss3_intern *intern, unsigned int *error)
 {
 	if (EXTCSS3_SUCCESS != extcss3_preprocess(intern, error)) {
 		return EXTCSS3_FAILURE;
@@ -393,7 +393,7 @@ static inline bool _extcss3_next_char(extcss3_intern *intern, int *error)
 	return EXTCSS3_SUCCESS;
 }
 
-static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *token, int *error)
+static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	extcss3_token *prev;
 
@@ -471,7 +471,7 @@ static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *tok
  * (1) EXTCSS3_TYPE_BR_CC
  * (1) EXTCSS3_TYPE_EOF
  */
-static inline bool _extcss3_fill_fixed_token(extcss3_intern *intern, extcss3_token *token, short int type, unsigned short int chars, int *error)
+static inline bool _extcss3_fill_fixed_token(extcss3_intern *intern, extcss3_token *token, unsigned int type, unsigned int chars, unsigned int *error)
 {
 	token->type = type;
 	token->data.str = intern->state.reader;
@@ -490,7 +490,7 @@ static inline bool _extcss3_fill_fixed_token(extcss3_intern *intern, extcss3_tok
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-a-token (whitespace)
  */
-static inline bool _extcss3_fill_ws_token(extcss3_intern *intern, extcss3_token *token, int *error)
+static inline bool _extcss3_fill_ws_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	token->type = EXTCSS3_TYPE_WS;
 	token->data.str = intern->state.reader;
@@ -507,7 +507,7 @@ static inline bool _extcss3_fill_ws_token(extcss3_intern *intern, extcss3_token 
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-a-token (U+0023 NUMBER SIGN (#))
  */
-static inline bool _extcss3_fill_hash_token(extcss3_intern *intern, extcss3_token *token, int *error)
+static inline bool _extcss3_fill_hash_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	token->type = EXTCSS3_TYPE_HASH;
 	token->flag = EXTCSS3_FLAG_UNRESTRICTED;
@@ -529,7 +529,7 @@ static inline bool _extcss3_fill_hash_token(extcss3_intern *intern, extcss3_toke
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-a-token (U+0040 COMMERCIAL AT (@))
  */
-static inline bool _extcss3_fill_at_token(extcss3_intern *intern, extcss3_token *token, int *error)
+static inline bool _extcss3_fill_at_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	token->type = EXTCSS3_TYPE_AT_KEYWORD;
 	token->data.str = intern->state.reader;
@@ -546,7 +546,7 @@ static inline bool _extcss3_fill_at_token(extcss3_intern *intern, extcss3_token 
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-a-token (U+002F SOLIDUS (/))
  */
-static inline bool _extcss3_fill_comment_token(extcss3_intern *intern, extcss3_token *token, int *error)
+static inline bool _extcss3_fill_comment_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	token->type = EXTCSS3_TYPE_COMMENT;
 	token->data.str = intern->state.reader;
@@ -576,9 +576,9 @@ static inline bool _extcss3_fill_comment_token(extcss3_intern *intern, extcss3_t
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-a-unicode-range-token
  */
-static inline bool _extcss3_fill_unicode_range_token(extcss3_intern *intern, extcss3_token *token, int *error)
+static inline bool _extcss3_fill_unicode_range_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
-	unsigned short int i, q;
+	unsigned int i, q;
 
 	token->type = EXTCSS3_TYPE_UNICODE_RANGE;
 	token->data.str = intern->state.reader;
@@ -624,7 +624,7 @@ static inline bool _extcss3_fill_unicode_range_token(extcss3_intern *intern, ext
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-an-ident-like-token
  */
-static inline bool _extcss3_fill_ident_like_token(extcss3_intern *intern, extcss3_token *token, int *error)
+static inline bool _extcss3_fill_ident_like_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	token->data.str = intern->state.reader;
 
@@ -658,7 +658,7 @@ static inline bool _extcss3_fill_ident_like_token(extcss3_intern *intern, extcss
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-a-url-token
  */
-static inline bool _extcss3_fill_url_token(extcss3_intern *intern, extcss3_token *token, int *error)
+static inline bool _extcss3_fill_url_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	extcss3_token tmp;
 
@@ -781,7 +781,7 @@ static inline bool _extcss3_fill_url_token(extcss3_intern *intern, extcss3_token
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-a-string-token
  */
-static inline bool _extcss3_fill_string_token(extcss3_intern *intern, extcss3_token *token, int *error)
+static inline bool _extcss3_fill_string_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	char *tmp = intern->state.reader;
 
@@ -834,7 +834,7 @@ static inline bool _extcss3_fill_string_token(extcss3_intern *intern, extcss3_to
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-a-numeric-token
  */
-static inline bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_token *token, int *error)
+static inline bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	token->flag = EXTCSS3_FLAG_INTEGER;
 	token->data.str = intern->state.reader;
@@ -912,10 +912,9 @@ static inline bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_to
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-an-escaped-code-point
  */
-static inline bool _extcss3_consume_escaped(extcss3_intern *intern, int *error)
+static inline bool _extcss3_consume_escaped(extcss3_intern *intern, unsigned int *error)
 {
-	unsigned short int i;
-	unsigned int v;
+	unsigned int i, v;
 	char hex[7];
 	char *reader_start, *writer_start;
 
@@ -969,7 +968,7 @@ static inline bool _extcss3_consume_escaped(extcss3_intern *intern, int *error)
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-the-remnants-of-a-bad-url
  */
-static inline bool _extcss3_consume_bad_url_remnants(extcss3_intern *intern, int *error)
+static inline bool _extcss3_consume_bad_url_remnants(extcss3_intern *intern, unsigned int *error)
 {
 	while (true) {
 		_EXTCSS3_NEXT(intern, error);
@@ -989,7 +988,7 @@ static inline bool _extcss3_consume_bad_url_remnants(extcss3_intern *intern, int
 /**
  * https://www.w3.org/TR/css-syntax-3/#consume-a-name
  */
-static inline bool _extcss3_consume_name(extcss3_intern *intern, int *error)
+static inline bool _extcss3_consume_name(extcss3_intern *intern, unsigned int *error)
 {
 	while (true) {
 		_EXTCSS3_NEXT(intern, error);

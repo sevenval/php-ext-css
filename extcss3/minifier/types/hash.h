@@ -5,7 +5,7 @@
 
 /* ==================================================================================================== */
 
-bool extcss3_minify_hash(char *str, unsigned short int len, extcss3_token *token, int *error);
-bool extcss3_minify_color(extcss3_token *token, int *error);
+bool extcss3_minify_hash(char *str, unsigned int len, extcss3_token *token, unsigned int *error);
+bool extcss3_minify_color(extcss3_token *token, unsigned int *error);
 
 #endif /* EXTCSS3_MINIFIER_TYPES_HASH_H */

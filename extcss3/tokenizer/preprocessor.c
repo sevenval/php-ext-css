@@ -8,9 +8,9 @@
 /**
  * Check the validity of the bytes in the non-ASCII (UTF-8) character
  */
-static inline bool _extcss3_check_bytes_corruption(extcss3_intern *intern, int *error)
+static inline bool _extcss3_check_bytes_corruption(extcss3_intern *intern, unsigned int *error)
 {
-	unsigned short int i, j;
+	unsigned int i, j;
 
 	if (EXTCSS3_IS_NON_ASCII(*intern->state.cursor)) {
 		i = 7;
@@ -46,7 +46,7 @@ static inline bool _extcss3_check_bytes_corruption(extcss3_intern *intern, int *
 /**
  * Copy a part of the input string to the intern CSS string and move the intern pointers to the new positions
  */
-static inline bool _extcss3_copy_and_move(extcss3_intern *intern, const char *src_str, size_t src_len, int processed)
+static inline bool _extcss3_copy_and_move(extcss3_intern *intern, const char *src_str, size_t src_len, unsigned int processed)
 {
 	memcpy(intern->state.writer, src_str, src_len);
 
@@ -63,9 +63,9 @@ static inline bool _extcss3_copy_and_move(extcss3_intern *intern, const char *sr
 /**
  * Extended version of https://www.w3.org/TR/css-syntax-3/#input-preprocessing
  */
-bool extcss3_preprocess(extcss3_intern *intern, int *error)
+bool extcss3_preprocess(extcss3_intern *intern, unsigned int *error)
 {
-	unsigned short int len;
+	unsigned int len;
 
 	if ((intern == NULL) || (intern->state.cursor == NULL) || (intern->state.writer == NULL)) {
 		*error = EXTCSS3_ERR_NULL_PTR;

@@ -47,7 +47,7 @@ void extcss3_object_free(zend_object *zo)
 
 /* ==================================================================================================== */
 
-static inline void php_extcss3_throw_exception(int error)
+static inline void php_extcss3_throw_exception(unsigned int error)
 {
 	switch (error) {
 		case EXTCSS3_ERR_MEMORY:
@@ -245,7 +245,7 @@ PHP_METHOD(CSS3Processor, setModifier)
 	extcss3_intern *intern = object->intern;
 	zval *callable, *copy;
 	size_t type;
-	int error = 0;
+	unsigned int error = 0;
 
 	if (SUCCESS != zend_parse_parameters(ZEND_NUM_ARGS(), "lz", &type, &callable)) {
 		return;
@@ -282,7 +282,7 @@ PHP_METHOD(CSS3Processor, dump)
 	extcss3_intern *intern = object->intern;
 	char *css, *result;
 	size_t len;
-	int error = 0;
+	unsigned int error = 0;
 
 	if (SUCCESS != zend_parse_parameters(ZEND_NUM_ARGS(), "s", &css, &len)) {
 		return;
@@ -307,7 +307,7 @@ PHP_METHOD(CSS3Processor, minify)
 	zval *name, *vendors = NULL;
 	char *css, *result;
 	size_t len;
-	int error = 0;
+	unsigned int error = 0;
 
 	if (SUCCESS != zend_parse_parameters(ZEND_NUM_ARGS(), "s|a", &css, &len, &vendors)) {
 		return;

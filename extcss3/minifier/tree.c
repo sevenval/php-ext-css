@@ -4,14 +4,14 @@
 
 /* ==================================================================================================== */
 
-static void *_extcss3_set_error_code(int *error, int code, extcss3_rule *tree);
+static void *_extcss3_set_error_code(unsigned int *error, unsigned int code, extcss3_rule *tree);
 
-static bool _extcss3_tree_fork_rule(extcss3_rule **rule, int *error);
-static bool _extcss3_tree_fork_decl(extcss3_decl **decl, int *error);
+static bool _extcss3_tree_fork_rule(extcss3_rule **rule, unsigned int *error);
+static bool _extcss3_tree_fork_decl(extcss3_decl **decl, unsigned int *error);
 
 /* ==================================================================================================== */
 
-extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, int level, int *error)
+extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, unsigned int level, unsigned int *error)
 {
 	extcss3_token *search;
 	extcss3_rule *tree, *rule;
@@ -238,7 +238,7 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, int
 
 /* ==================================================================================================== */
 
-static inline void *_extcss3_set_error_code(int *error, int code, extcss3_rule *tree)
+static inline void *_extcss3_set_error_code(unsigned int *error, unsigned int code, extcss3_rule *tree)
 {
 	*error = code;
 
@@ -249,7 +249,7 @@ static inline void *_extcss3_set_error_code(int *error, int code, extcss3_rule *
 	return NULL;
 }
 
-static inline bool _extcss3_tree_fork_rule(extcss3_rule **rule, int *error)
+static inline bool _extcss3_tree_fork_rule(extcss3_rule **rule, unsigned int *error)
 {
 	extcss3_rule *fork;
 
@@ -266,7 +266,7 @@ static inline bool _extcss3_tree_fork_rule(extcss3_rule **rule, int *error)
 	return EXTCSS3_SUCCESS;
 }
 
-static inline bool _extcss3_tree_fork_decl(extcss3_decl **decl, int *error)
+static inline bool _extcss3_tree_fork_decl(extcss3_decl **decl, unsigned int *error)
 {
 	extcss3_decl *fork;
 

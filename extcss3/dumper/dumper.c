@@ -7,7 +7,7 @@
 
 /* ==================================================================================================== */
 
-static void *_extcss3_set_error_code(int *error, int code);
+static void *_extcss3_set_error_code(unsigned int *error, unsigned int code);
 
 static void _extcss3_write_rules(extcss3_rule *rule, char **result);
 static void _extcss3_write_decls(extcss3_decl *decl, char **result);
@@ -15,7 +15,7 @@ static void _extcss3_write_token(extcss3_token *token, char **result);
 
 /* ==================================================================================================== */
 
-char *extcss3_dump_rules(extcss3_intern *intern, extcss3_rule *rule, int *error)
+char *extcss3_dump_rules(extcss3_intern *intern, extcss3_rule *rule, unsigned int *error)
 {
 	char *result, *curr;
 
@@ -32,7 +32,7 @@ char *extcss3_dump_rules(extcss3_intern *intern, extcss3_rule *rule, int *error)
 	return result;
 }
 
-char *extcss3_dump_tokens(extcss3_intern *intern, int *error)
+char *extcss3_dump_tokens(extcss3_intern *intern, unsigned int *error)
 {
 	extcss3_token *token;
 	char *result, *pos;
@@ -90,7 +90,7 @@ char *extcss3_dump_tokens(extcss3_intern *intern, int *error)
 
 /* ==================================================================================================== */
 
-static inline void *_extcss3_set_error_code(int *error, int code)
+static inline void *_extcss3_set_error_code(unsigned int *error, unsigned int code)
 {
 	*error = code;
 
