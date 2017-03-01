@@ -191,6 +191,8 @@ struct _extcss3_mod
 
 	void				(*callback)(extcss3_intern *intern);
 	void				(*destructor)(void *modifier);
+
+	long long			user_strlen_diff;
 };
 
 struct _extcss3_decl

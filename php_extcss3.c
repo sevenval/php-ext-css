@@ -181,6 +181,9 @@ static void php_extcss3_modifier_callback(extcss3_intern *intern)
 			intern->last_token->user.str = (char *)calloc(intern->last_token->user.len, sizeof(char));
 
 			memcpy(intern->last_token->user.str, Z_STRVAL(retval), Z_STRLEN(retval));
+
+			intern->modifier.user_strlen_diff -= intern->last_token->data.len;
+			intern->modifier.user_strlen_diff += intern->last_token->user.len;
 		}
 	}
 

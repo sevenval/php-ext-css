@@ -21,7 +21,7 @@ char *extcss3_dump_rules(extcss3_intern *intern, extcss3_rule *rule, unsigned in
 
 	if ((intern == NULL) || (intern->copy.str == NULL) || (rule == NULL)) {
 		return _extcss3_set_error_code(error, EXTCSS3_ERR_NULL_PTR);
-	} else if ((result = curr = (char *)calloc(intern->copy.len + 1, sizeof(char))) == NULL) {
+	} else if ((result = curr = (char *)calloc(intern->copy.len + intern->modifier.user_strlen_diff + 1, sizeof(char))) == NULL) {
 		return _extcss3_set_error_code(error, EXTCSS3_ERR_MEMORY);
 	}
 
@@ -45,7 +45,7 @@ char *extcss3_dump_tokens(extcss3_intern *intern, unsigned int *error)
 		return _extcss3_set_error_code(error, *error);
 	} else if ((token = intern->base_token) == NULL) {
 		return _extcss3_set_error_code(error, EXTCSS3_ERR_NULL_PTR);
-	} else if ((result = pos = (char *)calloc(intern->copy.len + 1, sizeof(char))) == NULL) {
+	} else if ((result = pos = (char *)calloc(intern->copy.len + intern->modifier.user_strlen_diff + 1, sizeof(char))) == NULL) {
 		return _extcss3_set_error_code(error, EXTCSS3_ERR_MEMORY);
 	}
 
