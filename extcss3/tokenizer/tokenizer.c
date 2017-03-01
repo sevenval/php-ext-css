@@ -433,6 +433,11 @@ static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *tok
 	if (intern->base_ctxt != NULL) {
 		if (EXTCSS3_TYPE_IS_MODIFIABLE(token->type) && (intern->modifier.callback != NULL)) {
 			intern->modifier.callback(intern);
+
+			if ((token->user.str != NULL) && (token->user.len > token->data.len)) {
+				intern->modifier.user_strlen_diff -= token->data.len;
+				intern->modifier.user_strlen_diff += token->user.len;
+			}
 		}
 
 		if (EXTCSS3_SUCCESS != extcss3_ctxt_update(intern, error)) {
