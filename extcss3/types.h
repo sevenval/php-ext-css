@@ -125,6 +125,10 @@ typedef struct _extcss3_ctxt	extcss3_ctxt;
 
 typedef struct _extcss3_vendor	extcss3_vendor;
 
+typedef struct _extcss3_sig		extcss3_sig;
+
+typedef struct _extcss3_not		extcss3_not;
+
 typedef struct _extcss3_mod		extcss3_mod;
 
 typedef struct _extcss3_decl	extcss3_decl;
@@ -179,6 +183,23 @@ struct _extcss3_vendor
 {
 	extcss3_str			name;
 	extcss3_vendor		*next;
+};
+
+struct _extcss3_sig
+{
+	unsigned int		type;
+	extcss3_sig			*next;
+
+	void				*callable;
+};
+
+struct _extcss3_not
+{
+	extcss3_sig			*base;
+	extcss3_sig			*last;
+
+	void				(*callback)(extcss3_intern *intern, extcss3_sig *signal);
+	void				(*destructor)(void *callable);
 };
 
 struct _extcss3_mod
@@ -242,6 +263,7 @@ struct _extcss3_intern
 	extcss3_vendor		*base_vendor;
 	extcss3_vendor		*last_vendor;
 
+	extcss3_not			notifier;
 	extcss3_mod			modifier;
 };
 
