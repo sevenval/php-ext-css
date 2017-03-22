@@ -25,8 +25,11 @@ void extcss3_release_rules_list(extcss3_rule *list);
 void extcss3_release_block(extcss3_block *block);
 void extcss3_release_decl(extcss3_decl *decl);
 void extcss3_release_decls_list(extcss3_decl *list);
+void extcss3_release_signal(extcss3_not *notifier, extcss3_sig *signal);
+void extcss3_release_signals_list(extcss3_not *notifier);
 
 bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len, unsigned int *error);
+bool extcss3_set_notifier(extcss3_intern *intern, unsigned int type, void *callable, unsigned int *error);
 bool extcss3_set_modifier(extcss3_intern *intern, unsigned int type, void *callable, unsigned int *error);
 bool extcss3_set_vendor_string(extcss3_intern *intern, char *name, size_t len, unsigned int *error);
 
