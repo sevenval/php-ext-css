@@ -141,6 +141,32 @@ static inline void php_extcss3_make_data_array(extcss3_intern *intern, zval *dat
 	zval_ptr_dtor(&empty);
 }
 
+static void php_extcss3_notifier_callback(extcss3_intern *intern, extcss3_sig *signal)
+{
+	zval data, retval, *args, *callable;
+
+	if ((intern == NULL) || (intern->last_token == NULL) || (signal == NULL)) {
+		return;
+	}
+
+	if ((callable = signal->callable) == NULL) {
+		return;
+	}
+
+	php_extcss3_make_data_array(intern, &data);
+
+	args = safe_emalloc(sizeof(zval), 1, 0);
+	ZVAL_COPY(&args[0], &data);
+
+	call_user_function_ex(EG(function_table), NULL, callable, &retval, 1, args, 0, NULL);
+
+	zval_ptr_dtor(&data);
+	zval_ptr_dtor(&args[0]);
+	zval_ptr_dtor(&retval);
+
+	efree(args);
+}
+
 static void php_extcss3_modifier_callback(extcss3_intern *intern)
 {
 	zval data, retval, *args, *callable = NULL;
@@ -194,9 +220,9 @@ static void php_extcss3_modifier_callback(extcss3_intern *intern)
 	efree(args);
 }
 
-static void php_extcss3_modifier_destructor(void *modifier)
+static void php_extcss3_callable_destructor(void *callable)
 {
-	zval *ptr = (zval *)modifier;
+	zval *ptr = (zval *)callable;
 
 	if (ptr == NULL) {
 		return;
@@ -235,8 +261,11 @@ PHP_METHOD(CSS3Processor, __construct)
 	if (intern == NULL) {
 		php_extcss3_throw_exception(EXTCSS3_ERR_MEMORY);
 	} else {
+		intern->notifier.callback	= php_extcss3_notifier_callback;
+		intern->notifier.destructor	= php_extcss3_callable_destructor;
+
 		intern->modifier.callback	= php_extcss3_modifier_callback;
-		intern->modifier.destructor	= php_extcss3_modifier_destructor;
+		intern->modifier.destructor	= php_extcss3_callable_destructor;
 
 		object->intern = intern;
 	}
@@ -271,6 +300,40 @@ PHP_METHOD(CSS3Processor, setModifier)
 
 	if (EXTCSS3_SUCCESS != extcss3_set_modifier(intern, type, copy, &error)) {
 		intern->modifier.destructor(copy);
+
+		php_extcss3_throw_exception(error);
+		return;
+	}
+
+	RETURN_TRUE;
+}
+
+PHP_METHOD(CSS3Processor, setNotifier)
+{
+	extcss3_object *object = extcss3_object_fetch(Z_OBJ_P(getThis()));
+	extcss3_intern *intern = object->intern;
+	zval *callable, *copy;
+	size_t type;
+	unsigned int error = 0;
+
+	if (SUCCESS != zend_parse_parameters(ZEND_NUM_ARGS(), "lz", &type, &callable)) {
+		return;
+	} else if (intern == NULL) {
+		php_extcss3_throw_exception(EXTCSS3_ERR_NULL_PTR);
+		return;
+	}
+
+	copy = (zval *)ecalloc(1, sizeof(zval));
+
+	if (copy == NULL) {
+		php_extcss3_throw_exception(EXTCSS3_ERR_MEMORY);
+		return;
+	}
+
+	ZVAL_COPY(copy, callable);
+
+	if (EXTCSS3_SUCCESS != extcss3_set_notifier(intern, type, copy, &error)) {
+		intern->notifier.destructor(copy);
 
 		php_extcss3_throw_exception(error);
 		return;
@@ -362,6 +425,7 @@ PHP_METHOD(CSS3Processor, minify)
 zend_function_entry extcss3_methods[] = {
 	PHP_ME(CSS3Processor, __construct, arginfo_EXTCSS3_void, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
 	PHP_ME(CSS3Processor, setModifier, arginfo_EXTCSS3_setModifier, ZEND_ACC_PUBLIC)
+	PHP_ME(CSS3Processor, setNotifier, arginfo_EXTCSS3_setModifier, ZEND_ACC_PUBLIC)
 	PHP_ME(CSS3Processor, dump, arginfo_EXTCSS3_dump, ZEND_ACC_PUBLIC)
 	PHP_ME(CSS3Processor, minify, arginfo_EXTCSS3_minify, ZEND_ACC_PUBLIC)
 	PHP_FE_END
