@@ -15,6 +15,7 @@
 #define EXTCSS3_ERR_BYTES_CORRUPTION	((unsigned int)2)
 #define EXTCSS3_ERR_NULL_PTR			((unsigned int)3)
 #define EXTCSS3_ERR_INV_PARAM			((unsigned int)4)
+#define EXTCSS3_ERR_INV_VALUE			((unsigned int)5)
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

@@ -62,6 +62,9 @@ static inline void php_extcss3_throw_exception(unsigned int error)
 		case EXTCSS3_ERR_INV_PARAM:
 			zend_throw_exception(zend_ce_exception, "extcss3: Invalid paramenter or parameter type given", EXTCSS3_ERR_INV_PARAM);
 			break;
+		case EXTCSS3_ERR_INV_VALUE:
+			zend_throw_exception(zend_ce_exception, "extcss3: Invalid, unallowed or unexpected value found", EXTCSS3_ERR_INV_VALUE);
+			break;
 		default:
 			zend_throw_exception(zend_ce_exception, "extcss3: Unknown internal error", 0);
 	}

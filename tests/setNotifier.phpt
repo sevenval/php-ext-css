@@ -13,6 +13,8 @@ class Test_Notifier
 	public static function B(array $aData)
 	{
 		var_dump('B: ' . $aData['value']);
+
+		return 'foo';
 	}
 }
 
