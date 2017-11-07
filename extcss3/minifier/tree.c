@@ -71,6 +71,22 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, uns
 					return tree;
 				}
 			}
+			// Pseudo-rule for <CDO> and <CDC> tokens in a non top-level
+			else if (((*token)->type == EXTCSS3_TYPE_CDO) || ((*token)->type == EXTCSS3_TYPE_CDC)) {
+				// See § 5.4.1.: https://www.w3.org/TR/css-syntax-3/#consume-a-list-of-rules
+				if (level > 0) {
+					rule->base_selector = rule->last_selector = *token;
+
+					// Fork the next rule
+					if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(&rule, error)) {
+						return _extcss3_set_error_code(error, *error, tree);
+					}
+				}
+
+				*token = (*token)->next;
+
+				continue;
+			}
 
 			// Pseudo-rule for the <eof> token
 			if ((*token)->type == EXTCSS3_TYPE_EOF) {

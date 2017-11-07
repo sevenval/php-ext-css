@@ -41,6 +41,9 @@ var_dump($oProcessor->minify($sCSS));
 $sCSS = ':not( x ) foo {a:b;}';
 var_dump($oProcessor->minify($sCSS));
 
+$sCSS = ' <!-- @media screen { <!-- x { a:b; } --> } --> ';
+var_dump($oProcessor->minify($sCSS));
+
 ?>
 ===DONE===
 --EXPECT--
@@ -50,4 +53,5 @@ string(105) "x{content:'\A\B'}y{background:url('wallpaper.jpg')}#\31st{color:red
 string(10) "x{y:1px\9}"
 string(48) "@media(min-width:30em)and (max-height:60em){a:b}"
 string(16) ":not(x) foo{a:b}"
+string(28) "@media screen{<!--x{a:b}-->}"
 ===DONE===
