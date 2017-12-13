@@ -598,8 +598,9 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 
 		// Remove whitespace and comments after...
 		if (
-			(value->type == EXTCSS3_TYPE_FUNCTION) ||
-			(value->type == EXTCSS3_TYPE_BR_RO)
+			(value->type == EXTCSS3_TYPE_FUNCTION)	||
+			(value->type == EXTCSS3_TYPE_BR_RO)		||
+			(value->type == EXTCSS3_TYPE_STRING)
 		) {
 			_extcss3_trim_right(value, &decl->last);
 		}
@@ -633,7 +634,6 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 		// Remove whitespace and comments around...
 		if (
 			(value->type == EXTCSS3_TYPE_COMMA) ||
-			(value->type == EXTCSS3_TYPE_STRING) ||
 			(value->type == EXTCSS3_TYPE_SEMICOLON) ||
 			(
 				(value->type == EXTCSS3_TYPE_DELIM) &&
