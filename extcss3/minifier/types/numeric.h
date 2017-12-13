@@ -5,6 +5,6 @@
 
 /* ==================================================================================================== */
 
-bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, unsigned int *error);
+bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, bool preserve_dimension, unsigned int *error);
 
 #endif /* EXTCSS3_MINIFIER_TYPES_NUMERIC_H */

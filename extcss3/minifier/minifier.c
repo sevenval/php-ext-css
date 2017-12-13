@@ -358,12 +358,8 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 				preserve_sign = false;
 			}
 
-			if (selector->type == EXTCSS3_TYPE_PERCENTAGE && rule->base_selector == selector && rule->last_selector == selector) {
-				// Do nothing
-			} else {
-				if (EXTCSS3_SUCCESS != extcss3_minify_numeric(selector, preserve_sign, error)) {
-					return NULL;
-				}
+			if (EXTCSS3_SUCCESS != extcss3_minify_numeric(selector, preserve_sign, false, error)) {
+				return NULL;
 			}
 		}
 
@@ -534,6 +530,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 {
 	extcss3_token *name = NULL, *sep = NULL, *value = NULL, *temp;
 	extcss3_vendor *vendor;
+	int preserve_dimension = 0;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -594,6 +591,15 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 	while (value != NULL) {
 		if ((value->type == EXTCSS3_TYPE_BAD_STRING) || (value->type == EXTCSS3_TYPE_BAD_URL)) {
 			return NULL;
+		}
+
+		// Handle round braces while processing "calc()" function
+		if (preserve_dimension) {
+			if (value->type == EXTCSS3_TYPE_BR_RO) {
+				preserve_dimension++;
+			} else if (value->type == EXTCSS3_TYPE_BR_RC) {
+				preserve_dimension--;
+			}
 		}
 
 		// Remove whitespace and comments after...
@@ -695,7 +701,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 			(value->type == EXTCSS3_TYPE_PERCENTAGE)	||
 			(value->type == EXTCSS3_TYPE_DIMENSION)
 		) {
-			if (EXTCSS3_SUCCESS != extcss3_minify_numeric(value, false, error)) {
+			if (EXTCSS3_SUCCESS != extcss3_minify_numeric(value, false, (preserve_dimension > 0), error)) {
 				return NULL;
 			}
 		} else if (value->type == EXTCSS3_TYPE_FUNCTION) {
@@ -720,6 +726,11 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 				} else if (value->type == EXTCSS3_TYPE_BR_CC) {
 					break;
 				}
+			} else if (
+				(value->data.len == 4) &&
+				(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(value->data.str, "calc", 4))
+			) {
+				preserve_dimension = 1;
 			}
 		}
 
