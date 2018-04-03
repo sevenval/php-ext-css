@@ -69,7 +69,7 @@ bool extcss3_tokenize(extcss3_intern *intern, unsigned int *error)
 	} else if ((intern->base_token = token = extcss3_create_token()) == NULL) {
 		return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_MEMORY, NULL, false, false);
 	} else if (
-		EXTCSS3_HAS_MODIFIER(intern) &&
+		((intern->notifier.base != NULL) || EXTCSS3_HAS_MODIFIER(intern)) &&
 		((intern->base_ctxt = intern->last_ctxt = extcss3_create_ctxt()) == NULL)
 	) {
 		return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_MEMORY, intern, true, false);
@@ -396,6 +396,7 @@ static inline bool _extcss3_next_char(extcss3_intern *intern, unsigned int *erro
 static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	extcss3_token *prev;
+	extcss3_sig *signal;
 
 	if ((token->prev = intern->last_token) != NULL) {
 		intern->last_token->next = token;
@@ -431,6 +432,24 @@ static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *tok
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	if (intern->base_ctxt != NULL) {
+		/* Calling notifier(s) */
+		if (((signal = intern->notifier.base) != NULL) && (intern->notifier.callback != NULL)) {
+			while (signal != NULL) {
+				if (signal->type == token->type) {
+					intern->notifier.callback(intern, signal);
+
+					if ((token->user.str != NULL) || (token->user.len != 0)) {
+						*error = EXTCSS3_ERR_INV_VALUE;
+
+						return EXTCSS3_FAILURE;
+					}
+				}
+
+				signal = signal->next;
+			}
+		}
+
+		/* Calling modifier */
 		if (EXTCSS3_TYPE_IS_MODIFIABLE(token->type) && (intern->modifier.callback != NULL)) {
 			intern->modifier.callback(intern);
 

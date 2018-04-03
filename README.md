@@ -49,6 +49,23 @@ public CSS3Processor::__construct(void) : CSS3Processor
 
 
 ```
+public CSS3Processor::setNotifier(int $type, callable $callback) : bool
+```
+
+* Registers a callback for the given token `$type` that will be called
+  during tokenisation. The callback gets an info array of the current
+  token and context.
+* All return values from the callback are discarded.
+* The parameter `$type` can be set to any of the `extcss3` Type Constants
+  listed below.
+* If a Modifier is registered for the same token type, the Notifier is
+  allways called bevore the Modifier.
+* Multiple notifier callbacks per token type are possible.
+* Returns `true` on success.
+* Throws exceptions on errors.
+
+
+```
 public CSS3Processor::setModifier(int $type, callable $callback) : bool
 ```
 

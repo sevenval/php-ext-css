@@ -40,6 +40,11 @@ extcss3_decl *extcss3_create_decl(void)
 	return (extcss3_decl *)calloc(1, sizeof(extcss3_decl));
 }
 
+extcss3_sig *extcss3_create_signal(void)
+{
+	return (extcss3_sig *)calloc(1, sizeof(extcss3_sig));
+}
+
 /* ==================================================================================================== */
 
 void extcss3_release_intern(extcss3_intern *intern)
@@ -84,6 +89,10 @@ void extcss3_release_intern(extcss3_intern *intern)
 		if (intern->modifier.comment != NULL) {
 			intern->modifier.destructor(intern->modifier.comment);
 		}
+	}
+
+	if (intern->notifier.base != NULL) {
+		extcss3_release_signals_list(&intern->notifier);
 	}
 
 	free(intern);
@@ -248,6 +257,36 @@ void extcss3_release_decls_list(extcss3_decl *list)
 	extcss3_release_decl(list);
 }
 
+void extcss3_release_signal(extcss3_not *notifier, extcss3_sig *signal)
+{
+	if (signal == NULL) {
+		return;
+	}
+
+	if ((signal->callable != NULL) && (notifier != NULL) && (notifier->destructor != NULL)) {
+		notifier->destructor(signal->callable);
+	}
+
+	free(signal);
+}
+
+void extcss3_release_signals_list(extcss3_not *notifier)
+{
+	extcss3_sig *next, *list = notifier->base;
+
+	if (list == NULL) {
+		return;
+	}
+
+	while (list->next != NULL) {
+		next = list->next->next;
+		extcss3_release_signal(notifier, list->next);
+		list->next = next;
+	}
+
+	extcss3_release_signal(notifier, list);
+}
+
 /* ==================================================================================================== */
 
 bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len, unsigned int *error)
@@ -294,6 +333,36 @@ bool extcss3_set_css_string(extcss3_intern *intern, char *css, size_t len, unsig
 	intern->base_ctxt = intern->last_ctxt = NULL;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+	return EXTCSS3_SUCCESS;
+}
+
+bool extcss3_set_notifier(extcss3_intern *intern, unsigned int type, void *callable, unsigned int *error)
+{
+	extcss3_sig *signal;
+
+	if ((intern == NULL) || (intern->notifier.destructor == NULL) || (intern->notifier.callback == NULL) || (callable == NULL)) {
+		*error = EXTCSS3_ERR_NULL_PTR;
+
+		return EXTCSS3_FAILURE;
+	}
+
+	if ((signal = extcss3_create_signal()) == NULL) {
+		*error = EXTCSS3_ERR_MEMORY;
+
+		return EXTCSS3_FAILURE;
+	}
+
+	signal->type		= type;
+	signal->callable	= callable;
+
+	if (intern->notifier.base == NULL) {
+		intern->notifier.base = signal;
+	} else {
+		intern->notifier.last->next = signal;
+	}
+
+	intern->notifier.last = signal;
 
 	return EXTCSS3_SUCCESS;
 }
