@@ -86,61 +86,61 @@ public CSS3Processor::minify(string $css [, array $vendors ]) : string
 
 #### Type Constants
 
-<pre>
-* `CSS3Processor::TYPE_IDENT`               1
-* `CSS3Processor::TYPE_FUNCTION`            2
-* `CSS3Processor::TYPE_AT_KEYWORD`          3
-* `CSS3Processor::TYPE_HASH`                4
-* `CSS3Processor::TYPE_STRING`              5 (modifiable)
-* `CSS3Processor::TYPE_BAD_STRING`          6 (modifiable)
-* `CSS3Processor::TYPE_URL`                 7 (modifiable)
-* `CSS3Processor::TYPE_BAD_URL`             8 (modifiable)
-* `CSS3Processor::TYPE_DELIM`               9
-* `CSS3Processor::TYPE_NUMBER`             10
-* `CSS3Processor::TYPE_PERCENTAGE`         11
-* `CSS3Processor::TYPE_DIMENSION`          12
-* `CSS3Processor::TYPE_UNICODE_RANGE`      13
-* `CSS3Processor::TYPE_INCLUDE_MATCH`      14
-* `CSS3Processor::TYPE_DASH_MATCH`         15
-* `CSS3Processor::TYPE_PREFIX_MATCH`       16
-* `CSS3Processor::TYPE_SUFFIX_MATCH`       17
-* `CSS3Processor::TYPE_SUBSTR_MATCH`       18
-* `CSS3Processor::TYPE_COLUMN`             19
-* `CSS3Processor::TYPE_WS`                 20
-* `CSS3Processor::TYPE_CDO`                21
-* `CSS3Processor::TYPE_CDC`                22
-* `CSS3Processor::TYPE_COLON`              23
-* `CSS3Processor::TYPE_SEMICOLON`          24
-* `CSS3Processor::TYPE_COMMA`              25
-* `CSS3Processor::TYPE_BR_RO`              26
-* `CSS3Processor::TYPE_BR_RC`              27
-* `CSS3Processor::TYPE_BR_SO`              28
-* `CSS3Processor::TYPE_BR_SC`              29
-* `CSS3Processor::TYPE_BR_CO`              30
-* `CSS3Processor::TYPE_BR_CC`              31
-* `CSS3Processor::TYPE_COMMENT`            32 (modifiable)
-* `CSS3Processor::TYPE_EOF`                33
-</pre>
+```php
+`CSS3Processor::TYPE_IDENT`               1
+`CSS3Processor::TYPE_FUNCTION`            2
+`CSS3Processor::TYPE_AT_KEYWORD`          3
+`CSS3Processor::TYPE_HASH`                4
+`CSS3Processor::TYPE_STRING`              5 (modifiable)
+`CSS3Processor::TYPE_BAD_STRING`          6 (modifiable)
+`CSS3Processor::TYPE_URL`                 7 (modifiable)
+`CSS3Processor::TYPE_BAD_URL`             8 (modifiable)
+`CSS3Processor::TYPE_DELIM`               9
+`CSS3Processor::TYPE_NUMBER`             10
+`CSS3Processor::TYPE_PERCENTAGE`         11
+`CSS3Processor::TYPE_DIMENSION`          12
+`CSS3Processor::TYPE_UNICODE_RANGE`      13
+`CSS3Processor::TYPE_INCLUDE_MATCH`      14
+`CSS3Processor::TYPE_DASH_MATCH`         15
+`CSS3Processor::TYPE_PREFIX_MATCH`       16
+`CSS3Processor::TYPE_SUFFIX_MATCH`       17
+`CSS3Processor::TYPE_SUBSTR_MATCH`       18
+`CSS3Processor::TYPE_COLUMN`             19
+`CSS3Processor::TYPE_WS`                 20
+`CSS3Processor::TYPE_CDO`                21
+`CSS3Processor::TYPE_CDC`                22
+`CSS3Processor::TYPE_COLON`              23
+`CSS3Processor::TYPE_SEMICOLON`          24
+`CSS3Processor::TYPE_COMMA`              25
+`CSS3Processor::TYPE_BR_RO`              26
+`CSS3Processor::TYPE_BR_RC`              27
+`CSS3Processor::TYPE_BR_SO`              28
+`CSS3Processor::TYPE_BR_SC`              29
+`CSS3Processor::TYPE_BR_CO`              30
+`CSS3Processor::TYPE_BR_CC`              31
+`CSS3Processor::TYPE_COMMENT`            32 (modifiable)
+`CSS3Processor::TYPE_EOF`                33
+```
 
 #### Flag Constants
 
-<pre>
-* `CSS3Processor::FLAG_ID`                  1
-* `CSS3Processor::FLAG_UNRESTRICTED`        2
-* `CSS3Processor::FLAG_INTEGER`             3
-* `CSS3Processor::FLAG_NUMBER`              4
-* `CSS3Processor::FLAG_STRING`              5
-* `CSS3Processor::FLAG_AT_URL_STRING`       6
-</pre>
+```php
+`CSS3Processor::FLAG_ID`                  1
+`CSS3Processor::FLAG_UNRESTRICTED`        2
+`CSS3Processor::FLAG_INTEGER`             3
+`CSS3Processor::FLAG_NUMBER`              4
+`CSS3Processor::FLAG_STRING`              5
+`CSS3Processor::FLAG_AT_URL_STRING`       6
+```
 
 #### Exception Code Constants
 
-<pre>
-* `CSS3Processor::ERR_MEMORY`               1
-* `CSS3Processor::ERR_BYTES_CORRUPTION`     2
-* `CSS3Processor::ERR_NULL_PTR`             3
-* `CSS3Processor::ERR_INV_PARAM`            4
-</pre>
+```php
+`CSS3Processor::ERR_MEMORY`               1
+`CSS3Processor::ERR_BYTES_CORRUPTION`     2
+`CSS3Processor::ERR_NULL_PTR`             3
+`CSS3Processor::ERR_INV_PARAM`            4
+```
 
 ### Examples
 
