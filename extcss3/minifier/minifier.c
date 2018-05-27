@@ -447,9 +447,9 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 							}
 
 							if ((range_base != NULL) && (range_base == range_last)) {
-								_extcss3_remove_token(&rule->base_selector, &range_base, NULL);
-
 								selector = range_last->next;
+
+								_extcss3_remove_token(&rule->base_selector, &range_base, NULL);
 							}
 						}
 
