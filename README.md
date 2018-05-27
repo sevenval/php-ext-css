@@ -1,7 +1,7 @@
-# `extcss3`
-
 [![Software license][ico-license]](LICENSE)
 [![Build status][ico-travis]][link-travis]
+
+# `extcss3`
 
 `extcss3` is a fast PHP7 extension for the handling of CSS3 strings (see
 [W3C Candidate Recommendation](https://www.w3.org/TR/css-syntax-3/)). It supports
