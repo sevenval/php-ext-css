@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "../mpz/src/mpz_alloc.h"
+
 /* ==================================================================================================== */
 
 #define EXTCSS3_SUCCESS					(true)
@@ -112,9 +114,6 @@
 
 /* ==================================================================================================== */
 
-#pragma pack(push)
-#pragma pack()
-
 typedef struct _extcss3_str		extcss3_str;
 
 typedef struct _extcss3_state	extcss3_state;
@@ -154,8 +153,6 @@ struct _extcss3_state
 
 struct _extcss3_token
 {
-	unsigned int		type;
-
 	extcss3_str			data;
 	extcss3_str			info;
 	extcss3_str			user;
@@ -163,6 +160,7 @@ struct _extcss3_token
 	extcss3_token		*prev;
 	extcss3_token		*next;
 
+	unsigned int		type;
 	unsigned int		flag;
 };
 
@@ -215,8 +213,6 @@ struct _extcss3_block
 
 struct _extcss3_rule
 {
-	unsigned int		level;
-
 	extcss3_token		*base_selector;
 	extcss3_token		*last_selector;
 
@@ -224,11 +220,13 @@ struct _extcss3_rule
 
 	extcss3_rule		*prev;
 	extcss3_rule		*next;
+
+	unsigned int		level;
 };
 
 struct _extcss3_intern
 {
-	extcss3_state		state;
+	mpz_pool_t			*pool;
 
 	extcss3_str			orig;
 	extcss3_str			copy;
@@ -243,9 +241,9 @@ struct _extcss3_intern
 	extcss3_vendor		*last_vendor;
 
 	extcss3_mod			modifier;
-};
 
-#pragma pack(pop)
+	extcss3_state		state;
+};
 
 /* ==================================================================================================== */
 
