@@ -82,9 +82,9 @@ public CSS3Processor::dump(string $css) : string
 public CSS3Processor::minify(string $css [, array $vendors ]) : string
 ```
 
-### PHP Class Constants
+## PHP Class Constants
 
-#### Type Constants
+### Type Constants
 
 ```php
 `CSS3Processor::TYPE_IDENT`               1
@@ -122,7 +122,7 @@ public CSS3Processor::minify(string $css [, array $vendors ]) : string
 `CSS3Processor::TYPE_EOF`                33
 ```
 
-#### Flag Constants
+### Flag Constants
 
 ```php
 `CSS3Processor::FLAG_ID`                  1
@@ -133,7 +133,7 @@ public CSS3Processor::minify(string $css [, array $vendors ]) : string
 `CSS3Processor::FLAG_AT_URL_STRING`       6
 ```
 
-#### Exception Code Constants
+### Exception Code Constants
 
 ```php
 `CSS3Processor::ERR_MEMORY`               1
@@ -142,7 +142,7 @@ public CSS3Processor::minify(string $css [, array $vendors ]) : string
 `CSS3Processor::ERR_INV_PARAM`            4
 ```
 
-### Examples
+## Examples
 
 ```php
 $css = file_get_contents('style.css');
