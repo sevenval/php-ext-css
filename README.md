@@ -37,14 +37,36 @@ processed.
 
 ### CSS3Processor::__construct()
 
-* Constructs a new `CSS3Processor` object.
-* Throws exceptions on errors.
-
 ```php
 public CSS3Processor::__construct(void) : CSS3Processor
 ```
 
+* Constructs a new `CSS3Processor` object.
+* Throws exceptions on errors.
+
+### CSS3Processor::setNotifier()
+
+```php
+public CSS3Processor::setNotifier(int $type, callable $callback) : bool
+```
+
+* Registers a callback for the given token `$type` that will be called
+  during tokenisation. The callback gets an info array of the current
+  token and context.
+* All return values from the callback are discarded.
+* The parameter `$type` can be set to any of the `extcss3` Type Constants
+  listed below.
+* If a Modifier is registered for the same token type, the Notifier is
+  allways called bevore the Modifier.
+* Multiple notifier callbacks per token type are possible.
+* Returns `true` on success.
+* Throws exceptions on errors.
+
 ### CSS3Processor::setModifier()
+
+```php
+public CSS3Processor::setModifier(int $type, callable $callback) : bool
+```
 
 * Registers a callback for the given token `$type` that will be called during tokenisation.
   The callback gets an info array of the current token and context.
@@ -58,29 +80,25 @@ public CSS3Processor::__construct(void) : CSS3Processor
 * Returns `true` on success.
 * Throws exceptions on errors.
 
-```php
-public CSS3Processor::setModifier(int $type, callable $callback) : bool
-```
-
 ### CSS3Processor::dump()
-
-* Applies preprocessing and the registered modifiers to `$css` and returns the
-  resulting string.
-* Throws exceptions on errors.
 
 ```php
 public CSS3Processor::dump(string $css) : string
 ```
 
-### CSS3Processor::minify()
-
-* Returns the minimized result string considering the registered modifiers and the
-  blacklist of vendor prefixes given in the `$vendors` array.
+* Applies preprocessing and the registered modifiers to `$css` and returns the
+  resulting string.
 * Throws exceptions on errors.
+
+### CSS3Processor::minify()
 
 ```php
 public CSS3Processor::minify(string $css [, array $vendors ]) : string
 ```
+
+* Returns the minimized result string considering the registered modifiers and the
+  blacklist of vendor prefixes given in the `$vendors` array.
+* Throws exceptions on errors.
 
 ## PHP Class Constants
 
@@ -140,6 +158,7 @@ public CSS3Processor::minify(string $css [, array $vendors ]) : string
 `CSS3Processor::ERR_BYTES_CORRUPTION`     2
 `CSS3Processor::ERR_NULL_PTR`             3
 `CSS3Processor::ERR_INV_PARAM`            4
+`CSS3Processor::ERR_INV_VALUE`            5
 ```
 
 ## Examples
