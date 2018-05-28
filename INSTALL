@@ -1,4 +1,4 @@
-To build and install the extcss3 run:
+To build and install the php-ext-css run:
 	phpize
 	./configure
 	make
