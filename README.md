@@ -1,8 +1,9 @@
-[![Software license][ico-license]](LICENSE)
-[![Build status][ico-travis]][link-travis]
-[![Build status][ico-travis-mpz]][link-travis-mpz]
+| extcss3 | MPZ | extcss3 MPZ edition |
+| :---: | :---: | :---: |
+| [![Software license][ico-license]](https://github.com/sevenval/php-ext-css/blob/master/LICENSE) | [![Software license][ico-license-mpz]](https://github.com/alex-schneider/mpz/blob/master/LICENSE) | [![Software license][ico-license-mpz]](mpz/LICENSE) |
+| [![Build status][ico-travis]][link-travis] | No own builds | [![Build status][ico-travis-mpz]][link-travis-mpz] |
 
-# `extcss3` (MPZ edition)
+# `extcss3` MPZ edition
 
 `extcss3` is a fast PHP7 extension for the handling of CSS3 strings (see
 [W3C Candidate Recommendation](https://www.w3.org/TR/css-syntax-3/)). It supports
@@ -185,5 +186,6 @@ See the tests for more examples.
 [ico-license]: https://img.shields.io/github/license/mashape/apistatus.svg
 [ico-travis]: https://travis-ci.org/sevenval/php-ext-css.svg?branch=master
 [link-travis]: https://travis-ci.org/sevenval/php-ext-css
+[ico-license-mpz]: https://img.shields.io/github/license/mashape/apistatus.svg
 [ico-travis-mpz]: https://api.travis-ci.org/alex-schneider/php-ext-css.svg?branch=master
 [link-travis-mpz]: https://travis-ci.org/alex-schneider/php-ext-css
