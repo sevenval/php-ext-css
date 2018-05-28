@@ -13,7 +13,7 @@
 #endif /* HAVE_CONFIG_H */
 
 extern zend_module_entry extcss3_module_entry;
-#define phpext_extcss3_ptr &extcss3_module_entry;
+#define phpext_extcss3_ptr &extcss3_module_entry
 
 typedef struct _extcss3_object
 {
