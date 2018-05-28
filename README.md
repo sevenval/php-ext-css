@@ -1,13 +1,17 @@
 [![Software license][ico-license]](LICENSE)
 [![Build status][ico-travis]][link-travis]
 
-# `extcss3`
+# `extcss3` (MPZ edition)
 
 `extcss3` is a fast PHP7 extension for the handling of CSS3 strings (see
 [W3C Candidate Recommendation](https://www.w3.org/TR/css-syntax-3/)). It supports
 preprocessing, tokenizing and minifying. Furthermore, `extcss3` implements an API
 that can be used to analyse, augment or correct the style sheet while it is being
 processed.
+
+The MPZ edition uses the [Memory-Pool-Z](https://github.com/alex-schneider/mpz)
+to increase the real processing speed of `extcss3` to over 30 % while reducing the
+system time to over 45 %.
 
 ## Library Features
 

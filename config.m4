@@ -1,6 +1,6 @@
 
-PHP_ARG_WITH(extcss3, whether to enable the extcss3 extension with MPZ,
-	[--with-extcss3                   Enable extcss3 support with MPZ])
+PHP_ARG_WITH(extcss3, whether to enable the extcss3 extension (MPZ eidition),
+	[--with-extcss3                   Enable extcss3 support (MPZ edition]))
 
 if test "$PHP_EXTCSS3" != "no"; then
 	PHP_SUBST(EXTCSS3_SHARED_LIBADD)
