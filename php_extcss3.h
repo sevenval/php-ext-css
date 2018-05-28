@@ -6,7 +6,7 @@
 #include "extcss3/types.h"
 
 #define PHP_EXTCSS3_EXTNAME	"extcss3"
-#define PHP_EXTCSS3_EXTVER	"1.0.1"
+#define PHP_EXTCSS3_EXTVER	"2.0"
 
 #ifdef HAVE_CONFIG_H
 	#include "config.h"
