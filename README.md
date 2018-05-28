@@ -1,4 +1,4 @@
-| extcss3 | MPZ | extcss3 MPZ edition |
+| extcss3 stand alone | MPZ stand alone | extcss3 MPZ edition |
 | :---: | :---: | :---: |
 | [![Software license][ico-license]](https://github.com/sevenval/php-ext-css/blob/master/LICENSE) | [![Software license][ico-license-mpz]](https://github.com/alex-schneider/mpz/blob/master/LICENSE) | [![Software license][ico-license-mpz]](mpz/LICENSE) |
 | [![Build status][ico-travis]][link-travis] | No own builds | [![Build status][ico-travis-mpz]][link-travis-mpz] |
