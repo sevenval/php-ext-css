@@ -1,5 +1,6 @@
 [![Software license][ico-license]](LICENSE)
 [![Build status][ico-travis]][link-travis]
+[![Build status][ico-travis-mpz]][link-travis-mpz]
 
 # `extcss3` (MPZ edition)
 
@@ -184,3 +185,5 @@ See the tests for more examples.
 [ico-license]: https://img.shields.io/github/license/mashape/apistatus.svg
 [ico-travis]: https://travis-ci.org/sevenval/php-ext-css.svg?branch=master
 [link-travis]: https://travis-ci.org/sevenval/php-ext-css
+[ico-travis-mpz]: https://api.travis-ci.org/alex-schneider/php-ext-css.svg?branch=master
+[link-travis-mpz]: https://travis-ci.org/alex-schneider/php-ext-css
