@@ -80,6 +80,8 @@ public CSS3Processor::setModifier(int $type, callable $callback) : bool
   value is left unmodified.
 * The parameter `$type` can be set to any of the `php-ext-css` Type Constants listed
   below that are marked as `modifiable`.
+* If a Notifier is registered for the same token type, the Notifier is allways called
+  bevore the Modifier.
 * Only one modifier callback per token type is possible. Any subsequent call to
   `::setModifier()` replaces previously set callbacks for the same type.
 * Returns `true` on success.
