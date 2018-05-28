@@ -18,5 +18,5 @@ if test "$PHP_EXTCSS3" != "no"; then
 		extcss3/tokenizer/context.c         \
 		extcss3/tokenizer/tokenizer.c       \
 		php_extcss3.c,
-	$ext_shared, , "-Wall")
+	$ext_shared, , "-Wall -Wextra")
 fi
