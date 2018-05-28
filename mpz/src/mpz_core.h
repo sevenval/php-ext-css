@@ -41,7 +41,7 @@
  * 
  * Disabling of this feature increases a little bit the performance of the MPZ.
 */
-#define MPZ_RAISE_SIGSEGV_ON_MEM_ERRORS
+//#define MPZ_RAISE_SIGSEGV_ON_MEM_ERRORS
 
 /**
  * Total number of indexes in the bins-array (0 - 127). You can increase this number,
