@@ -9,7 +9,7 @@
 
 /* ==================================================================================================== */
 
-bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, unsigned int *error)
+bool extcss3_minify_function_rgb_a(extcss3_intern *intern, extcss3_token **token, extcss3_decl *decl, unsigned int *error)
 {
 	extcss3_token *temp, *curr = (*token)->next;
 	double value;
@@ -77,7 +77,7 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, un
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	if ((((*token)->data.len == 3) && (idx == 6)) || (((*token)->data.len == 4) && (idx == 8))) {
-		if (EXTCSS3_SUCCESS != extcss3_minify_hash(hex, idx, *token, error)) {
+		if (EXTCSS3_SUCCESS != extcss3_minify_hash(intern, hex, idx, *token, error)) {
 			return EXTCSS3_FAILURE;
 		}
 
@@ -85,7 +85,7 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, un
 		if ((*token)->user.str == NULL) {
 			(*token)->user.len = idx + 1;
 
-			if (((*token)->user.str = (char *)calloc((*token)->user.len, sizeof(char))) == NULL) {
+			if (((*token)->user.str = (char *)mpz_pmalloc(intern->pool, (*token)->user.len * sizeof(char))) == NULL) {
 				*error = EXTCSS3_ERR_MEMORY;
 				return EXTCSS3_FAILURE;
 			}
@@ -105,7 +105,7 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, un
 			curr->prev->next = curr->next;
 
 			temp = curr->prev;
-			extcss3_release_token(curr);
+			extcss3_release_token(intern->pool, curr);
 			curr = temp;
 		}
 
@@ -113,8 +113,8 @@ bool extcss3_minify_function_rgb_a(extcss3_token **token, extcss3_decl *decl, un
 			temp = (*token)->next;
 
 			// Create a new whitespace token
-			if (((*token)->next = extcss3_create_token()) == NULL) {
-				extcss3_release_tokens_list(temp);
+			if (((*token)->next = extcss3_create_token(intern->pool)) == NULL) {
+				extcss3_release_tokens_list(intern->pool, temp);
 
 				*error = EXTCSS3_ERR_MEMORY;
 				return EXTCSS3_FAILURE;

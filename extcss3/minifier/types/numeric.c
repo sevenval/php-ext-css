@@ -55,7 +55,7 @@ static inline bool _extcss3_minify_numeric_preserve_dimension(extcss3_token *tok
 
 /* ==================================================================================================== */
 
-bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, bool preserve_dimension, unsigned int *error)
+bool extcss3_minify_numeric(extcss3_intern *intern, extcss3_token *token, bool preserve_sign, bool preserve_dimension, unsigned int *error)
 {
 	char *base, *last;
 	double num;
@@ -83,7 +83,7 @@ bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, bool prese
 			token->user.len = 1 + token->info.len;
 		}
 
-		if ((token->user.str = (char *)calloc(token->user.len + token->info.len, sizeof(char))) == NULL) {
+		if ((token->user.str = (char *)mpz_pmalloc(intern->pool, (token->user.len + token->info.len) * sizeof(char))) == NULL) {
 			*error = EXTCSS3_ERR_MEMORY;
 			return EXTCSS3_FAILURE;
 		}
@@ -137,7 +137,7 @@ bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, bool prese
 
 		token->user.len = last - base + val_is_signed + token->info.len;
 
-		if ((token->user.str = (char *)calloc(token->user.len, sizeof(char))) == NULL) {
+		if ((token->user.str = (char *)mpz_pmalloc(intern->pool, token->user.len * sizeof(char))) == NULL) {
 			*error = EXTCSS3_ERR_MEMORY;
 			return EXTCSS3_FAILURE;
 		}

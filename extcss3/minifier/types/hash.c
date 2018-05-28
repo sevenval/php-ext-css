@@ -167,7 +167,7 @@ const char *extcss3_color_hashes_xx[11][2] = {
 
 /* ==================================================================================================== */
 
-bool extcss3_minify_hash(char *str, unsigned int len, extcss3_token *token, unsigned int *error)
+bool extcss3_minify_hash(extcss3_intern *intern, char *str, unsigned int len, extcss3_token *token, unsigned int *error)
 {
 	unsigned int i;
 
@@ -180,11 +180,11 @@ bool extcss3_minify_hash(char *str, unsigned int len, extcss3_token *token, unsi
 
 	if (len == 4) {
 		if (EXTCSS3_CHARS_EQ(str[3], 'f')) {
-			return extcss3_minify_hash(str, 3, token, error);
+			return extcss3_minify_hash(intern, str, 3, token, error);
 		}
 	} else if (len == 8) {
 		if (EXTCSS3_CHARS_EQ(str[6], 'f') && EXTCSS3_CHARS_EQ(str[7], 'f')) {
-			return extcss3_minify_hash(str, 6, token, error);
+			return extcss3_minify_hash(intern, str, 6, token, error);
 		} else if (
 			EXTCSS3_CHARS_EQ(str[0], str[1]) &&
 			EXTCSS3_CHARS_EQ(str[2], str[3]) &&
@@ -192,7 +192,7 @@ bool extcss3_minify_hash(char *str, unsigned int len, extcss3_token *token, unsi
 			EXTCSS3_CHARS_EQ(str[6], str[7])
 		) {
 			token->user.len = 5;
-			if ((token->user.str = (char *)calloc(token->user.len, sizeof(char))) == NULL) {
+			if ((token->user.str = (char *)mpz_pmalloc(intern->pool, token->user.len * sizeof(char))) == NULL) {
 				*error = EXTCSS3_ERR_MEMORY;
 				return EXTCSS3_FAILURE;
 			}
@@ -211,7 +211,7 @@ bool extcss3_minify_hash(char *str, unsigned int len, extcss3_token *token, unsi
 		) {
 			if (EXTCSS3_CHARS_EQ(str[0], 'f') && (str[2] == '0') && (str[4] == '0')) {
 				token->user.len = 3;
-				if ((token->user.str = (char *)calloc(token->user.len, sizeof(char))) == NULL) {
+				if ((token->user.str = (char *)mpz_pmalloc(intern->pool, token->user.len * sizeof(char))) == NULL) {
 					*error = EXTCSS3_ERR_MEMORY;
 					return EXTCSS3_FAILURE;
 				}
@@ -219,7 +219,7 @@ bool extcss3_minify_hash(char *str, unsigned int len, extcss3_token *token, unsi
 				memcpy(token->user.str, "red", 3);
 			} else {
 				token->user.len = 4;
-				if ((token->user.str = (char *)calloc(token->user.len, sizeof(char))) == NULL) {
+				if ((token->user.str = (char *)mpz_pmalloc(intern->pool, token->user.len * sizeof(char))) == NULL) {
 					*error = EXTCSS3_ERR_MEMORY;
 					return EXTCSS3_FAILURE;
 				}
@@ -233,7 +233,7 @@ bool extcss3_minify_hash(char *str, unsigned int len, extcss3_token *token, unsi
 			for (i = (sizeof(extcss3_hash_colors) / sizeof(extcss3_hash_colors[0])); i--; ) {
 				if (EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(str, extcss3_hash_colors[i][0], 6)) {
 					token->user.len = strlen(extcss3_hash_colors[i][1]);
-					if ((token->user.str = (char *)calloc(token->user.len, sizeof(char))) == NULL) {
+					if ((token->user.str = (char *)mpz_pmalloc(intern->pool, token->user.len * sizeof(char))) == NULL) {
 						*error = EXTCSS3_ERR_MEMORY;
 						return EXTCSS3_FAILURE;
 					}
@@ -245,7 +245,7 @@ bool extcss3_minify_hash(char *str, unsigned int len, extcss3_token *token, unsi
 	} else if (len == 3) {
 		if (EXTCSS3_CHARS_EQ(str[0], 'f') && (str[1] == '0') && (str[2] == '0')) {
 			token->user.len = 3;
-			if ((token->user.str = (char *)calloc(token->user.len, sizeof(char))) == NULL) {
+			if ((token->user.str = (char *)mpz_pmalloc(intern->pool, token->user.len * sizeof(char))) == NULL) {
 				*error = EXTCSS3_ERR_MEMORY;
 				return EXTCSS3_FAILURE;
 			}
@@ -257,7 +257,7 @@ bool extcss3_minify_hash(char *str, unsigned int len, extcss3_token *token, unsi
 	return EXTCSS3_SUCCESS;
 }
 
-bool extcss3_minify_color(extcss3_token *token, unsigned int *error)
+bool extcss3_minify_color(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	unsigned int i, elements;
 	const char *(*map)[2];
@@ -320,7 +320,7 @@ bool extcss3_minify_color(extcss3_token *token, unsigned int *error)
 		) {
 			token->user.len = strlen(map[i][1]) + 1;
 
-			if ((token->user.str = (char *)calloc(token->user.len, sizeof(char))) == NULL) {
+			if ((token->user.str = (char *)mpz_pmalloc(intern->pool, token->user.len * sizeof(char))) == NULL) {
 				*error = EXTCSS3_ERR_MEMORY;
 				return EXTCSS3_FAILURE;
 			}

@@ -4,14 +4,14 @@
 
 /* ==================================================================================================== */
 
-static void *_extcss3_set_error_code(unsigned int *error, unsigned int code, extcss3_rule *tree);
+static void *_extcss3_set_error_code(extcss3_intern *intern, unsigned int *error, unsigned int code, extcss3_rule *tree);
 
-static bool _extcss3_tree_fork_rule(extcss3_rule **rule, unsigned int *error);
-static bool _extcss3_tree_fork_decl(extcss3_decl **decl, unsigned int *error);
+static bool _extcss3_tree_fork_rule(extcss3_intern *intern, extcss3_rule **rule, unsigned int *error);
+static bool _extcss3_tree_fork_decl(extcss3_intern *intern, extcss3_decl **decl, unsigned int *error);
 
 /* ==================================================================================================== */
 
-extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, unsigned int level, unsigned int *error)
+extcss3_rule *extcss3_create_tree(extcss3_intern *intern, extcss3_token **token, extcss3_token *max, unsigned int level, unsigned int *error)
 {
 	extcss3_token *search;
 	extcss3_rule *tree, *rule;
@@ -20,8 +20,8 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, uns
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	if ((tree = rule = extcss3_create_rule()) == NULL) {
-		return _extcss3_set_error_code(error, EXTCSS3_ERR_MEMORY, tree);
+	if ((tree = rule = extcss3_create_rule(intern->pool)) == NULL) {
+		return _extcss3_set_error_code(intern, error, EXTCSS3_ERR_MEMORY, tree);
 	}
 
 	rule->level = level;
@@ -36,8 +36,8 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, uns
 				rule->base_selector = rule->last_selector = *token;
 
 				// Fork the next rule
-				if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(&rule, error)) {
-					return _extcss3_set_error_code(error, *error, tree);
+				if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(intern, &rule, error)) {
+					return _extcss3_set_error_code(intern, error, *error, tree);
 				}
 
 				*token = (*token)->next;
@@ -78,8 +78,8 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, uns
 					rule->base_selector = rule->last_selector = *token;
 
 					// Fork the next rule
-					if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(&rule, error)) {
-						return _extcss3_set_error_code(error, *error, tree);
+					if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(intern, &rule, error)) {
+						return _extcss3_set_error_code(intern, error, *error, tree);
 					}
 				}
 
@@ -148,8 +148,8 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, uns
 						*token = (*token)->next;
 					}
 				} else {
-					if ((rule->block = extcss3_create_block()) == NULL) {
-						return _extcss3_set_error_code(error, EXTCSS3_ERR_MEMORY, tree);
+					if ((rule->block = extcss3_create_block(intern->pool)) == NULL) {
+						return _extcss3_set_error_code(intern, error, EXTCSS3_ERR_MEMORY, tree);
 					}
 
 					// Set the '{'
@@ -164,8 +164,8 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, uns
 
 					// Consume all nested rules (recursive)
 					if (nested > 0) {
-						if ((rule->block->rules = extcss3_create_tree(token, search, level + 1, error)) == NULL) {
-							return _extcss3_set_error_code(error, *error, tree);
+						if ((rule->block->rules = extcss3_create_tree(intern, token, search, level + 1, error)) == NULL) {
+							return _extcss3_set_error_code(intern, error, *error, tree);
 						}
 					}
 					// Consume all declarations in the current block
@@ -181,12 +181,12 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, uns
 								}
 
 								if (last == NULL) {
-									if ((rule->block->decls = decl = last = extcss3_create_decl()) == NULL) {
-										return _extcss3_set_error_code(error, EXTCSS3_ERR_MEMORY, tree);
+									if ((rule->block->decls = decl = last = extcss3_create_decl(intern->pool)) == NULL) {
+										return _extcss3_set_error_code(intern, error, EXTCSS3_ERR_MEMORY, tree);
 									}
 								} else {
-									if (EXTCSS3_SUCCESS != _extcss3_tree_fork_decl(&last, error)) {
-										return _extcss3_set_error_code(error, *error, tree);
+									if (EXTCSS3_SUCCESS != _extcss3_tree_fork_decl(intern, &last, error)) {
+										return _extcss3_set_error_code(intern, error, *error, tree);
 									}
 
 									decl = last;
@@ -207,8 +207,8 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, uns
 					}
 
 					// Fork the next rule
-					if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(&rule, error)) {
-						return _extcss3_set_error_code(error, *error, tree);
+					if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(intern, &rule, error)) {
+						return _extcss3_set_error_code(intern, error, *error, tree);
 					}
 				}
 
@@ -221,8 +221,8 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, uns
 				// Pseudo-rule for the <eof> token
 				if ((*token)->type == EXTCSS3_TYPE_EOF) {
 					// Fork the next rule
-					if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(&rule, error)) {
-						return _extcss3_set_error_code(error, *error, tree);
+					if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(intern, &rule, error)) {
+						return _extcss3_set_error_code(intern, error, *error, tree);
 					}
 
 					rule->base_selector = rule->last_selector = *token;
@@ -237,8 +237,8 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, uns
 					rule->base_selector->type == EXTCSS3_TYPE_AT_KEYWORD &&
 					(*token)->type == EXTCSS3_TYPE_SEMICOLON
 				) {
-					if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(&rule, error)) {
-						return _extcss3_set_error_code(error, *error, tree);
+					if (EXTCSS3_SUCCESS != _extcss3_tree_fork_rule(intern, &rule, error)) {
+						return _extcss3_set_error_code(intern, error, *error, tree);
 					}
 				}
 			}
@@ -254,22 +254,22 @@ extcss3_rule *extcss3_create_tree(extcss3_token **token, extcss3_token *max, uns
 
 /* ==================================================================================================== */
 
-static inline void *_extcss3_set_error_code(unsigned int *error, unsigned int code, extcss3_rule *tree)
+static inline void *_extcss3_set_error_code(extcss3_intern *intern, unsigned int *error, unsigned int code, extcss3_rule *tree)
 {
 	*error = code;
 
 	if (tree != NULL) {
-		extcss3_release_rules_list(tree);
+		extcss3_release_rules_list(intern->pool, tree);
 	}
 
 	return NULL;
 }
 
-static inline bool _extcss3_tree_fork_rule(extcss3_rule **rule, unsigned int *error)
+static inline bool _extcss3_tree_fork_rule(extcss3_intern *intern, extcss3_rule **rule, unsigned int *error)
 {
 	extcss3_rule *fork;
 
-	if ((fork = extcss3_create_rule()) == NULL) {
+	if ((fork = extcss3_create_rule(intern->pool)) == NULL) {
 		*error = EXTCSS3_ERR_MEMORY;
 		return EXTCSS3_FAILURE;
 	}
@@ -282,11 +282,11 @@ static inline bool _extcss3_tree_fork_rule(extcss3_rule **rule, unsigned int *er
 	return EXTCSS3_SUCCESS;
 }
 
-static inline bool _extcss3_tree_fork_decl(extcss3_decl **decl, unsigned int *error)
+static inline bool _extcss3_tree_fork_decl(extcss3_intern *intern, extcss3_decl **decl, unsigned int *error)
 {
 	extcss3_decl *fork;
 
-	if ((fork = extcss3_create_decl()) == NULL) {
+	if ((fork = extcss3_create_decl(intern->pool)) == NULL) {
 		*error = EXTCSS3_ERR_MEMORY;
 		return EXTCSS3_FAILURE;
 	}

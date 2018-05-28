@@ -10,7 +10,7 @@ static inline void _extcss3_ctxt_parent(extcss3_intern *intern)
 	if ((intern->last_ctxt != NULL) && (intern->last_ctxt->prev != NULL)) {
 		prev = intern->last_ctxt->prev;
 		prev->next = NULL;
-		extcss3_release_ctxt(intern->last_ctxt);
+		extcss3_release_ctxt(intern->pool, intern->last_ctxt);
 		intern->last_ctxt = prev;
 	}
 }
@@ -30,7 +30,7 @@ bool extcss3_ctxt_update(extcss3_intern *intern, unsigned int *error)
 		case EXTCSS3_TYPE_BR_SO:
 		case EXTCSS3_TYPE_BR_CO:
 		{
-			if ((intern->last_ctxt->next = extcss3_create_ctxt()) == NULL) {
+			if ((intern->last_ctxt->next = extcss3_create_ctxt(intern->pool)) == NULL) {
 				*error = EXTCSS3_ERR_MEMORY;
 
 				return EXTCSS3_FAILURE;

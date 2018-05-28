@@ -207,9 +207,11 @@ static void php_extcss3_modifier_callback(extcss3_intern *intern)
 	if (SUCCESS == call_user_function_ex(EG(function_table), NULL, callable, &retval, 1, args, 0, NULL)) {
 		if (Z_TYPE(retval) == IS_STRING) {
 			intern->last_token->user.len = Z_STRLEN(retval);
-			intern->last_token->user.str = (char *)calloc(intern->last_token->user.len, sizeof(char));
+			intern->last_token->user.str = (char *)mpz_pmalloc(intern->pool, intern->last_token->user.len * sizeof(char));
 
-			memcpy(intern->last_token->user.str, Z_STRVAL(retval), Z_STRLEN(retval));
+			if (NULL != intern->last_token->user.str) {
+				memcpy(intern->last_token->user.str, Z_STRVAL(retval), Z_STRLEN(retval));
+			}
 		}
 	}
 
@@ -261,11 +263,11 @@ PHP_METHOD(CSS3Processor, __construct)
 	if (intern == NULL) {
 		php_extcss3_throw_exception(EXTCSS3_ERR_MEMORY);
 	} else {
-		intern->notifier.callback	= php_extcss3_notifier_callback;
-		intern->notifier.destructor	= php_extcss3_callable_destructor;
+		intern->notifier.callback   = php_extcss3_notifier_callback;
+		intern->notifier.destructor = php_extcss3_callable_destructor;
 
- 		intern->modifier.callback	= php_extcss3_modifier_callback;
-		intern->modifier.destructor	= php_extcss3_callable_destructor;
+		intern->modifier.callback   = php_extcss3_modifier_callback;
+		intern->modifier.destructor = php_extcss3_callable_destructor;
 
 		object->intern = intern;
 	}
@@ -388,7 +390,7 @@ PHP_METHOD(CSS3Processor, minify)
 	}
 
 	if ((intern->base_vendor != NULL) || (intern->last_vendor != NULL)) {
-		extcss3_release_vendors_list(intern->base_vendor);
+		extcss3_release_vendors_list(intern->pool, intern->base_vendor);
 		intern->base_vendor = intern->last_vendor = NULL;
 	}
 
@@ -399,9 +401,9 @@ PHP_METHOD(CSS3Processor, minify)
 			}
 
 			if (intern->last_vendor == NULL) {
-				intern->base_vendor = intern->last_vendor = extcss3_create_vendor();
+				intern->base_vendor = intern->last_vendor = extcss3_create_vendor(intern->pool);
 			} else {
-				intern->last_vendor->next = extcss3_create_vendor();
+				intern->last_vendor->next = extcss3_create_vendor(intern->pool);
 				intern->last_vendor = intern->last_vendor->next;
 			}
 

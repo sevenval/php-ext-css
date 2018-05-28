@@ -66,11 +66,11 @@ bool extcss3_tokenize(extcss3_intern *intern, unsigned int *error)
 
 	if ((intern == NULL) || (intern->copy.str == NULL)) {
 		return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_NULL_PTR, NULL, false, false);
-	} else if ((intern->base_token = token = extcss3_create_token()) == NULL) {
+	} else if ((intern->base_token = token = extcss3_create_token(intern->pool)) == NULL) {
 		return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_MEMORY, NULL, false, false);
 	} else if (
 		((intern->notifier.base != NULL) || EXTCSS3_HAS_MODIFIER(intern)) &&
-		((intern->base_ctxt = intern->last_ctxt = extcss3_create_ctxt()) == NULL)
+		((intern->base_ctxt = intern->last_ctxt = extcss3_create_ctxt(intern->pool)) == NULL)
 	) {
 		return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_MEMORY, intern, true, false);
 	}
@@ -352,7 +352,7 @@ bool extcss3_tokenize(extcss3_intern *intern, unsigned int *error)
 
 		if (token->type == EXTCSS3_TYPE_EOF) {
 			break;
-		} else if ((token = extcss3_create_token()) == NULL) {
+		} else if ((token = extcss3_create_token(intern->pool)) == NULL) {
 			return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_MEMORY, intern, true, true);
 		}
 	}
@@ -369,12 +369,12 @@ static inline bool _extcss3_cleanup_tokenizer(unsigned int error, extcss3_intern
 {
 	if (intern != NULL) {
 		if (token && (intern->base_token != NULL)) {
-			extcss3_release_tokens_list(intern->base_token);
+			extcss3_release_tokens_list(intern->pool, intern->base_token);
 			intern->base_token = NULL;
 		}
 
 		if (ctxt && (intern->base_ctxt != NULL)) {
-			extcss3_release_ctxts_list(intern->base_ctxt);
+			extcss3_release_ctxts_list(intern->pool, intern->base_ctxt);
 			intern->base_ctxt = NULL;
 		}
 	}
@@ -396,7 +396,7 @@ static inline bool _extcss3_next_char(extcss3_intern *intern, unsigned int *erro
 static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	extcss3_token *prev;
-	extcss3_sig *sig;
+	extcss3_sig   *sig;
 
 	if ((token->prev = intern->last_token) != NULL) {
 		intern->last_token->next = token;
