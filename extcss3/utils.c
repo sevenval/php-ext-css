@@ -7,7 +7,8 @@
  */
 inline unsigned int extcss3_char_len(char c)
 {
-	unsigned int i = 7, j = 0;
+	int i = 7;
+	unsigned int j = 0;
 
 	while ((i >= 0) && ((c >> i) & 1)) {
 		i--;
