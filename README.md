@@ -168,7 +168,7 @@ public CSS3Processor::minify(string $css [, array $vendors ]) : string
 `CSS3Processor::ERR_INV_VALUE`            5
 ```
 
-## Examples
+## Example
 
 ```php
 $css = file_get_contents('style.css');
