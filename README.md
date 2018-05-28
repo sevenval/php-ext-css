@@ -1,19 +1,19 @@
-| extcss3 stand alone | MPZ stand alone | extcss3 MPZ edition |
+| php-ext-css stand alone | MPZ stand alone | php-ext-css MPZ edition |
 | :---: | :---: | :---: |
 | [![Software license][ico-license]](https://github.com/sevenval/php-ext-css/blob/master/LICENSE) | [![Software license][ico-license-mpz]](https://github.com/alex-schneider/mpz/blob/master/LICENSE) | [![Software license][ico-license-mpz]](mpz/LICENSE) |
 | [![Build status][ico-travis]][link-travis] | No own builds | [![Build status][ico-travis-mpz]][link-travis-mpz] |
 
-# `extcss3` MPZ edition
+# `php-ext-css` MPZ edition
 
-`extcss3` is a fast PHP7 extension for the handling of CSS3 strings (see
+`php-ext-css` is a fast PHP7 extension for the handling of CSS3 strings (see
 [W3C Candidate Recommendation](https://www.w3.org/TR/css-syntax-3/)). It supports
-preprocessing, tokenizing and minifying. Furthermore, `extcss3` implements an API
-that can be used to analyse, augment or correct the style sheet while it is being
-processed.
+preprocessing, tokenizing and minifying. Furthermore, `php-ext-css` implements an
+API that can be used to analyse, augment or correct the style sheet while it is
+being processed.
 
 The MPZ edition uses the [Memory-Pool-Z](https://github.com/alex-schneider/mpz)
-to increase the real processing speed of `extcss3` to over 30 % while reducing the
-system time to over 45 %.
+to increase the real processing speed of `php-ext-css` to over 30 % while reducing
+the system time to over 45 %.
 
 ## Library Features
 
@@ -56,14 +56,13 @@ public CSS3Processor::__construct(void) : CSS3Processor
 public CSS3Processor::setNotifier(int $type, callable $callback) : bool
 ```
 
-* Registers a callback for the given token `$type` that will be called
-  during tokenisation. The callback gets an info array of the current
-  token and context.
+* Registers a callback for the given token `$type` that will be called during tokenisation.
+  The callback gets an info array of the current token and context.
 * All return values from the callback are discarded.
-* The parameter `$type` can be set to any of the `extcss3` Type Constants
-  listed below.
-* If a Modifier is registered for the same token type, the Notifier is
-  allways called bevore the Modifier.
+* The parameter `$type` can be set to any of the `php-ext-css` Type Constants listed
+  below.
+* If a Modifier is registered for the same token type, the Notifier is allways called
+  bevore the Modifier.
 * Multiple notifier callbacks per token type are possible.
 * Returns `true` on success.
 * Throws exceptions on errors.
@@ -79,7 +78,7 @@ public CSS3Processor::setModifier(int $type, callable $callback) : bool
 * The callback should return a string with a (new) value that replaces the given
   token in the result string. If the return value is not a string, the original
   value is left unmodified.
-* The parameter `$type` can be set to any of the `extcss3` Type Constants listed
+* The parameter `$type` can be set to any of the `php-ext-css` Type Constants listed
   below that are marked as `modifiable`.
 * Only one modifier callback per token type is possible. Any subsequent call to
   `::setModifier()` replaces previously set callbacks for the same type.
