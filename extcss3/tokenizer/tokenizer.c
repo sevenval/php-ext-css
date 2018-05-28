@@ -650,6 +650,8 @@ static inline bool _extcss3_fill_unicode_range_token(extcss3_intern *intern, ext
  */
 static inline bool _extcss3_fill_ident_like_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
+	char u = 'u', r = 'r', l = 'l';
+
 	token->data.str = intern->state.reader;
 
 	if (EXTCSS3_SUCCESS != _extcss3_consume_name(intern, error)) {
@@ -659,9 +661,9 @@ static inline bool _extcss3_fill_ident_like_token(extcss3_intern *intern, extcss
 	if (*intern->state.reader == '(') {
 		if (
 			((intern->state.reader - token->data.str) == 3) &&
-			EXTCSS3_CHARS_EQ(token->data.str[0], 'u') &&
-			EXTCSS3_CHARS_EQ(token->data.str[1], 'r') &&
-			EXTCSS3_CHARS_EQ(token->data.str[2], 'l')
+			EXTCSS3_CHARS_EQ(token->data.str[0], u) &&
+			EXTCSS3_CHARS_EQ(token->data.str[1], r) &&
+			EXTCSS3_CHARS_EQ(token->data.str[2], l)
 		) {
 			return _extcss3_fill_url_token(intern, token, error);
 		} else {
@@ -860,6 +862,8 @@ static inline bool _extcss3_fill_string_token(extcss3_intern *intern, extcss3_to
  */
 static inline bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
+	char e = 'e';
+
 	token->flag = EXTCSS3_FLAG_INTEGER;
 	token->data.str = intern->state.reader;
 
@@ -881,7 +885,7 @@ static inline bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_to
 		}
 	}
 
-	if (EXTCSS3_CHARS_EQ(*intern->state.reader, 'e')) {
+	if (EXTCSS3_CHARS_EQ(*intern->state.reader, e)) {
 		if (EXTCSS3_IS_DIGIT(intern->state.reader[1])) {
 			_EXTCSS3_NEXT(intern, error);
 

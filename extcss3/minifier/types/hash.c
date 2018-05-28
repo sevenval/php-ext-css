@@ -170,6 +170,7 @@ const char *extcss3_color_hashes_xx[11][2] = {
 bool extcss3_minify_hash(extcss3_intern *intern, char *str, unsigned int len, extcss3_token *token, unsigned int *error)
 {
 	unsigned int i;
+	char         f = 'f';
 
 	if ((token == NULL) || (str == NULL)) {
 		*error = EXTCSS3_ERR_NULL_PTR;
@@ -179,11 +180,11 @@ bool extcss3_minify_hash(extcss3_intern *intern, char *str, unsigned int len, ex
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	if (len == 4) {
-		if (EXTCSS3_CHARS_EQ(str[3], 'f')) {
+		if (EXTCSS3_CHARS_EQ(str[3], f)) {
 			return extcss3_minify_hash(intern, str, 3, token, error);
 		}
 	} else if (len == 8) {
-		if (EXTCSS3_CHARS_EQ(str[6], 'f') && EXTCSS3_CHARS_EQ(str[7], 'f')) {
+		if (EXTCSS3_CHARS_EQ(str[6], f) && EXTCSS3_CHARS_EQ(str[7], f)) {
 			return extcss3_minify_hash(intern, str, 6, token, error);
 		} else if (
 			EXTCSS3_CHARS_EQ(str[0], str[1]) &&
@@ -209,7 +210,7 @@ bool extcss3_minify_hash(extcss3_intern *intern, char *str, unsigned int len, ex
 			EXTCSS3_CHARS_EQ(str[2], str[3]) &&
 			EXTCSS3_CHARS_EQ(str[4], str[5])
 		) {
-			if (EXTCSS3_CHARS_EQ(str[0], 'f') && (str[2] == '0') && (str[4] == '0')) {
+			if (EXTCSS3_CHARS_EQ(str[0], f) && (str[2] == '0') && (str[4] == '0')) {
 				token->user.len = 3;
 				if ((token->user.str = (char *)mpz_pmalloc(intern->pool, token->user.len * sizeof(char))) == NULL) {
 					*error = EXTCSS3_ERR_MEMORY;
@@ -243,7 +244,7 @@ bool extcss3_minify_hash(extcss3_intern *intern, char *str, unsigned int len, ex
 			}
 		}
 	} else if (len == 3) {
-		if (EXTCSS3_CHARS_EQ(str[0], 'f') && (str[1] == '0') && (str[2] == '0')) {
+		if (EXTCSS3_CHARS_EQ(str[0], f) && (str[1] == '0') && (str[2] == '0')) {
 			token->user.len = 3;
 			if ((token->user.str = (char *)mpz_pmalloc(intern->pool, token->user.len * sizeof(char))) == NULL) {
 				*error = EXTCSS3_ERR_MEMORY;
