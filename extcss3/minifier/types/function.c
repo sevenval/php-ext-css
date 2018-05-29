@@ -12,10 +12,10 @@
 bool extcss3_minify_function_rgb_a(extcss3_intern *intern, extcss3_token **token, extcss3_decl *decl, unsigned int *error)
 {
 	extcss3_token *temp, *curr = (*token)->next;
-	double value;
-	char hex[9];
-	unsigned int idx = 0, percentages = 0, numbers = 0;
-	bool valid = true;
+	double         value;
+	char           hex[9];
+	unsigned int   idx = 0, percentages = 0, numbers = 0;
+	bool           valid = true;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

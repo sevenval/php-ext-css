@@ -9,18 +9,18 @@
 
 /* ==================================================================================================== */
 
-#define _EXTCSS3_NEXT(intern, error) do {				\
-	bool result = _extcss3_next_char(intern, error);	\
-	if (EXTCSS3_SUCCESS != result) {					\
-		return EXTCSS3_FAILURE;							\
-	}													\
+#define _EXTCSS3_NEXT(intern, error) do {              \
+	bool result = _extcss3_next_char(intern, error);   \
+	if (EXTCSS3_SUCCESS != result) {                   \
+		return EXTCSS3_FAILURE;                        \
+	}                                                  \
 } while (0)
 
-#define _EXTCSS3_FILL_FIXED_TOKEN(intern, token, type, chars, error) do {		\
-	bool result = _extcss3_fill_fixed_token(intern, token, type, chars, error);	\
-	if (EXTCSS3_SUCCESS != result) {											\
-		return _extcss3_cleanup_tokenizer(*error, intern, true, true);			\
-	}																			\
+#define _EXTCSS3_FILL_FIXED_TOKEN(intern, token, type, chars, error) do {         \
+	bool result = _extcss3_fill_fixed_token(intern, token, type, chars, error);   \
+	if (EXTCSS3_SUCCESS != result) {                                              \
+		return _extcss3_cleanup_tokenizer(*error, intern, true, true);            \
+	}                                                                             \
 } while (0)
 
 /* ==================================================================================================== */

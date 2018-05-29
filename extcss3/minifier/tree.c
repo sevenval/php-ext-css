@@ -95,19 +95,19 @@ extcss3_rule *extcss3_create_tree(extcss3_intern *intern, extcss3_token **token,
 			}
 			// Beginn a new rule by a valid selector type
 			else if (
-				((*token)->type == EXTCSS3_TYPE_AT_KEYWORD)	||
-				((*token)->type == EXTCSS3_TYPE_IDENT)		||
-				((*token)->type == EXTCSS3_TYPE_HASH)		||
-				((*token)->type == EXTCSS3_TYPE_DELIM)		||
-				((*token)->type == EXTCSS3_TYPE_BR_SO)		||
-				((*token)->type == EXTCSS3_TYPE_COLON)		||
+				((*token)->type == EXTCSS3_TYPE_AT_KEYWORD) ||
+				((*token)->type == EXTCSS3_TYPE_IDENT)      ||
+				((*token)->type == EXTCSS3_TYPE_HASH)       ||
+				((*token)->type == EXTCSS3_TYPE_DELIM)      ||
+				((*token)->type == EXTCSS3_TYPE_BR_SO)      ||
+				((*token)->type == EXTCSS3_TYPE_COLON)      ||
 				((*token)->type == EXTCSS3_TYPE_PERCENTAGE)
 			) {
 				rule->base_selector = rule->last_selector = *token;
 			} else if ((*token)->type != EXTCSS3_TYPE_WS && (*token)->type != EXTCSS3_TYPE_COMMENT) {
 				// Skip all tokens until the next '{'
 				while (
-					(*token != NULL) &&
+					(*token != NULL)                     &&
 					((*token)->type != EXTCSS3_TYPE_EOF) &&
 					((*token)->type != EXTCSS3_TYPE_BR_CO)
 				) {
@@ -274,10 +274,10 @@ static inline bool _extcss3_tree_fork_rule(extcss3_intern *intern, extcss3_rule 
 		return EXTCSS3_FAILURE;
 	}
 
-	fork->level		= (*rule)->level;
-	fork->prev		= *rule;
-	(*rule)->next	= fork;
-	*rule			= fork;
+	fork->level   = (*rule)->level;
+	fork->prev    = *rule;
+	(*rule)->next = fork;
+	*rule         = fork;
 
 	return EXTCSS3_SUCCESS;
 }
@@ -291,9 +291,9 @@ static inline bool _extcss3_tree_fork_decl(extcss3_intern *intern, extcss3_decl 
 		return EXTCSS3_FAILURE;
 	}
 
-	fork->prev		= *decl;
-	(*decl)->next	= fork;
-	*decl			= fork;
+	fork->prev    = *decl;
+	(*decl)->next = fork;
+	*decl         = fork;
 
 	return EXTCSS3_SUCCESS;
 }

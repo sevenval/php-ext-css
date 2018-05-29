@@ -57,16 +57,16 @@ static inline bool _extcss3_minify_numeric_preserve_dimension(extcss3_token *tok
 
 bool extcss3_minify_numeric(extcss3_intern *intern, extcss3_token *token, bool preserve_sign, bool preserve_dimension, unsigned int *error)
 {
-	char *base, *last;
-	double num;
-	unsigned int val_is_signed = 0;
+	char         *base, *last;
+	double        num;
+	unsigned int  val_is_signed = 0;
 
 	if (token == NULL) {
 		*error = EXTCSS3_ERR_NULL_PTR;
 		return EXTCSS3_FAILURE;
 	} else if (
-		(token->type != EXTCSS3_TYPE_NUMBER)		&&
-		(token->type != EXTCSS3_TYPE_PERCENTAGE)	&&
+		(token->type != EXTCSS3_TYPE_NUMBER)     &&
+		(token->type != EXTCSS3_TYPE_PERCENTAGE) &&
 		(token->type != EXTCSS3_TYPE_DIMENSION)
 	) {
 		return EXTCSS3_SUCCESS;
