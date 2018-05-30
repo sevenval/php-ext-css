@@ -3,7 +3,7 @@
 | [![Software license][ico-license]](https://github.com/sevenval/php-ext-css/blob/master/LICENSE) | [![Software license][ico-license-mpz]](https://github.com/alex-schneider/mpz/blob/master/LICENSE) | [![Software license][ico-license-mpz]](mpz/LICENSE) |
 | [![Build status][ico-travis]][link-travis] | No own builds | [![Build status][ico-travis-mpz]][link-travis-mpz] |
 
-# `php-ext-css` MPZ edition
+# php-ext-css MPZ edition
 
 `php-ext-css` is a fast PHP7 extension for the handling of CSS3 strings (see
 [W3C Candidate Recommendation](https://www.w3.org/TR/css-syntax-3/)). It supports
