@@ -11,7 +11,7 @@ preprocessing, tokenizing and minifying. Furthermore, `php-ext-css` implements a
 API that can be used to analyse, augment or correct the style sheet while it is
 being processed.
 
-The MPZ edition uses the [Memory-Pool-Z](https://github.com/alex-schneider/mpz)
+The MPZ edition uses the [Memory-Pool-Z](https://alex-schneider.github.io/mpz/)
 to increase the real processing speed of `php-ext-css` to over 30 % while reducing
 the system time to over 45 %.
 
