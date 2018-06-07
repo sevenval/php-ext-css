@@ -73,8 +73,6 @@ char *extcss3_minify(extcss3_intern *intern, unsigned int *error)
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	_extcss3_set_error_code(error, 0, tree, intern);
-
 	return result;
 }
 

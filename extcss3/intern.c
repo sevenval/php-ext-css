@@ -5,19 +5,36 @@
 
 /* ==================================================================================================== */
 
-extcss3_intern *extcss3_create_intern(void)
+extcss3_intern *extcss3_reset_intern(extcss3_intern *intern, unsigned int *error)
 {
-	mpz_pool_t     *pool;
-	extcss3_intern *intern;
-
-	if (NULL == (pool = mpz_pool_create())) {
-		return NULL;
-	} else if (NULL == (intern = mpz_pcalloc(pool, sizeof(extcss3_intern)))) {
-		mpz_pool_destroy(pool);
+	if (NULL == intern) {
+		*error = EXTCSS3_ERR_NULL_PTR;
 		return NULL;
 	}
 
-	intern->pool = pool;
+	mpz_pool_destroy(intern->pool);
+
+	if (NULL == (intern->pool = mpz_pool_create())) {
+		*error = EXTCSS3_ERR_MEMORY;
+		return NULL;
+	}
+
+	intern->copy.str    = NULL;
+	intern->base_vendor = NULL;
+
+	return intern;
+}
+
+extcss3_intern *extcss3_create_intern(void)
+{
+	extcss3_intern *intern;
+
+	if (NULL == (intern = malloc(sizeof(*intern)))) {
+		return NULL;
+	} else if (NULL == (intern->pool = mpz_pool_create())) {
+		free(intern);
+		return NULL;
+	}
 
 	intern->orig.str                  = NULL;
 	intern->orig.len                  = 0;
@@ -68,7 +85,7 @@ extcss3_vendor *extcss3_create_vendor(mpz_pool_t *pool)
 
 extcss3_token *extcss3_create_token(mpz_pool_t *pool)
 {
-	extcss3_token *token = (extcss3_token *)mpz_pcalloc(pool, sizeof(extcss3_token));
+	extcss3_token *token = (extcss3_token *)mpz_pmalloc(pool, sizeof(extcss3_token));
 
 	if (NULL != token) {
 		token->data.str = NULL;
@@ -144,9 +161,9 @@ extcss3_decl *extcss3_create_decl(mpz_pool_t *pool)
 	return decl;
 }
 
-extcss3_sig *extcss3_create_signal(mpz_pool_t *pool)
+extcss3_sig *extcss3_create_signal(void)
 {
-	extcss3_sig *sig = (extcss3_sig *)mpz_pmalloc(pool, sizeof(extcss3_sig));
+	extcss3_sig *sig = (extcss3_sig *)malloc(sizeof(extcss3_sig));
 
 	if (NULL != sig) {
 		sig->type     = 0;
@@ -161,13 +178,9 @@ extcss3_sig *extcss3_create_signal(mpz_pool_t *pool)
 
 void extcss3_release_intern(extcss3_intern *intern)
 {
-	mpz_pool_t *pool;
-
 	if (intern == NULL) {
 		return;
 	}
-
-	pool = intern->pool;
 
 	if (intern->modifier.destructor != NULL) {
 		if (intern->modifier.string != NULL) {
@@ -192,10 +205,12 @@ void extcss3_release_intern(extcss3_intern *intern)
 	}
 
 	if (intern->notifier.base != NULL) {
-		extcss3_release_signals_list(pool, &intern->notifier);
+		extcss3_release_signals_list(&intern->notifier);
 	}
 
-	mpz_pool_destroy(pool);
+	mpz_pool_destroy(intern->pool);
+
+	free(intern);
 }
 
 void extcss3_release_vendor(mpz_pool_t *pool, extcss3_vendor *vendor)
@@ -357,7 +372,7 @@ void extcss3_release_decls_list(mpz_pool_t *pool, extcss3_decl *list)
 	extcss3_release_decl(pool, list);
 }
 
-void extcss3_release_signal(mpz_pool_t *pool, extcss3_not *notifier, extcss3_sig *sig)
+void extcss3_release_signal(extcss3_not *notifier, extcss3_sig *sig)
 {
 	if (sig == NULL) {
 		return;
@@ -367,10 +382,10 @@ void extcss3_release_signal(mpz_pool_t *pool, extcss3_not *notifier, extcss3_sig
 		notifier->destructor(sig->callable);
 	}
 
-	mpz_free(pool, sig);
+	free(sig);
 }
 
-void extcss3_release_signals_list(mpz_pool_t *pool, extcss3_not *notifier)
+void extcss3_release_signals_list(extcss3_not *notifier)
 {
 	extcss3_sig *next, *list = notifier->base;
 
@@ -380,11 +395,11 @@ void extcss3_release_signals_list(mpz_pool_t *pool, extcss3_not *notifier)
 
 	while (list->next != NULL) {
 		next = list->next->next;
-		extcss3_release_signal(pool, notifier, list->next);
+		extcss3_release_signal(notifier, list->next);
 		list->next = next;
 	}
 
-	extcss3_release_signal(pool, notifier, list);
+	extcss3_release_signal(notifier, list);
 }
 
 /* ==================================================================================================== */
@@ -447,7 +462,7 @@ bool extcss3_set_notifier(extcss3_intern *intern, unsigned int type, void *calla
 		return EXTCSS3_FAILURE;
 	}
 
-	if ((sig = extcss3_create_signal(intern->pool)) == NULL) {
+	if ((sig = extcss3_create_signal()) == NULL) {
 		*error = EXTCSS3_ERR_MEMORY;
 
 		return EXTCSS3_FAILURE;

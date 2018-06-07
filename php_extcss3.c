@@ -358,6 +358,8 @@ PHP_METHOD(CSS3Processor, dump)
 		php_extcss3_throw_exception(EXTCSS3_ERR_NULL_PTR);
 	} else if (!len) {
 		RETURN_EMPTY_STRING();
+	} else if (NULL == extcss3_reset_intern(intern, &error)) {
+		php_extcss3_throw_exception(error);
 	} else if (EXTCSS3_SUCCESS != extcss3_set_css_string(intern, css, len, &error)) {
 		php_extcss3_throw_exception(error);
 	} else if ((result = extcss3_dump_tokens(intern, &error)) == NULL) {
@@ -384,6 +386,8 @@ PHP_METHOD(CSS3Processor, minify)
 		return;
 	} else if (!len) {
 		RETURN_EMPTY_STRING();
+	} else if (NULL == extcss3_reset_intern(intern, &error)) {
+		php_extcss3_throw_exception(error);
 	} else if (EXTCSS3_SUCCESS != extcss3_set_css_string(intern, css, len, &error)) {
 		php_extcss3_throw_exception(error);
 		return;
