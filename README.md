@@ -39,6 +39,22 @@ the system time to over 45 %.
   or 'xxx') as given in the original CSS string.
 * The code compiles and runs on Linux systems. Other platforms have not been tested.
 
+## Installation
+
+To build the `php-ext-css` MPZ edition extension run:
+
+```bash
+phpize
+./configure
+make
+```
+
+and finally install it via:
+
+```bash
+make install
+```
+
 ## PHP Class (`CSS3Processor`)
 
 ### CSS3Processor::__construct()
