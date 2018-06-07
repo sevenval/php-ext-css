@@ -52,33 +52,43 @@
 
 #endif /* MPZ_RAISE_SIGSEGV_ON_MEM_ERRORS */
 
+#if defined (__cplusplus) || defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L /* C99 */
+#	ifdef __GNUC__
+#		define MPZ_FORCE_INLINE static inline __attribute__((always_inline))
+#	else
+#		define MPZ_FORCE_INLINE static inline
+#	endif /* __GNUC__ */
+#else
+#	define MPZ_FORCE_INLINE static
+#endif /* __STDC_VERSION__ */
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-static inline mpz_void_t _mpz_pool_gc(
+MPZ_FORCE_INLINE mpz_void_t _mpz_pool_gc(
 	mpz_pool_t *pool, mpz_cuint_t soft
 );
 
-static inline mpz_void_t *_mpz_palloc(
+MPZ_FORCE_INLINE mpz_void_t *_mpz_palloc(
 	mpz_pool_t *pool, mpz_size_t size, mpz_cuint_t zeroize
 );
 
-static inline mpz_void_t *_mpz_slab_create(
+MPZ_FORCE_INLINE mpz_void_t *_mpz_slab_create(
 	mpz_pool_t *pool, mpz_csize_t size
 );
 
-static inline mpz_void_t _mpz_slab_init(
+MPZ_FORCE_INLINE mpz_void_t _mpz_slab_init(
 	mpz_pool_t *pool, mpz_slab_t *slab, mpz_cuint32_t size
 );
 
-static inline mpz_void_t _mpz_slab_push(
+MPZ_FORCE_INLINE mpz_void_t _mpz_slab_push(
 	mpz_pool_t *pool, mpz_slab_t *slab
 );
 
-static inline mpz_void_t _mpz_slab_free(
+MPZ_FORCE_INLINE mpz_void_t _mpz_slab_free(
 	mpz_pool_t *pool, mpz_slot_t *slot
 );
 
-static inline mpz_void_t _mpz_slot_init(
+MPZ_FORCE_INLINE mpz_void_t _mpz_slot_init(
 	mpz_slot_t *slot, mpz_cuint32_t size, mpz_cuint32_t flags
 );
 
@@ -178,7 +188,7 @@ mpz_void_t mpz_free(
 /* ==================================================================================================== */
 /* PRIVATE STUFF: DEFINITIONS */
 
-static inline mpz_void_t _mpz_pool_gc(
+MPZ_FORCE_INLINE mpz_void_t _mpz_pool_gc(
 	mpz_pool_t *pool, mpz_cuint_t soft
 ) {
 	mpz_slab_t *slab, *next;
@@ -221,7 +231,7 @@ static inline mpz_void_t _mpz_pool_gc(
 	}
 }
 
-static inline mpz_void_t *_mpz_palloc(
+MPZ_FORCE_INLINE mpz_void_t *_mpz_palloc(
 	mpz_pool_t *pool, mpz_size_t size, mpz_cuint_t zeroize
 ) {
 	mpz_slab_t *slab;
@@ -279,7 +289,7 @@ static inline mpz_void_t *_mpz_palloc(
 	return MPZ_SLOT_TO_DATA(slot);
 }
 
-static inline mpz_void_t *_mpz_slab_create(
+MPZ_FORCE_INLINE mpz_void_t *_mpz_slab_create(
 	mpz_pool_t *pool, mpz_csize_t size
 ) {
 	mpz_slab_t *slab;
@@ -291,7 +301,7 @@ static inline mpz_void_t *_mpz_slab_create(
 	return slab;
 }
 
-static inline mpz_void_t _mpz_slab_init(
+MPZ_FORCE_INLINE mpz_void_t _mpz_slab_init(
 	mpz_pool_t *pool, mpz_slab_t *slab, mpz_cuint32_t size
 ) {
 	mpz_slot_t *slot = MPZ_SLAB_TO_SLOT(slab);
@@ -324,7 +334,7 @@ static inline mpz_void_t _mpz_slab_init(
 	}
 }
 
-static inline mpz_void_t _mpz_slab_push(
+MPZ_FORCE_INLINE mpz_void_t _mpz_slab_push(
 	mpz_pool_t *pool, mpz_slab_t *slab
 ) {
 	slab->prev = NULL;
@@ -337,7 +347,7 @@ static inline mpz_void_t _mpz_slab_push(
 	pool->slabs = slab;
 }
 
-static inline mpz_void_t _mpz_slab_free(
+MPZ_FORCE_INLINE mpz_void_t _mpz_slab_free(
 	mpz_pool_t *pool, mpz_slot_t *slot
 ) {
 	mpz_slab_t *slab = MPZ_SLOT_TO_SLAB(slot);
@@ -360,7 +370,7 @@ static inline mpz_void_t _mpz_slab_free(
 	free(slab);
 }
 
-static inline mpz_void_t _mpz_slot_init(
+MPZ_FORCE_INLINE mpz_void_t _mpz_slot_init(
 	mpz_slot_t *slot, mpz_cuint32_t size, mpz_cuint32_t flags
 ) {
 	/**
