@@ -12,8 +12,8 @@ API that can be used to analyse, augment or correct the style sheet while it is
 being processed.
 
 The MPZ edition uses the [Memory-Pool-Z](https://alex-schneider.github.io/mpz/)
-to increase the real processing speed of `php-ext-css` to over 30 % while reducing
-the system time to over 45 %.
+to increase the real processing speed of `php-ext-css` to over 35 % while reducing
+the user time to over 40% and system time to over 10 %.
 
 ## Library Features
 
