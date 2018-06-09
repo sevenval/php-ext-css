@@ -20,6 +20,7 @@ extcss3_intern *extcss3_reset_intern(extcss3_intern *intern, unsigned int *error
 	}
 
 	intern->copy.str    = NULL;
+	intern->base_token  = NULL;
 	intern->base_vendor = NULL;
 
 	return intern;
