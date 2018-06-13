@@ -109,8 +109,8 @@ public CSS3Processor::setModifier(int $type, callable $callback) : bool
 public CSS3Processor::dump(string $css) : string
 ```
 
-* Applies preprocessing and the registered modifiers to `$css` and returns the
-  resulting string.
+* Applies preprocessing, the registered notifiers and modifiers to `$css` and returns
+  the resulting string.
 * Throws exceptions on errors.
 
 ### CSS3Processor::minify()
@@ -119,8 +119,8 @@ public CSS3Processor::dump(string $css) : string
 public CSS3Processor::minify(string $css [, array $vendors ]) : string
 ```
 
-* Returns the minimized result string considering the registered modifiers and the
-  blacklist of vendor prefixes given in the `$vendors` array.
+* Returns the minimized result string considering the registered notifiers, modifiers
+  and the blacklist of vendor prefixes given in the `$vendors` array.
 * Throws exceptions on errors.
 
 ## PHP Class Constants
