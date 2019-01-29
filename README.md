@@ -20,7 +20,7 @@ the user time to over 40% and system time to over 10 %.
 * Written in pure C99.
 * Doesn't require any external libraries.
 * Implements an intervention API.
-* PHP 7, PHP 7.1 and PHP 7.2 ready.
+* PHP 7, PHP 7.1, PHP 7.2 and PHP 7.3 ready.
 
 ## Minifying Features
 
