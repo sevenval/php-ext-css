@@ -9,18 +9,18 @@
 
 /* ==================================================================================================== */
 
-#define _EXTCSS3_NEXT(intern, error) do {				\
-	bool result = _extcss3_next_char(intern, error);	\
-	if (EXTCSS3_SUCCESS != result) {					\
-		return EXTCSS3_FAILURE;							\
-	}													\
+#define _EXTCSS3_NEXT(intern, error) do {              \
+	bool result = _extcss3_next_char(intern, error);   \
+	if (EXTCSS3_SUCCESS != result) {                   \
+		return EXTCSS3_FAILURE;                        \
+	}                                                  \
 } while (0)
 
-#define _EXTCSS3_FILL_FIXED_TOKEN(intern, token, type, chars, error) do {		\
-	bool result = _extcss3_fill_fixed_token(intern, token, type, chars, error);	\
-	if (EXTCSS3_SUCCESS != result) {											\
-		return _extcss3_cleanup_tokenizer(*error, intern, true, true);			\
-	}																			\
+#define _EXTCSS3_FILL_FIXED_TOKEN(intern, token, type, chars, error) do {         \
+	bool result = _extcss3_fill_fixed_token(intern, token, type, chars, error);   \
+	if (EXTCSS3_SUCCESS != result) {                                              \
+		return _extcss3_cleanup_tokenizer(*error, intern, true, true);            \
+	}                                                                             \
 } while (0)
 
 /* ==================================================================================================== */
@@ -66,11 +66,11 @@ bool extcss3_tokenize(extcss3_intern *intern, unsigned int *error)
 
 	if ((intern == NULL) || (intern->copy.str == NULL)) {
 		return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_NULL_PTR, NULL, false, false);
-	} else if ((intern->base_token = token = extcss3_create_token()) == NULL) {
+	} else if ((intern->base_token = token = extcss3_create_token(intern->pool)) == NULL) {
 		return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_MEMORY, NULL, false, false);
 	} else if (
-		EXTCSS3_HAS_MODIFIER(intern) &&
-		((intern->base_ctxt = intern->last_ctxt = extcss3_create_ctxt()) == NULL)
+		((intern->notifier.base != NULL) || EXTCSS3_HAS_MODIFIER(intern)) &&
+		((intern->base_ctxt = intern->last_ctxt = extcss3_create_ctxt(intern->pool)) == NULL)
 	) {
 		return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_MEMORY, intern, true, false);
 	}
@@ -352,7 +352,7 @@ bool extcss3_tokenize(extcss3_intern *intern, unsigned int *error)
 
 		if (token->type == EXTCSS3_TYPE_EOF) {
 			break;
-		} else if ((token = extcss3_create_token()) == NULL) {
+		} else if ((token = extcss3_create_token(intern->pool)) == NULL) {
 			return _extcss3_cleanup_tokenizer(*error = EXTCSS3_ERR_MEMORY, intern, true, true);
 		}
 	}
@@ -369,12 +369,12 @@ static inline bool _extcss3_cleanup_tokenizer(unsigned int error, extcss3_intern
 {
 	if (intern != NULL) {
 		if (token && (intern->base_token != NULL)) {
-			extcss3_release_tokens_list(intern->base_token);
+			extcss3_release_tokens_list(intern->pool, intern->base_token);
 			intern->base_token = NULL;
 		}
 
 		if (ctxt && (intern->base_ctxt != NULL)) {
-			extcss3_release_ctxts_list(intern->base_ctxt);
+			extcss3_release_ctxts_list(intern->pool, intern->base_ctxt);
 			intern->base_ctxt = NULL;
 		}
 	}
@@ -396,6 +396,7 @@ static inline bool _extcss3_next_char(extcss3_intern *intern, unsigned int *erro
 static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
 	extcss3_token *prev;
+	extcss3_sig   *sig;
 
 	if ((token->prev = intern->last_token) != NULL) {
 		intern->last_token->next = token;
@@ -431,6 +432,24 @@ static inline bool _extcss3_token_add(extcss3_intern *intern, extcss3_token *tok
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	if (intern->base_ctxt != NULL) {
+		/* Calling notifier(s) */
+		if (((sig = intern->notifier.base) != NULL) && (intern->notifier.callback != NULL)) {
+			while (sig != NULL) {
+				if (sig->type == token->type) {
+					intern->notifier.callback(intern, sig);
+
+					if ((token->user.str != NULL) || (token->user.len != 0)) {
+						*error = EXTCSS3_ERR_INV_VALUE;
+
+						return EXTCSS3_FAILURE;
+					}
+				}
+
+				sig = sig->next;
+			}
+		}
+
+		/* Calling modifier */
 		if (EXTCSS3_TYPE_IS_MODIFIABLE(token->type) && (intern->modifier.callback != NULL)) {
 			intern->modifier.callback(intern);
 
@@ -631,6 +650,8 @@ static inline bool _extcss3_fill_unicode_range_token(extcss3_intern *intern, ext
  */
 static inline bool _extcss3_fill_ident_like_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
+	char u = 'u', r = 'r', l = 'l';
+
 	token->data.str = intern->state.reader;
 
 	if (EXTCSS3_SUCCESS != _extcss3_consume_name(intern, error)) {
@@ -640,9 +661,9 @@ static inline bool _extcss3_fill_ident_like_token(extcss3_intern *intern, extcss
 	if (*intern->state.reader == '(') {
 		if (
 			((intern->state.reader - token->data.str) == 3) &&
-			EXTCSS3_CHARS_EQ(token->data.str[0], 'u') &&
-			EXTCSS3_CHARS_EQ(token->data.str[1], 'r') &&
-			EXTCSS3_CHARS_EQ(token->data.str[2], 'l')
+			EXTCSS3_CHARS_EQ(token->data.str[0], u) &&
+			EXTCSS3_CHARS_EQ(token->data.str[1], r) &&
+			EXTCSS3_CHARS_EQ(token->data.str[2], l)
 		) {
 			return _extcss3_fill_url_token(intern, token, error);
 		} else {
@@ -841,6 +862,8 @@ static inline bool _extcss3_fill_string_token(extcss3_intern *intern, extcss3_to
  */
 static inline bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_token *token, unsigned int *error)
 {
+	char e = 'e';
+
 	token->flag = EXTCSS3_FLAG_INTEGER;
 	token->data.str = intern->state.reader;
 
@@ -862,7 +885,7 @@ static inline bool _extcss3_fill_number_token(extcss3_intern *intern, extcss3_to
 		}
 	}
 
-	if (EXTCSS3_CHARS_EQ(*intern->state.reader, 'e')) {
+	if (EXTCSS3_CHARS_EQ(*intern->state.reader, e)) {
 		if (EXTCSS3_IS_DIGIT(intern->state.reader[1])) {
 			_EXTCSS3_NEXT(intern, error);
 

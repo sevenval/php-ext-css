@@ -1,7 +1,0 @@
-To build and install the extcss3 run:
-	phpize
-	./configure
-	make
-
-And finally install it via:
-	make install

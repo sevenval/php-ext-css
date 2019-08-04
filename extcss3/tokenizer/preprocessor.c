@@ -10,7 +10,8 @@
  */
 static inline bool _extcss3_check_bytes_corruption(extcss3_intern *intern, unsigned int *error)
 {
-	unsigned int i, j;
+	int i;
+	unsigned int j;
 
 	if (EXTCSS3_IS_NON_ASCII(*intern->state.cursor)) {
 		i = 7;

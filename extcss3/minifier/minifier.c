@@ -23,13 +23,13 @@ static extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, extcss3
 
 static extcss3_token *_extcss3_get_decl_name(extcss3_decl *decl);
 static extcss3_token *_extcss3_get_decl_sep(extcss3_token *name, extcss3_decl *decl);
-static extcss3_token *_extcss3_get_decl_value(extcss3_token *last, extcss3_decl *decl);
+static extcss3_token *_extcss3_get_decl_value(extcss3_intern *intern, extcss3_token *last, extcss3_decl *decl);
 
-static void _extcss3_trim_left(extcss3_token *curr);
-static void _extcss3_trim_right(extcss3_token *curr, extcss3_token **last);
-static void _extcss3_trim_around(extcss3_token *curr, extcss3_token **last);
+static void _extcss3_trim_left(extcss3_intern *intern, extcss3_token *curr);
+static void _extcss3_trim_right(extcss3_intern *intern, extcss3_token *curr, extcss3_token **last);
+static void _extcss3_trim_around(extcss3_intern *intern, extcss3_token *curr, extcss3_token **last);
 
-static void _extcss3_remove_token(extcss3_token **base, extcss3_token **token, extcss3_token *repl);
+static void _extcss3_remove_token(extcss3_intern *intern, extcss3_token **base, extcss3_token **token, extcss3_token *repl);
 
 static bool _extcss3_check_at_rule_is_valid_charset(extcss3_intern *intern, extcss3_rule *rule);
 static bool _extcss3_check_at_rule_is_valid_import(extcss3_rule *rule);
@@ -53,7 +53,7 @@ char *extcss3_minify(extcss3_intern *intern, unsigned int *error)
 		return _extcss3_set_error_code(error, *error, NULL, NULL);
 	} else if ((token = intern->base_token) == NULL) {
 		return _extcss3_set_error_code(error, EXTCSS3_ERR_NULL_PTR, NULL, NULL);
-	} else if ((tree = extcss3_create_tree(&token, NULL, 0, error)) == NULL) {
+	} else if ((tree = extcss3_create_tree(intern, &token, NULL, 0, error)) == NULL) {
 		return _extcss3_set_error_code(error, *error, NULL, intern);
 	} else if (tree->base_selector == NULL) {
 		return _extcss3_set_error_code(error, EXTCSS3_ERR_NULL_PTR, tree, intern);
@@ -73,8 +73,6 @@ char *extcss3_minify(extcss3_intern *intern, unsigned int *error)
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	_extcss3_set_error_code(error, 0, tree, intern);
-
 	return result;
 }
 
@@ -85,11 +83,11 @@ static inline void *_extcss3_set_error_code(unsigned int *error, unsigned int co
 	*error = code;
 
 	if (tree != NULL) {
-		extcss3_release_rules_list(tree);
+		extcss3_release_rules_list(intern->pool, tree);
 	}
 
 	if ((intern != NULL) && (intern->base_token != NULL)) {
-		extcss3_release_tokens_list(intern->base_token);
+		extcss3_release_tokens_list(intern->pool, intern->base_token);
 		intern->base_token = NULL;
 	}
 
@@ -121,7 +119,7 @@ static extcss3_rule *_extcss3_minify_tree(extcss3_intern *intern, extcss3_rule *
 			}
 
 			next = curr->next;
-			extcss3_release_rule(curr);
+			extcss3_release_rule(intern->pool, curr);
 
 			curr = next;
 			continue;
@@ -131,7 +129,7 @@ static extcss3_rule *_extcss3_minify_tree(extcss3_intern *intern, extcss3_rule *
 	}
 
 	if ((*tree)->base_selector == NULL) {
-		extcss3_release_rules_list(*tree);
+		extcss3_release_rules_list(intern->pool, *tree);
 
 		*tree = NULL;
 	}
@@ -226,45 +224,45 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 	while (selector != NULL) {
 		// Remove whitespace and comments after...
 		if (
-			(selector->type == EXTCSS3_TYPE_BR_SO)		||
-			(selector->type == EXTCSS3_TYPE_BR_RO)		||
-			(selector->type == EXTCSS3_TYPE_COLON)		||
-			(selector->type == EXTCSS3_TYPE_FUNCTION)	||
+			(selector->type == EXTCSS3_TYPE_BR_SO)    ||
+			(selector->type == EXTCSS3_TYPE_BR_RO)    ||
+			(selector->type == EXTCSS3_TYPE_COLON)    ||
+			(selector->type == EXTCSS3_TYPE_FUNCTION) ||
 			(selector->type == EXTCSS3_TYPE_STRING)
 		) {
-			_extcss3_trim_right(selector, &rule->last_selector);
+			_extcss3_trim_right(intern, selector, &rule->last_selector);
 		}
 
 		// Remove whitespace and comments before...
 		if (
-			(selector->type == EXTCSS3_TYPE_BR_SC)		||
-			(selector->type == EXTCSS3_TYPE_BR_RC)		||
-			(selector->type == EXTCSS3_TYPE_BAD_STRING)	||
+			(selector->type == EXTCSS3_TYPE_BR_SC)      ||
+			(selector->type == EXTCSS3_TYPE_BR_RC)      ||
+			(selector->type == EXTCSS3_TYPE_BAD_STRING) ||
 			(
 				(selector->type == EXTCSS3_TYPE_STRING) &&
 				(EXTCSS3_SUCCESS != _extcss3_check_at_rule_is_valid_charset(intern, rule))
 			) ||
 			(
-				(selector->type == EXTCSS3_TYPE_BR_RO) &&
-				(selector->prev != NULL) &&
-				(selector->prev->prev != NULL) &&
+				(selector->type == EXTCSS3_TYPE_BR_RO)   &&
+				(selector->prev != NULL)                 &&
+				(selector->prev->prev != NULL)           &&
 				(_EXTCSS3_TYPE_EMPTY_EX(selector->prev)) &&
 				(selector->prev->prev->type != EXTCSS3_TYPE_IDENT)
 			)
 		) {
-			_extcss3_trim_left(selector);
+			_extcss3_trim_left(intern, selector);
 		}
 
 		// Remove whitespace and comments around...
 		if (
-			(selector->flag == EXTCSS3_FLAG_AT_URL_STRING)	||
-			(selector->type == EXTCSS3_TYPE_COMMA)			||
-			(selector->type == EXTCSS3_TYPE_SUFFIX_MATCH)	||
-			(selector->type == EXTCSS3_TYPE_SUBSTR_MATCH)	||
-			(selector->type == EXTCSS3_TYPE_PREFIX_MATCH)	||
-			(selector->type == EXTCSS3_TYPE_DASH_MATCH)		||
-			(selector->type == EXTCSS3_TYPE_INCLUDE_MATCH)	||
-			(selector->type == EXTCSS3_TYPE_COLUMN)			||
+			(selector->flag == EXTCSS3_FLAG_AT_URL_STRING) ||
+			(selector->type == EXTCSS3_TYPE_COMMA)         ||
+			(selector->type == EXTCSS3_TYPE_SUFFIX_MATCH)  ||
+			(selector->type == EXTCSS3_TYPE_SUBSTR_MATCH)  ||
+			(selector->type == EXTCSS3_TYPE_PREFIX_MATCH)  ||
+			(selector->type == EXTCSS3_TYPE_DASH_MATCH)    ||
+			(selector->type == EXTCSS3_TYPE_INCLUDE_MATCH) ||
+			(selector->type == EXTCSS3_TYPE_COLUMN)        ||
 			(
 				(selector->type == EXTCSS3_TYPE_DELIM) &&
 				(
@@ -275,32 +273,32 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 				)
 			) ||
 			(
-				(selector->type == EXTCSS3_TYPE_BR_RC) &&
-				(rule->base_selector->type == EXTCSS3_TYPE_AT_KEYWORD) &&
+				(selector->type == EXTCSS3_TYPE_BR_RC)                    &&
+				(rule->base_selector->type == EXTCSS3_TYPE_AT_KEYWORD)    &&
 				(rule->base_selector->data.len == 6 /*strlen("@media")*/) &&
 				(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(rule->base_selector->data.str, "@media", 6))
 			)
 		) {
-			_extcss3_trim_around(selector, &rule->last_selector);
+			_extcss3_trim_around(intern, selector, &rule->last_selector);
 		}
 
 		if (selector->type == EXTCSS3_TYPE_COMMENT) {
 			if ((selector->prev != NULL) && (selector->prev->type == EXTCSS3_TYPE_WS)) {
 				if ((selector->next != NULL) && (selector->next->type == EXTCSS3_TYPE_WS)) {
-					_extcss3_trim_right(selector, &rule->last_selector);
+					_extcss3_trim_right(intern, selector, &rule->last_selector);
 				}
 			}
 
 			if (selector->user.str == NULL) {
-				_extcss3_remove_token(&rule->base_selector, &selector, selector->next);
+				_extcss3_remove_token(intern, &rule->base_selector, &selector, selector->next);
 				continue;
 			}
 		}
 
 		if (
-			(selector->type == EXTCSS3_TYPE_BR_SC)	&&
-			(selector->prev != NULL)				&&
-			(selector->prev->user.str == NULL)		&&
+			(selector->type == EXTCSS3_TYPE_BR_SC) &&
+			(selector->prev != NULL)               &&
+			(selector->prev->user.str == NULL)     &&
 			(selector->prev->type == EXTCSS3_TYPE_STRING)
 		) {
 			size_t i = 1, n = selector->prev->data.len - 1;
@@ -327,12 +325,12 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 		}
 
 		if (
-			(selector->type == EXTCSS3_TYPE_NUMBER)		||
-			(selector->type == EXTCSS3_TYPE_PERCENTAGE)	||
+			(selector->type == EXTCSS3_TYPE_NUMBER)     ||
+			(selector->type == EXTCSS3_TYPE_PERCENTAGE) ||
 			(selector->type == EXTCSS3_TYPE_DIMENSION)
 		) {
 			if (
-				(selector->prev != NULL) &&
+				(selector->prev != NULL)                     &&
 				(selector->prev->type == EXTCSS3_TYPE_IDENT) &&
 				(
 					(
@@ -348,9 +346,9 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 			) {
 				preserve_sign = true;
 			} else if (
-				(selector->prev != NULL) &&
+				(selector->prev != NULL)                         &&
 				(selector->prev->type == EXTCSS3_TYPE_DIMENSION) &&
-				(selector->prev->info.len == 1) &&
+				(selector->prev->info.len == 1)                  &&
 				(selector->prev->info.str[0] == 'n')
 			) {
 				preserve_sign = true;
@@ -358,12 +356,8 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 				preserve_sign = false;
 			}
 
-			if (selector->type == EXTCSS3_TYPE_PERCENTAGE && rule->base_selector == selector && rule->last_selector == selector) {
-				// Do nothing
-			} else {
-				if (EXTCSS3_SUCCESS != extcss3_minify_numeric(selector, preserve_sign, error)) {
-					return NULL;
-				}
+			if (EXTCSS3_SUCCESS != extcss3_minify_numeric(intern, selector, preserve_sign, false, error)) {
+				return NULL;
 			}
 		}
 
@@ -371,8 +365,8 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 			if ((vendor = intern->base_vendor) != NULL) {
 				while (vendor != NULL) {
 					if (
-						(selector->data.len > vendor->name.len)				&&
-						(selector->data.str[vendor->name.len + 1] == '-')	&&
+						(selector->data.len > vendor->name.len)           &&
+						(selector->data.str[vendor->name.len + 1] == '-') &&
 						(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(selector->data.str + 2, vendor->name.str + 1, vendor->name.len - 1))
 					) {
 						return rule->base_selector = rule->last_selector = NULL;
@@ -382,18 +376,18 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 				}
 			}
 		} else if (
-			(selector->type == EXTCSS3_TYPE_COLON)				&&
-			(selector->prev != NULL)							&&
-			(selector->prev->type == EXTCSS3_TYPE_COLON)		&&
-			(selector->next != NULL)							&&
-			(selector->next->type == EXTCSS3_TYPE_IDENT)		&&
+			(selector->type == EXTCSS3_TYPE_COLON)       &&
+			(selector->prev != NULL)                     &&
+			(selector->prev->type == EXTCSS3_TYPE_COLON) &&
+			(selector->next != NULL)                     &&
+			(selector->next->type == EXTCSS3_TYPE_IDENT) &&
 			(selector->next->data.str[0] == '-')
 		) {
 			if ((vendor = intern->base_vendor) != NULL) {
 				while (vendor != NULL) {
 					if (
-						(selector->next->data.len > vendor->name.len)		&&
-						(selector->next->data.str[vendor->name.len] == '-')	&&
+						(selector->next->data.len > vendor->name.len)       &&
+						(selector->next->data.str[vendor->name.len] == '-') &&
 						(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(selector->next->data.str + 1, vendor->name.str + 1, vendor->name.len - 1))
 					) {
 						range_base = range_last = selector;
@@ -412,7 +406,7 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 							if (selector == rule->last_selector) {
 								break;
 							} else if (selector->type == EXTCSS3_TYPE_COMMA) {
-								_extcss3_trim_around(selector, &rule->last_selector);
+								_extcss3_trim_around(intern, selector, &rule->last_selector);
 								break;
 							}
 
@@ -445,15 +439,15 @@ static inline extcss3_token *_extcss3_minify_selectors(extcss3_intern *intern, e
 							}
 
 							while ((range_base != NULL) && (range_base != range_last)) {
-								_extcss3_remove_token(&rule->base_selector, &range_base, range_base->next);
+								_extcss3_remove_token(intern, &rule->base_selector, &range_base, range_base->next);
 
 								selector = range_base;
 							}
 
 							if ((range_base != NULL) && (range_base == range_last)) {
-								_extcss3_remove_token(&rule->base_selector, &range_base, NULL);
-
 								selector = range_last->next;
+
+								_extcss3_remove_token(intern, &rule->base_selector, &range_base, NULL);
 							}
 						}
 
@@ -490,7 +484,7 @@ static inline extcss3_block *_extcss3_minify_declarations(extcss3_intern *intern
 	while (curr != NULL) {
 		if (_extcss3_minify_declaration(intern, curr, error) == NULL) {
 			if (*error > 0) {
-				extcss3_release_block(block);
+				extcss3_release_block(intern->pool, block);
 				return NULL;
 			}
 
@@ -511,7 +505,7 @@ static inline extcss3_block *_extcss3_minify_declarations(extcss3_intern *intern
 			}
 
 			temp = curr->next;
-			extcss3_release_decl(curr);
+			extcss3_release_decl(intern->pool, curr);
 			curr = temp;
 
 			continue;
@@ -523,7 +517,7 @@ static inline extcss3_block *_extcss3_minify_declarations(extcss3_intern *intern
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	if (block->decls == NULL) {
-		extcss3_release_block(block);
+		extcss3_release_block(intern->pool, block);
 		return NULL;
 	}
 
@@ -534,20 +528,21 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 {
 	extcss3_token *name = NULL, *sep = NULL, *value = NULL, *temp;
 	extcss3_vendor *vendor;
+	int preserve_dimension = 0;
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	name = _extcss3_get_decl_name(decl);
 
 	if (name != NULL) {
-		_extcss3_trim_around(name, &decl->last);
+		_extcss3_trim_around(intern, name, &decl->last);
 
 		sep = _extcss3_get_decl_sep(name, decl);
 
 		if (sep != NULL) {
-			_extcss3_trim_around(sep, &decl->last);
+			_extcss3_trim_around(intern, sep, &decl->last);
 
-			value = _extcss3_get_decl_value(sep, decl);
+			value = _extcss3_get_decl_value(intern, sep, decl);
 		}
 	}
 
@@ -565,8 +560,8 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 		if ((vendor = intern->base_vendor) != NULL) {
 			while (vendor != NULL) {
 				if (
-					(name->data.len > vendor->name.len)			&&
-					(name->data.str[vendor->name.len] == '-')	&&
+					(name->data.len > vendor->name.len)       &&
+					(name->data.str[vendor->name.len] == '-') &&
 					(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + 1, vendor->name.str + 1, vendor->name.len - 1))
 				) {
 					return NULL;
@@ -596,12 +591,22 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 			return NULL;
 		}
 
+		// Handle round braces while processing "calc()" function
+		if (preserve_dimension) {
+			if (value->type == EXTCSS3_TYPE_BR_RO) {
+				preserve_dimension++;
+			} else if (value->type == EXTCSS3_TYPE_BR_RC) {
+				preserve_dimension--;
+			}
+		}
+
 		// Remove whitespace and comments after...
 		if (
 			(value->type == EXTCSS3_TYPE_FUNCTION) ||
-			(value->type == EXTCSS3_TYPE_BR_RO)
+			(value->type == EXTCSS3_TYPE_BR_RO)    ||
+			(value->type == EXTCSS3_TYPE_STRING)
 		) {
-			_extcss3_trim_right(value, &decl->last);
+			_extcss3_trim_right(intern, value, &decl->last);
 		}
 
 		// Remove whitespace and comments before...
@@ -609,7 +614,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 			(value->type == EXTCSS3_TYPE_BR_RC) ||
 			((value->type == EXTCSS3_TYPE_DELIM) && (*value->data.str == '!'))
 		) {
-			_extcss3_trim_left(value);
+			_extcss3_trim_left(intern, value);
 
 			if ((*value->data.str == '+') || (*value->data.str == '-')) {
 				temp = value->next;
@@ -619,11 +624,11 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 				}
 
 				if (
-					(temp->type != EXTCSS3_TYPE_NUMBER)		&&
-					(temp->type != EXTCSS3_TYPE_PERCENTAGE)	&&
+					(temp->type != EXTCSS3_TYPE_NUMBER)     &&
+					(temp->type != EXTCSS3_TYPE_PERCENTAGE) &&
 					(temp->type != EXTCSS3_TYPE_DIMENSION)
 				) {
-					_extcss3_trim_right(value, &decl->last);
+					_extcss3_trim_right(intern, value, &decl->last);
 					value = temp;
 					continue;
 				}
@@ -632,8 +637,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 
 		// Remove whitespace and comments around...
 		if (
-			(value->type == EXTCSS3_TYPE_COMMA) ||
-			(value->type == EXTCSS3_TYPE_STRING) ||
+			(value->type == EXTCSS3_TYPE_COMMA)     ||
 			(value->type == EXTCSS3_TYPE_SEMICOLON) ||
 			(
 				(value->type == EXTCSS3_TYPE_DELIM) &&
@@ -644,7 +648,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 				)
 			)
 		) {
-			_extcss3_trim_around(value, &decl->last);
+			_extcss3_trim_around(intern, value, &decl->last);
 		}
 
 		// Remove the trailing whitespace
@@ -652,7 +656,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 			if (value->type == EXTCSS3_TYPE_WS) {
 				decl->last = decl->last->prev;
 
-				_extcss3_trim_left(value);
+				_extcss3_trim_left(intern, value);
 			}
 		}
 
@@ -662,8 +666,8 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 			if ((vendor = intern->base_vendor) != NULL) {
 				while (vendor != NULL) {
 					if (
-						(value->data.len > vendor->name.len)		&&
-						(value->data.str[vendor->name.len] == '-')	&&
+						(value->data.len > vendor->name.len)       &&
+						(value->data.str[vendor->name.len] == '-') &&
 						(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(value->data.str + 1, vendor->name.str + 1, vendor->name.len - 1))
 					) {
 						return NULL;
@@ -677,25 +681,25 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 		if (value->user.str != NULL) {
-			value = _extcss3_get_decl_value(value, decl);
+			value = _extcss3_get_decl_value(intern, value, decl);
 			continue;
 		} else if ((decl->next == NULL) && (value->type == EXTCSS3_TYPE_SEMICOLON)) {
 			decl->last = value->prev;
 			break;
 		} else if (value->type == EXTCSS3_TYPE_HASH) {
-			if (EXTCSS3_SUCCESS != extcss3_minify_hash(value->data.str + 1, value->data.len - 1, value, error)) {
+			if (EXTCSS3_SUCCESS != extcss3_minify_hash(intern, value->data.str + 1, value->data.len - 1, value, error)) {
 				return NULL;
 			}
 		} else if (EXTCSS3_SUCCESS == _extcss3_check_minify_color(name, value)) {
-			if (EXTCSS3_SUCCESS != extcss3_minify_color(value, error)) {
+			if (EXTCSS3_SUCCESS != extcss3_minify_color(intern, value, error)) {
 				return NULL;
 			}
 		} else if (
-			(value->type == EXTCSS3_TYPE_NUMBER)		||
-			(value->type == EXTCSS3_TYPE_PERCENTAGE)	||
+			(value->type == EXTCSS3_TYPE_NUMBER)     ||
+			(value->type == EXTCSS3_TYPE_PERCENTAGE) ||
 			(value->type == EXTCSS3_TYPE_DIMENSION)
 		) {
-			if (EXTCSS3_SUCCESS != extcss3_minify_numeric(value, false, error)) {
+			if (EXTCSS3_SUCCESS != extcss3_minify_numeric(intern, value, false, (preserve_dimension > 0), error)) {
 				return NULL;
 			}
 		} else if (value->type == EXTCSS3_TYPE_FUNCTION) {
@@ -710,7 +714,7 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 				(value->data.len == 3) &&
 				(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(value->data.str, "rgb", 3))
 			) {
-				if (EXTCSS3_SUCCESS != extcss3_minify_function_rgb_a(&value, decl, error)) {
+				if (EXTCSS3_SUCCESS != extcss3_minify_function_rgb_a(intern, &value, decl, error)) {
 					return NULL;
 				}
 
@@ -720,10 +724,15 @@ static inline extcss3_decl *_extcss3_minify_declaration(extcss3_intern *intern, 
 				} else if (value->type == EXTCSS3_TYPE_BR_CC) {
 					break;
 				}
+			} else if (
+				(value->data.len == 4) &&
+				(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(value->data.str, "calc", 4))
+			) {
+				preserve_dimension = 1;
 			}
 		}
 
-		value = _extcss3_get_decl_value(value, decl);
+		value = _extcss3_get_decl_value(intern, value, decl);
 	}
 
 	return decl;
@@ -774,7 +783,7 @@ static inline extcss3_token *_extcss3_get_decl_sep(extcss3_token *name, extcss3_
 	return NULL;
 }
 
-static inline extcss3_token *_extcss3_get_decl_value(extcss3_token *last, extcss3_decl *decl)
+static inline extcss3_token *_extcss3_get_decl_value(extcss3_intern *intern, extcss3_token *last, extcss3_decl *decl)
 {
 	extcss3_token *curr = last->next, *term = decl->last->next;
 
@@ -785,7 +794,7 @@ static inline extcss3_token *_extcss3_get_decl_value(extcss3_token *last, extcss
 		} else if (curr->type == EXTCSS3_TYPE_COMMENT) {
 			if ((curr->prev != NULL) && (curr->prev->type == EXTCSS3_TYPE_WS)) {
 				if ((curr->next != NULL) && (curr->next->type == EXTCSS3_TYPE_WS)) {
-					_extcss3_trim_right(curr, &decl->last);
+					_extcss3_trim_right(intern, curr, &decl->last);
 				}
 			}
 
@@ -794,7 +803,7 @@ static inline extcss3_token *_extcss3_get_decl_value(extcss3_token *last, extcss
 					((curr->prev != NULL) && (curr->prev->type == EXTCSS3_TYPE_WS)) ||
 					((curr->next != NULL) && (curr->next->type == EXTCSS3_TYPE_WS))
 				) {
-					_extcss3_remove_token(&decl->base, &curr, curr->next);
+					_extcss3_remove_token(intern, &decl->base, &curr, curr->next);
 					continue;
 				}
 			}
@@ -808,20 +817,20 @@ static inline extcss3_token *_extcss3_get_decl_value(extcss3_token *last, extcss
 
 /* ==================================================================================================== */
 
-static inline void _extcss3_trim_left(extcss3_token *curr)
+static inline void _extcss3_trim_left(extcss3_intern *intern, extcss3_token *curr)
 {
 	extcss3_token *temp;
 
 	while ((curr->prev != NULL) && _EXTCSS3_TYPE_EMPTY_EX(curr->prev)) {
 		if ((temp = curr->prev->prev) != NULL) {
 			temp->next = curr;
-			extcss3_release_token(curr->prev);
+			extcss3_release_token(intern->pool, curr->prev);
 			curr->prev = temp;
 		}
 	}
 }
 
-static inline void _extcss3_trim_right(extcss3_token *curr, extcss3_token **last)
+static inline void _extcss3_trim_right(extcss3_intern *intern, extcss3_token *curr, extcss3_token **last)
 {
 	extcss3_token *temp;
 
@@ -832,21 +841,21 @@ static inline void _extcss3_trim_right(extcss3_token *curr, extcss3_token **last
 			}
 
 			temp->prev = curr;
-			extcss3_release_token(curr->next);
+			extcss3_release_token(intern->pool, curr->next);
 			curr->next = temp;
 		}
 	}
 }
 
-static inline void _extcss3_trim_around(extcss3_token *curr, extcss3_token **last)
+static inline void _extcss3_trim_around(extcss3_intern *intern, extcss3_token *curr, extcss3_token **last)
 {
-	_extcss3_trim_left(curr);
-	_extcss3_trim_right(curr, last);
+	_extcss3_trim_left(intern, curr);
+	_extcss3_trim_right(intern, curr, last);
 }
 
 /* ==================================================================================================== */
 
-static inline void _extcss3_remove_token(extcss3_token **base, extcss3_token **token, extcss3_token *repl)
+static inline void _extcss3_remove_token(extcss3_intern *intern, extcss3_token **base, extcss3_token **token, extcss3_token *repl)
 {
 	if ((base != NULL) && (*base == *token)) {
 		*base = (*token)->next;
@@ -861,7 +870,7 @@ static inline void _extcss3_remove_token(extcss3_token **base, extcss3_token **t
 		(*token)->prev->next = (*token)->next;
 	}
 
-	extcss3_release_token(*token);
+	extcss3_release_token(intern->pool, *token);
 
 	*token = repl;
 }
@@ -871,18 +880,18 @@ static inline void _extcss3_remove_token(extcss3_token **base, extcss3_token **t
 static inline bool _extcss3_check_at_rule_is_valid_charset(extcss3_intern *intern, extcss3_rule *rule)
 {
 	if (
-		(rule->level == 0)														&&
-		(rule->base_selector->data.len == 8 /* strlen("@charset") */)			&&
-		(rule->base_selector->next)												&&
-		(rule->base_selector->next->type == EXTCSS3_TYPE_WS)					&&
-		(rule->base_selector->next->data.len == 1)								&&
-		(rule->base_selector->next->data.str[0] == ' ')							&&
-		(rule->base_selector->next->next)										&&
-		(rule->base_selector->next->next->type == EXTCSS3_TYPE_STRING)			&&
-		(rule->base_selector->next->next->data.str[0] == '"')					&&
-		(rule->base_selector->next->next->next)									&&
-		(rule->base_selector->next->next->next->type == EXTCSS3_TYPE_SEMICOLON)	&&
-		(rule->base_selector->data.str == intern->copy.str)						&&
+		(rule->level == 0)                                                      &&
+		(rule->base_selector->data.len == 8 /* strlen("@charset") */)           &&
+		(rule->base_selector->next)                                             &&
+		(rule->base_selector->next->type == EXTCSS3_TYPE_WS)                    &&
+		(rule->base_selector->next->data.len == 1)                              &&
+		(rule->base_selector->next->data.str[0] == ' ')                         &&
+		(rule->base_selector->next->next)                                       &&
+		(rule->base_selector->next->next->type == EXTCSS3_TYPE_STRING)          &&
+		(rule->base_selector->next->next->data.str[0] == '"')                   &&
+		(rule->base_selector->next->next->next)                                 &&
+		(rule->base_selector->next->next->next->type == EXTCSS3_TYPE_SEMICOLON) &&
+		(rule->base_selector->data.str == intern->copy.str)                     &&
 		(memcmp(rule->base_selector->data.str, "@charset", 8) == 0)
 	) {
 		return EXTCSS3_SUCCESS;
@@ -975,10 +984,10 @@ static inline bool _extcss3_check_at_rule_is_valid_namespace(extcss3_rule *rule)
 static inline bool _extcss3_check_minify_color(extcss3_token *name, extcss3_token *value)
 {
 	if (
-		(name->data.len >= 10)				&&
-		(value->user.str == NULL)			&&
-		(value->type == EXTCSS3_TYPE_IDENT)	&&
-		(value->data.len > 4)				&&
+		(name->data.len >= 10)              &&
+		(value->user.str == NULL)           &&
+		(value->type == EXTCSS3_TYPE_IDENT) &&
+		(value->data.len > 4)               &&
 		(
 			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + name->data.len - 10, "background", 10)) ||
 			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + name->data.len - 10, "decoration", 10))
@@ -986,9 +995,9 @@ static inline bool _extcss3_check_minify_color(extcss3_token *name, extcss3_toke
 	) {
 		return EXTCSS3_SUCCESS;
 	} else if (
-		(name->data.len >= 6)				&&
-		(value->user.str == NULL)			&&
-		(value->type == EXTCSS3_TYPE_IDENT)	&&
+		(name->data.len >= 6)               &&
+		(value->user.str == NULL)           &&
+		(value->type == EXTCSS3_TYPE_IDENT) &&
 		(value->data.len > 4)				&&
 		(
 			(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + name->data.len - 6, "shadow", 6)) ||
@@ -997,10 +1006,10 @@ static inline bool _extcss3_check_minify_color(extcss3_token *name, extcss3_toke
 	) {
 		return EXTCSS3_SUCCESS;
 	} else if (
-		(name->data.len >= 5)				&&
-		(value->user.str == NULL)			&&
-		(value->type == EXTCSS3_TYPE_IDENT)	&&
-		(value->data.len > 4)				&&
+		(name->data.len >= 5)               &&
+		(value->user.str == NULL)           &&
+		(value->type == EXTCSS3_TYPE_IDENT) &&
+		(value->data.len > 4)               &&
 		(EXTCSS3_SUCCESS == extcss3_ascii_strncasecmp(name->data.str + name->data.len - 5, "color", 5))
 	) {
 		return EXTCSS3_SUCCESS;

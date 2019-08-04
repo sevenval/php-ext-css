@@ -55,18 +55,18 @@ static inline bool _extcss3_minify_numeric_preserve_dimension(extcss3_token *tok
 
 /* ==================================================================================================== */
 
-bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, unsigned int *error)
+bool extcss3_minify_numeric(extcss3_intern *intern, extcss3_token *token, bool preserve_sign, bool preserve_dimension, unsigned int *error)
 {
-	char *base, *last;
-	double num;
-	unsigned int val_is_signed = 0;
+	char         *base, *last;
+	double        num;
+	unsigned int  val_is_signed = 0;
 
 	if (token == NULL) {
 		*error = EXTCSS3_ERR_NULL_PTR;
 		return EXTCSS3_FAILURE;
 	} else if (
-		(token->type != EXTCSS3_TYPE_NUMBER)		&&
-		(token->type != EXTCSS3_TYPE_PERCENTAGE)	&&
+		(token->type != EXTCSS3_TYPE_NUMBER)     &&
+		(token->type != EXTCSS3_TYPE_PERCENTAGE) &&
 		(token->type != EXTCSS3_TYPE_DIMENSION)
 	) {
 		return EXTCSS3_SUCCESS;
@@ -83,7 +83,7 @@ bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, unsigned i
 			token->user.len = 1 + token->info.len;
 		}
 
-		if ((token->user.str = (char *)calloc(token->user.len + token->info.len, sizeof(char))) == NULL) {
+		if ((token->user.str = (char *)mpz_pmalloc(intern->pool, (token->user.len + token->info.len) * sizeof(char))) == NULL) {
 			*error = EXTCSS3_ERR_MEMORY;
 			return EXTCSS3_FAILURE;
 		}
@@ -137,7 +137,7 @@ bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, unsigned i
 
 		token->user.len = last - base + val_is_signed + token->info.len;
 
-		if ((token->user.str = (char *)calloc(token->user.len, sizeof(char))) == NULL) {
+		if ((token->user.str = (char *)mpz_pmalloc(intern->pool, token->user.len * sizeof(char))) == NULL) {
 			*error = EXTCSS3_ERR_MEMORY;
 			return EXTCSS3_FAILURE;
 		}
@@ -151,7 +151,11 @@ bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, unsigned i
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	if ((num != 0) || (EXTCSS3_SUCCESS == _extcss3_minify_numeric_preserve_dimension(token))) {
+	if (!preserve_dimension) {
+		preserve_dimension = (num == 0) && (token->type == EXTCSS3_TYPE_PERCENTAGE);
+	}
+
+	if (preserve_dimension || (num != 0) || (EXTCSS3_SUCCESS == _extcss3_minify_numeric_preserve_dimension(token))) {
 		memcpy(token->user.str + token->user.len - token->info.len, token->info.str, token->info.len);
 	} else if (token->user.str != NULL) {
 		token->user.len -= token->info.len;

@@ -5,15 +5,15 @@
 
 #include "extcss3/types.h"
 
-#define PHP_EXTCSS3_EXTNAME	"extcss3"
-#define PHP_EXTCSS3_EXTVER	"1.0.1"
+#define PHP_EXTCSS3_EXTNAME	"php-ext-css"
+#define PHP_EXTCSS3_EXTVER	"2.0"
 
 #ifdef HAVE_CONFIG_H
 	#include "config.h"
 #endif /* HAVE_CONFIG_H */
 
 extern zend_module_entry extcss3_module_entry;
-#define phpext_extcss3_ptr &extcss3_module_entry;
+#define phpext_extcss3_ptr &extcss3_module_entry
 
 typedef struct _extcss3_object
 {

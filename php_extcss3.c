@@ -62,6 +62,9 @@ static inline void php_extcss3_throw_exception(unsigned int error)
 		case EXTCSS3_ERR_INV_PARAM:
 			zend_throw_exception(zend_ce_exception, "extcss3: Invalid paramenter or parameter type given", EXTCSS3_ERR_INV_PARAM);
 			break;
+		case EXTCSS3_ERR_INV_VALUE:
+			zend_throw_exception(zend_ce_exception, "extcss3: Invalid, unallowed or unexpected value found", EXTCSS3_ERR_INV_VALUE);
+			break;
 		default:
 			zend_throw_exception(zend_ce_exception, "extcss3: Unknown internal error", 0);
 	}
@@ -138,6 +141,32 @@ static inline void php_extcss3_make_data_array(extcss3_intern *intern, zval *dat
 	zval_ptr_dtor(&empty);
 }
 
+static void php_extcss3_notifier_callback(extcss3_intern *intern, extcss3_sig *sig)
+{
+	zval data, retval, *args, *callable;
+
+	if ((intern == NULL) || (intern->last_token == NULL) || (sig == NULL)) {
+		return;
+	}
+
+	if ((callable = sig->callable) == NULL) {
+		return;
+	}
+
+	php_extcss3_make_data_array(intern, &data);
+
+	args = safe_emalloc(sizeof(zval), 1, 0);
+	ZVAL_COPY(&args[0], &data);
+
+	call_user_function_ex(EG(function_table), NULL, callable, &retval, 1, args, 0, NULL);
+
+	zval_ptr_dtor(&data);
+	zval_ptr_dtor(&args[0]);
+	zval_ptr_dtor(&retval);
+
+	efree(args);
+}
+
 static void php_extcss3_modifier_callback(extcss3_intern *intern)
 {
 	zval data, retval, *args, *callable = NULL;
@@ -178,9 +207,11 @@ static void php_extcss3_modifier_callback(extcss3_intern *intern)
 	if (SUCCESS == call_user_function_ex(EG(function_table), NULL, callable, &retval, 1, args, 0, NULL)) {
 		if (Z_TYPE(retval) == IS_STRING) {
 			intern->last_token->user.len = Z_STRLEN(retval);
-			intern->last_token->user.str = (char *)calloc(intern->last_token->user.len, sizeof(char));
+			intern->last_token->user.str = (char *)mpz_pmalloc(intern->pool, intern->last_token->user.len * sizeof(char));
 
-			memcpy(intern->last_token->user.str, Z_STRVAL(retval), Z_STRLEN(retval));
+			if (NULL != intern->last_token->user.str) {
+				memcpy(intern->last_token->user.str, Z_STRVAL(retval), Z_STRLEN(retval));
+			}
 		}
 	}
 
@@ -191,9 +222,9 @@ static void php_extcss3_modifier_callback(extcss3_intern *intern)
 	efree(args);
 }
 
-static void php_extcss3_modifier_destructor(void *modifier)
+static void php_extcss3_callable_destructor(void *callable)
 {
-	zval *ptr = (zval *)modifier;
+	zval *ptr = (zval *)callable;
 
 	if (ptr == NULL) {
 		return;
@@ -232,11 +263,48 @@ PHP_METHOD(CSS3Processor, __construct)
 	if (intern == NULL) {
 		php_extcss3_throw_exception(EXTCSS3_ERR_MEMORY);
 	} else {
-		intern->modifier.callback	= php_extcss3_modifier_callback;
-		intern->modifier.destructor	= php_extcss3_modifier_destructor;
+		intern->notifier.callback   = php_extcss3_notifier_callback;
+		intern->notifier.destructor = php_extcss3_callable_destructor;
+
+		intern->modifier.callback   = php_extcss3_modifier_callback;
+		intern->modifier.destructor = php_extcss3_callable_destructor;
 
 		object->intern = intern;
 	}
+}
+
+PHP_METHOD(CSS3Processor, setNotifier)
+{
+	extcss3_object *object = extcss3_object_fetch(Z_OBJ_P(getThis()));
+	extcss3_intern *intern = object->intern;
+	zval *callable, *copy;
+	size_t type;
+	unsigned int error = 0;
+
+	if (SUCCESS != zend_parse_parameters(ZEND_NUM_ARGS(), "lz", &type, &callable)) {
+		return;
+	} else if (intern == NULL) {
+		php_extcss3_throw_exception(EXTCSS3_ERR_NULL_PTR);
+		return;
+	}
+
+	copy = (zval *)ecalloc(1, sizeof(zval));
+
+	if (copy == NULL) {
+		php_extcss3_throw_exception(EXTCSS3_ERR_MEMORY);
+		return;
+	}
+
+	ZVAL_COPY(copy, callable);
+
+	if (EXTCSS3_SUCCESS != extcss3_set_notifier(intern, type, copy, &error)) {
+		intern->notifier.destructor(copy);
+
+		php_extcss3_throw_exception(error);
+		return;
+	}
+
+	RETURN_TRUE;
 }
 
 PHP_METHOD(CSS3Processor, setModifier)
@@ -290,6 +358,8 @@ PHP_METHOD(CSS3Processor, dump)
 		php_extcss3_throw_exception(EXTCSS3_ERR_NULL_PTR);
 	} else if (!len) {
 		RETURN_EMPTY_STRING();
+	} else if (NULL == extcss3_reset_intern(intern, &error)) {
+		php_extcss3_throw_exception(error);
 	} else if (EXTCSS3_SUCCESS != extcss3_set_css_string(intern, css, len, &error)) {
 		php_extcss3_throw_exception(error);
 	} else if ((result = extcss3_dump_tokens(intern, &error)) == NULL) {
@@ -316,13 +386,15 @@ PHP_METHOD(CSS3Processor, minify)
 		return;
 	} else if (!len) {
 		RETURN_EMPTY_STRING();
+	} else if (NULL == extcss3_reset_intern(intern, &error)) {
+		php_extcss3_throw_exception(error);
 	} else if (EXTCSS3_SUCCESS != extcss3_set_css_string(intern, css, len, &error)) {
 		php_extcss3_throw_exception(error);
 		return;
 	}
 
 	if ((intern->base_vendor != NULL) || (intern->last_vendor != NULL)) {
-		extcss3_release_vendors_list(intern->base_vendor);
+		extcss3_release_vendors_list(intern->pool, intern->base_vendor);
 		intern->base_vendor = intern->last_vendor = NULL;
 	}
 
@@ -333,9 +405,9 @@ PHP_METHOD(CSS3Processor, minify)
 			}
 
 			if (intern->last_vendor == NULL) {
-				intern->base_vendor = intern->last_vendor = extcss3_create_vendor();
+				intern->base_vendor = intern->last_vendor = extcss3_create_vendor(intern->pool);
 			} else {
-				intern->last_vendor->next = extcss3_create_vendor();
+				intern->last_vendor->next = extcss3_create_vendor(intern->pool);
 				intern->last_vendor = intern->last_vendor->next;
 			}
 
@@ -357,10 +429,11 @@ PHP_METHOD(CSS3Processor, minify)
 /* ==================================================================================================== */
 
 zend_function_entry extcss3_methods[] = {
-	PHP_ME(CSS3Processor, __construct, arginfo_EXTCSS3_void, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+	PHP_ME(CSS3Processor, __construct, arginfo_EXTCSS3_void,        ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+	PHP_ME(CSS3Processor, setNotifier, arginfo_EXTCSS3_setModifier, ZEND_ACC_PUBLIC)
 	PHP_ME(CSS3Processor, setModifier, arginfo_EXTCSS3_setModifier, ZEND_ACC_PUBLIC)
-	PHP_ME(CSS3Processor, dump, arginfo_EXTCSS3_dump, ZEND_ACC_PUBLIC)
-	PHP_ME(CSS3Processor, minify, arginfo_EXTCSS3_minify, ZEND_ACC_PUBLIC)
+	PHP_ME(CSS3Processor, dump,        arginfo_EXTCSS3_dump,        ZEND_ACC_PUBLIC)
+	PHP_ME(CSS3Processor, minify,      arginfo_EXTCSS3_minify,      ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -383,55 +456,56 @@ PHP_MINIT_FUNCTION(extcss3)
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_IDENT",			EXTCSS3_TYPE_IDENT);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_FUNCTION",		EXTCSS3_TYPE_FUNCTION);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_AT_KEYWORD",	EXTCSS3_TYPE_AT_KEYWORD);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_HASH",			EXTCSS3_TYPE_HASH);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_STRING",		EXTCSS3_TYPE_STRING);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BAD_STRING",	EXTCSS3_TYPE_BAD_STRING);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_URL",			EXTCSS3_TYPE_URL);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BAD_URL",		EXTCSS3_TYPE_BAD_URL);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_DELIM",			EXTCSS3_TYPE_DELIM);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_NUMBER",		EXTCSS3_TYPE_NUMBER);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_PERCENTAGE",	EXTCSS3_TYPE_PERCENTAGE);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_DIMENSION",		EXTCSS3_TYPE_DIMENSION);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_UNICODE_RANGE",	EXTCSS3_TYPE_UNICODE_RANGE);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_INCLUDE_MATCH",	EXTCSS3_TYPE_INCLUDE_MATCH);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_DASH_MATCH",	EXTCSS3_TYPE_DASH_MATCH);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_PREFIX_MATCH",	EXTCSS3_TYPE_PREFIX_MATCH);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_SUFFIX_MATCH",	EXTCSS3_TYPE_SUFFIX_MATCH);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_SUBSTR_MATCH",	EXTCSS3_TYPE_SUBSTR_MATCH);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_COLUMN",		EXTCSS3_TYPE_COLUMN);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_WS",			EXTCSS3_TYPE_WS);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_CDO",			EXTCSS3_TYPE_CDO);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_CDC",			EXTCSS3_TYPE_CDC);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_COLON",			EXTCSS3_TYPE_COLON);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_SEMICOLON",		EXTCSS3_TYPE_SEMICOLON);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_COMMA",			EXTCSS3_TYPE_COMMA);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_RO",			EXTCSS3_TYPE_BR_RO);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_RC",			EXTCSS3_TYPE_BR_RC);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_SO",			EXTCSS3_TYPE_BR_SO);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_SC",			EXTCSS3_TYPE_BR_SC);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_CO",			EXTCSS3_TYPE_BR_CO);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_CC",			EXTCSS3_TYPE_BR_CC);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_COMMENT",		EXTCSS3_TYPE_COMMENT);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_EOF",			EXTCSS3_TYPE_EOF);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_IDENT",            EXTCSS3_TYPE_IDENT);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_FUNCTION",         EXTCSS3_TYPE_FUNCTION);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_AT_KEYWORD",       EXTCSS3_TYPE_AT_KEYWORD);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_HASH",             EXTCSS3_TYPE_HASH);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_STRING",           EXTCSS3_TYPE_STRING);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BAD_STRING",       EXTCSS3_TYPE_BAD_STRING);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_URL",              EXTCSS3_TYPE_URL);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BAD_URL",          EXTCSS3_TYPE_BAD_URL);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_DELIM",            EXTCSS3_TYPE_DELIM);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_NUMBER",           EXTCSS3_TYPE_NUMBER);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_PERCENTAGE",       EXTCSS3_TYPE_PERCENTAGE);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_DIMENSION",        EXTCSS3_TYPE_DIMENSION);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_UNICODE_RANGE",    EXTCSS3_TYPE_UNICODE_RANGE);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_INCLUDE_MATCH",    EXTCSS3_TYPE_INCLUDE_MATCH);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_DASH_MATCH",       EXTCSS3_TYPE_DASH_MATCH);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_PREFIX_MATCH",     EXTCSS3_TYPE_PREFIX_MATCH);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_SUFFIX_MATCH",     EXTCSS3_TYPE_SUFFIX_MATCH);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_SUBSTR_MATCH",     EXTCSS3_TYPE_SUBSTR_MATCH);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_COLUMN",           EXTCSS3_TYPE_COLUMN);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_WS",               EXTCSS3_TYPE_WS);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_CDO",              EXTCSS3_TYPE_CDO);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_CDC",              EXTCSS3_TYPE_CDC);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_COLON",            EXTCSS3_TYPE_COLON);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_SEMICOLON",        EXTCSS3_TYPE_SEMICOLON);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_COMMA",            EXTCSS3_TYPE_COMMA);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_RO",            EXTCSS3_TYPE_BR_RO);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_RC",            EXTCSS3_TYPE_BR_RC);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_SO",            EXTCSS3_TYPE_BR_SO);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_SC",            EXTCSS3_TYPE_BR_SC);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_CO",            EXTCSS3_TYPE_BR_CO);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_BR_CC",            EXTCSS3_TYPE_BR_CC);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_COMMENT",          EXTCSS3_TYPE_COMMENT);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("TYPE_EOF",              EXTCSS3_TYPE_EOF);
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_ID",			EXTCSS3_FLAG_ID);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_UNRESTRICTED",	EXTCSS3_FLAG_UNRESTRICTED);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_INTEGER",		EXTCSS3_FLAG_INTEGER);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_NUMBER",		EXTCSS3_FLAG_NUMBER);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_STRING",		EXTCSS3_FLAG_STRING);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_AT_URL_STRING",	EXTCSS3_FLAG_AT_URL_STRING);
-	
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_ID",               EXTCSS3_FLAG_ID);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_UNRESTRICTED",     EXTCSS3_FLAG_UNRESTRICTED);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_INTEGER",          EXTCSS3_FLAG_INTEGER);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_NUMBER",           EXTCSS3_FLAG_NUMBER);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_STRING",           EXTCSS3_FLAG_STRING);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("FLAG_AT_URL_STRING",    EXTCSS3_FLAG_AT_URL_STRING);
+
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("ERR_MEMORY",				EXTCSS3_ERR_MEMORY);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("ERR_BYTES_CORRUPTION",	EXTCSS3_ERR_BYTES_CORRUPTION);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("ERR_NULL_PTR",			EXTCSS3_ERR_NULL_PTR);
-	EXTCSS3_REGISTER_LONG_CLASS_CONST("ERR_INV_PARAM",			EXTCSS3_ERR_INV_PARAM);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("ERR_MEMORY",            EXTCSS3_ERR_MEMORY);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("ERR_BYTES_CORRUPTION",  EXTCSS3_ERR_BYTES_CORRUPTION);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("ERR_NULL_PTR",          EXTCSS3_ERR_NULL_PTR);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("ERR_INV_PARAM",         EXTCSS3_ERR_INV_PARAM);
+	EXTCSS3_REGISTER_LONG_CLASS_CONST("ERR_INV_VALUE",         EXTCSS3_ERR_INV_VALUE);
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
