@@ -55,7 +55,7 @@ static inline bool _extcss3_minify_numeric_preserve_dimension(extcss3_token *tok
 
 /* ==================================================================================================== */
 
-bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, unsigned int *error)
+bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, bool preserve_dimension, unsigned int *error)
 {
 	char *base, *last;
 	double num;
@@ -151,7 +151,11 @@ bool extcss3_minify_numeric(extcss3_token *token, bool preserve_sign, unsigned i
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	if ((num != 0) || (EXTCSS3_SUCCESS == _extcss3_minify_numeric_preserve_dimension(token))) {
+	if (!preserve_dimension) {
+		preserve_dimension = (num == 0) && (token->type == EXTCSS3_TYPE_PERCENTAGE);
+	}
+
+	if (preserve_dimension || (num != 0) || (EXTCSS3_SUCCESS == _extcss3_minify_numeric_preserve_dimension(token))) {
 		memcpy(token->user.str + token->user.len - token->info.len, token->info.str, token->info.len);
 	} else if (token->user.str != NULL) {
 		token->user.len -= token->info.len;
